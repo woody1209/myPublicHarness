@@ -1,0 +1,46 @@
+﻿{
+    "generated":  "2026-10-18T11:40:02",
+    "os":  "Windows_NT 10.0.26300.0",
+    "repo_root":  "E:\\AIcherry\\C2000TI\\F280039C-harness",
+    "ccs":  {
+                "root":  "D:\\ti\\ccs2101\\ccs",
+                "version":  "21.0.1.00010"
+            },
+    "toolchain":  {
+                      "c2000":  {
+                                    "path":  "D:\\ti\\ccs2101\\ccs\\tools\\compiler\\ti-cgt-c2000_25.11.1.LTS\\bin\\cl2000.exe",
+                                    "version":  "25.11.1"
+                                }
+                  },
+    "sdk":  {
+                "c2000ware":  {
+                                  "root":  "D:\\ti\\ccs2101\\C2000Ware_26_01_00_00",
+                                  "version":  "26.01.00.00"
+                              }
+            },
+    "tools":  {
+                  "py":  "C:\\Windows\\py.exe",
+                  "xdsdfu":  "D:\\ti\\ccs2101\\ccs\\ccs_base\\common\\uscif\\xds110\\xdsdfu.exe",
+                  "sysconfig":  "D:\\ti\\ccs2101\\ccs\\utils\\sysconfig_1.28.1\\sysconfig_cli.bat",
+                  "loadti":  "D:\\ti\\ccs2101\\ccs\\ccs_base\\scripting\\examples\\loadti\\loadti.bat",
+                  "gmake":  "D:\\ti\\ccs2101\\ccs\\utils\\bin\\gmake.exe",
+                  "git":  "D:\\Program Files\\Git\\cmd\\git.exe",
+                  "sysconfig_version":  "1.28.1",
+                  "host_cc":  "msvc"
+              },
+    "probes":  [
+                   {
+                       "name":  "XDS110 Embed with CMSIS-DAP",
+                       "serial":  "CL391078",
+                       "version":  "3.0.0.43"
+                   }
+               ],
+    "workspace":  {
+                      "app_dirs":  [
+                                       "launchxl-f280039c-led-chaser"
+                                   ]
+                  },
+    "problems":  [
+
+                 ]
+}

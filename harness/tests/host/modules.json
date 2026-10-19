@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "purpose": "Single declared truth for which firmware modules are host-tested. run-host-tests.ps1 builds its compiler list from here; static-check.ps1 asserts that CMakeLists.txt, test_runner.c and this file agree, and that every host-compilable module is declared.",
+    "read_by": [
+      "harness/tools/run-host-tests.ps1",
+      "harness/tools/static-check.ps1"
+    ],
+    "project": "launchxl-f280039c-led-chaser",
+    "source_dir": "projects/launchxl-f280039c-led-chaser/source"
+  },
+  "logic": [
+    "led_pattern",
+    "fmt",
+    "self_test"
+  ],
+  "framework": [
+    "framework/fw_test.c"
+  ],
+  "runner": "runner/test_runner.c",
+  "suites": [
+    {
+      "file": "test/test_led_pattern.c",
+      "entry": "led_pattern_tests",
+      "covers": ["led_pattern", "self_test"]
+    },
+    {
+      "file": "test/test_fmt.c",
+      "entry": "fmt_tests",
+      "covers": ["fmt"]
+    }
+  ]
+}

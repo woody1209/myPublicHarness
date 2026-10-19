@@ -1,0 +1,122 @@
+<mxfile host="app.diagrams.net" modified="2026-10-18T00:00:00.000Z" agent="WorkBuddy" version="24.0.0">
+  <diagram id="scenario-b" name="场景B-新功能工作流">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="1060" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="tb" value="场景 B：新功能变化 &#8212; 在 harness 中的体现路径（六步）" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="12" width="740" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="legb" value="图例：实线 = 主流程；虚线 = 参考挂接&#10;黄菱形 = 判定；绿框 = 分支 / 终点；灰框 = 右侧注释卡" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;align=center;verticalAlign=middle;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="800" y="12" width="470" height="56" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d1" value="改动引入新的对外行为&#10;或新的硬件依赖？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="70" width="340" height="76" as="geometry"/>
+        </mxCell>
+        <mxCell id="bno" value="否（免 spec）：注释 / 日志文案 /&#10;单文件小修 &#8594; 直接实现，仍走 DoD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="176" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="是：spec 三件套 + 批准门&#10;requirements &#8594; design &#8594; tasks（见 N1）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="430" y="176" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="ed1no" value="否" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=0.2;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="d1" target="bno">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="238" y="161"/>
+              <mxPoint x="165" y="161"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ed1b2" value="是" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=0.8;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="d1" target="b2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="442" y="161"/>
+              <mxPoint x="555" y="161"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="enob5" value="跳过 spec，仍需过验证门禁" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;fontSize=10;fontColor=#333333;endArrow=block;exitX=0.25;exitY=1;entryX=0;entryY=0.5;" edge="1" parent="1" source="bno" target="b5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="105" y="568"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eb2b3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.7;entryY=0;" edge="1" parent="1" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="555" y="320"/>
+              <mxPoint x="408" y="320"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="b3" value="B3 代码落点分层&#10;纯逻辑进 source/（主机可测）；硬件隔离 _hw.c / board_*.c（见 N2）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="368" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="B4 单一真相同步&#10;引脚 / 时钟 / 行为 / 状态 各自只在一处定义（见 N3）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="452" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="B5 DoD 聚合门&#10;verify.ps1（固件行为改动加 -Hil）&#8594; VERIFY OK 9 腿&#10;&#8594; 明细见右侧 N4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="536" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="B6 落盘六项&#10;spec 收口 / README / ADR+docs / state.json / 提交信息 / memory（见 N4）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="620" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="fin" value="status = done&#10;（spec 与代码双向一致）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="220" y="724" width="240" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="eb34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="b3" target="b4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eb45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="b4" target="b5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eb56" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="b5" target="b6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eb6fin" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="b6" target="fin">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="en1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.7;" edge="1" parent="1" source="b2" target="n1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="en2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.6;" edge="1" parent="1" source="b3" target="n2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="en3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.011;" edge="1" parent="1" source="b4" target="n3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="en4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.2;" edge="1" parent="1" source="b6" target="n4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="652"/>
+              <mxPoint x="610" y="745"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="n1" value="N1 &#183; 判定口径与批准门（specs/README.md &#183; docs/70）&#10;&#10;&#183; 判定：改动引入新的对外行为或新的硬件依赖 &#8594; 必须写 spec&#10;　（新模块 / 新外设驱动 / 协议 / 时钟策略 / 引脚分配 / 跨文件重构 / RTOS）&#10;　拿不准一律按&#8220;必须 spec&#8221;处理&#10;&#183; 分级：S / M / L（M 级含启动顺序、时钟策略等影响全局的变更）&#10;&#183; 批准门状态机：draft &#8594; requirements-approved &#8594; design-approved&#10;　&#8594; implementing &#8594; done&#10;&#183; 硬规则：未获用户确认，不得越过 requirements / design 直接写代码&#10;&#183; 收口：spec.ps1 check 通过；status=done 要求 tasks 全勾选且 trace 全 verified" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="560" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n2" value="N2 &#183; 代码落点分层（docs/30）&#10;&#10;&#183; 纯逻辑 &#8594; source/&lt;module&gt;.c：只依赖 C 标准库 + 本仓头文件，主机可编译测试&#10;&#183; 硬件相关 &#8594; source/&lt;module&gt;_hw.c / board_*.c，主机层不可达&#10;&#183; 引脚 &#8594; 只出现在 targets/&lt;MPN&gt;.json 与 source/board_pins.h 各一次；&#10;　业务代码只许用符号名，禁止裸引脚号&#10;&#183; 新增模块必须同时新增 test/test_&lt;module&gt;.c，并在 CMakeLists.txt&#10;　与 run-host-tests.ps1 两处注册（两套驱动同时维护）&#10;&#183; 目标侧上电自检与主机侧单测共用同一组参考常量（不许两份参考值）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="286" width="560" height="190" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n3" value="N3 &#183; 单一真相同步表&#10;&#10;　事实类型　　　　　定义处（唯一）　　　　　　消费方&#10;&#183; 引脚分配　　　　　targets/&lt;MPN&gt;.json + board_pins.h　　业务代码用符号名&#10;&#183; 时钟 / 启动顺序　　board_clock.c + 目标卡 + ADR　　　　main() 五步样板&#10;&#183; 对外行为约定　　　projects/&lt;proj&gt;/README.md　　　　　　DoD 与验收对照&#10;&#183; 需求与追溯　　　　specs/&lt;id&gt;/（三件套）　　　　　　　　spec.ps1 check&#10;&#183; 运行时状态　　　　projects/&lt;proj&gt;/state.json　　　　　　只存指针与统计（过 schema）&#10;&#183; 环境工具链　　　　harness/env/manifest.json　　　　　　doctor.ps1 / ccs.ps1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="482" width="560" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n4" value="N4 &#183; 收口：DoD 聚合门 + 落盘六项 + 新增硬规则（ADR 0005-0009）&#10;&#10;DoD（verify.ps1，一条命令 9 腿，ADR 0009）：&#10;　doctor &#183; static-check &#183; host-tests &#183; spec-check &#183; state-schema&#10;　build &#183; size &#183; size-delta &#183; hil（固件行为改动须加 -Hil）&#10;　退出码即结论；跳过某腿 = 该判据未被证明，按失败处理&#10;&#10;落盘六项：spec 收口（trace 全 verified）&#183; 工程 README &#183; ADR/docs&#10;　state.json &#183; 提交信息（含 .text 增量与来源）&#183; memory 日志&#10;&#10;新增硬规则（2026-10-18 实证沉淀）：&#10;&#183; ADR 0005：外设时钟门控 PCLKCRn 全关，用前先 SysCtl_enablePeripheral()；&#10;　CPUTIMER 时基 = SYSCLK，TIF 单标志，时序须核心运行时测量&#10;&#183; ADR 0006：仿真器在线即 Emulation Boot（RESC.DCON），H6 以 PC=code_start&#10;　等价冷启动；断电重启路径无法用探针自动验证&#10;&#183; ADR 0007：改头文件不触发重编 &#8212; &#8220;gmake 打印 building file&#8221; &#8800; 产物更新，&#10;　判据只看 .obj/.out 时间戳 + dis2000 反汇编常量，必要时 rebuild&#10;&#183; ADR 0008：门禁脚本函数内禁用 Write-Output / 禁止原生输出漏到输出流，&#10;　否则返回值数组恒真，红测被报成绿（假 PASS）&#10;&#183; ADR 0009：聚合门每腿须有可判定条件；跳过 = 未证明 = 失败" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="678" width="560" height="336" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

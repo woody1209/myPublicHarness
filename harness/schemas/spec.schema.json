@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "f280039c.spec.v1",
+  "title": "f280039c-harness 特性规格 spec.json（requirements 机读镜像）",
+  "description": "specs/<NNNN-slug>/spec.json 的结构契约。它是 requirements.md 的机读副本，供 harness/tools/spec.ps1 check 做引用一致性与可追溯性校验。字段与 requirements.md 一一对应，两者必须一致。结构与 C3M3-harness 的 spec.schema.json 保持同构。",
+  "type": "object",
+  "required": ["meta", "feature", "summary", "requirements"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["spec_id", "title", "status", "schema_version", "created_at", "updated_at", "project"],
+      "additionalProperties": false,
+      "properties": {
+        "spec_id": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[a-z0-9-]+$",
+          "description": "spec 标识，与目录名一致（如 0001-led-chaser）"
+        },
+        "title": { "type": "string", "minLength": 1, "description": "特性名称" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "requirements-approved", "design-approved", "implementing", "done", "blocked"],
+          "description": "阶段状态：draft=起草中；requirements-approved=① 已确认；design-approved=② 已确认；implementing=③ 实现中；done=完成；blocked=受阻"
+        },
+        "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+$", "description": "本文件结构版本（如 1.0）" },
+        "created_at": { "type": "string", "description": "创建日期（ISO）" },
+        "updated_at": { "type": "string", "description": "更新日期（ISO）" },
+        "adr": {
+          "type": ["string", "null"],
+          "description": "关联的 ADR 文件名（harness/docs/adr/NNNN-*.md），无则 null"
+        },
+        "project": { "type": "string", "minLength": 1, "description": "目标工程名（projects/<proj>）" }
+      }
+    },
+    "feature": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "特性 slug（kebab-case）" },
+    "summary": { "type": "string", "minLength": 1, "description": "一句话概述" },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "description": "需求条目：每条是可独立验收的功能点",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "user_story", "priority", "category", "ears", "acceptance", "tasks"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^REQ-\\d{3}$", "description": "需求编号，顺序不跳号" },
+          "title": { "type": "string", "minLength": 1, "description": "需求标题" },
+          "user_story": {
+            "type": "string",
+            "minLength": 1,
+            "description": "用户故事：作为 <角色>，我想要 <能力>，以便 <收益>"
+          },
+          "priority": { "type": "string", "enum": ["must", "should", "could"], "description": "优先级" },
+          "category": {
+            "type": "string",
+            "enum": ["functional", "interface", "performance", "constraint"],
+            "description": "functional=功能行为；interface=对外/外设接口；performance=性能指标；constraint=系统级约束"
+          },
+          "ears": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "EARS 验收句（THE SYSTEM SHALL / WHEN... / WHILE... / IF...THEN... / WHERE...），可观测可判定"
+          },
+          "acceptance": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "可执行验收：命令或断言"
+          },
+          "design_ref": {
+            "type": ["string", "null"],
+            "description": "design.md 锚点（如 design.md#3-组件与接口），② 阶段回填"
+          },
+          "tasks": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^T-\\d{3}$" },
+            "description": "覆盖本需求的 task 编号（须存在于 tasks.md）"
+          }
+        }
+      }
+    },
+    "out_of_scope": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "明确不做的事项"
+    },
+    "open_questions": {
+      "type": "array",
+      "description": "未决项（影响范围与结论）",
+      "items": {
+        "type": "object",
+        "required": ["question", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "question": { "type": "string", "minLength": 1 },
+          "requirements": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^REQ-\\d{3}$" }
+          },
+          "status": { "type": "string", "enum": ["pending", "resolved", "waived"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "spec_id": "0000-template",
+    "generated_at": "<YYYY-MM-DD>",
+    "schema_version": "1.0"
+  },
+  "traces": [
+    {
+      "requirement": "REQ-001",
+      "files": [
+        "projects/<proj>/source/<module>.c",
+        "projects/<proj>/source/<module>.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_<module>.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1",
+      "status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+<mxfile host="app.diagrams.net" modified="2026-10-18T00:00:00.000Z" agent="WorkBuddy" version="24.0.0">
+  <diagram id="scenario-a" name="场景A-换板工作流">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="1010" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="ta" value="场景 A：更换板子 / 更换 MCU &#8212; AI Coding 开展流程（八步）" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="12" width="740" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="lega" value="图例：实线 = 主流程；虚线 = 参考挂接&#10;黄菱形 = 判定；绿框 = 分支 / 终点；灰框 = 右侧注释卡" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;align=center;verticalAlign=middle;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="800" y="12" width="470" height="56" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="d1" value="同一工具链 / SDK&#10;家族内换板？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="70" width="340" height="76" as="geometry"/>
+        </mxCell>
+        <mxCell id="lyes" value="是：harness 内扩展&#10;新增 targets/&lt;MPN&gt;.json + 新参考工程" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="176" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="lno" value="否：新建 harness&#10;克隆骨架（如 C3M3），目标内容全部重填" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="430" y="176" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="ed1yes" value="是" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=0.2;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="d1" target="lyes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="238" y="161"/>
+              <mxPoint x="165" y="161"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ed1no" value="否" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=0.8;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="d1" target="lno">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="442" y="161"/>
+              <mxPoint x="555" y="161"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="a2" value="A2 环境自发现&#10;doctor.ps1 &#8594; manifest.json（工具链/SDK/探针唯一出处，禁止猜路径）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="284" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="A3 建目标卡 targets/&lt;MPN&gt;.json&#10;两阶段：手册可查先填；字地址/启动顺序上板实证后回填并注明来源" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="368" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="A4 换板必查清单（11 条硬件事实）&#10;逐条实证后才许写进代码 &#8594; 见右侧 N1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="452" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5" value="A5 移植参考工程&#10;Makefile 保留项 + 分层 + board_pins.h + 启动顺序样板" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="536" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a6" value="A6 验证闭环（聚合门）&#10;verify.ps1 -Hil &#8594; VERIFY OK（9 腿全 PASS）&#10;&#8594; 见右侧 N2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="620" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a7" value="A7 知识落盘&#10;targets 回填 / docs 踩坑 / ADR / README / state.json / memory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="704" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="a8" value="A8 换板 DoD 全勾&#10;八项全过才算平台就绪（再开工业务功能）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="170" y="788" width="340" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="fin" value="平台就绪&#10;（可承接业务 spec）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="220" y="880" width="240" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="eyesa2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.3;entryY=0;" edge="1" parent="1" source="lyes" target="a2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="165" y="264"/>
+              <mxPoint x="272" y="264"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="enoa2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.7;entryY=0;" edge="1" parent="1" source="lno" target="a2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="555" y="264"/>
+              <mxPoint x="408" y="264"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="ea23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a2" target="a3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a3" target="a4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a4" target="a5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea56" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a5" target="a6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea67" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a6" target="a7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea78" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a7" target="a8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="ea8fin" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="a8" target="fin">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="en1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.55;" edge="1" parent="1" source="a4" target="n1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="484"/>
+              <mxPoint x="610" y="306"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="en2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#999999;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.25;" edge="1" parent="1" source="a6" target="n2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="652"/>
+              <mxPoint x="610" y="628"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="n1" value="N1 &#183; 换板必查清单（11 条，逐条实证后才许写进代码）&#10;&#10;1 &#183; cJTAG (1149.7) 2-pin 调试接口，LaunchPad 类板载 XDS110&#10;2 &#183; 用户 LED 引脚以板厂用户指南为准（非 SDK 默认 31/34）&#10;3 &#183; LED 极性（active-low，低电平点亮）&#10;4 &#183; C28x 字地址模型：地址/长度全是 16 位字，driverlib 实证无罪，禁止绕开&#10;5 &#183; .TI.ramfunc 启动顺序：main() 首动作即重定位（ADR 0003，违反=启动即死）&#10;6 &#183; loadti 链接约束：LDFLAGS 必须 --args=&lt;n&gt; 定义 __c_args__（ADR 0004，缺则 4011）&#10;7 &#183; 上拉默认关闭：GPxPUD 复位全 1，悬空脚拾噪声，判读只认目标引脚所在字&#10;8 &#183; JTAG 引脚红线：GPIO35-38 禁复用为 GPIO（否则 JTAG 永久失效）&#10;9 &#183; 外设时钟门控：复位后 PCLKCRn 全关，用前先 SysCtl_enablePeripheral()（ADR 0005）&#10;10 &#183; CPUTIMER 时基 = SYSCLK（TPR=0），TIF 是单标志，时序须核心运行时测量（ADR 0005）&#10;11 &#183; 仿真器在线即 Emulation Boot（RESC.DCON），H6 用 PC=code_start 等价冷启动（ADR 0006）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="560" height="430" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n2" value="N2 · 验证闭环：verify.ps1 聚合门（9 腿，ADR 0009）+ 判读坑&#10;&#10;① 一条命令跑完全部腿：verify.ps1 -Hil → VERIFY OK&#10;　 doctor · static-check · host-tests · spec-check · state-schema&#10;　 build · size · size-delta · hil&#10;② 单腿命令仍可单独跑：doctor / static-check / run-host-tests /&#10;　 spec.ps1 check / ccs.ps1 build|size|program / run-hil&#10;③ 退出码即结论：VERIFY OK / INCOMPLETE / FAIL&#10;　 跳过某腿 = 该判据未被证明，按失败处理（ADR 0009）&#10;&#10;判读坑（会让绿灯说谎，务必避开）：&#10;· 读外设前必须确认目标已 halt（0x20000 第二成因）&#10;· 32 位寄存器须读两个字拼接，LED 位在 GPADAT 高字&#10;· g_self_test_code==0 不能单独作证，须与 H5 节拍 + SCI banner 组合判读&#10;· ADR 0007：改头文件不触发重编 — “gmake 打印 building file” ≠ 产物更新，&#10;　　判据只看 .obj/.out 时间戳 + dis2000 反汇编常量，必要时 rebuild&#10;· ADR 0008：门禁脚本函数内禁用 Write-Output，否则返回值数组恒真 → 假 PASS&#10;· run-hil.ps1 退出码 3 = 探针不在 = UNAVAILABLE（不持任何证据，不得读作回归）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=10;fontColor=#333333;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="520" width="560" height="432" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

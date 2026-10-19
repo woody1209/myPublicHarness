@@ -1,0 +1,143 @@
+﻿C28xx_CPU1: GEL Output: 
+
+RAM initialization done
+
+
+C28xx_CPU1: GEL Output: 
+Memory Map Initialization Complete
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Start ... 
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Done ...
+
+connected: Texas Instruments XDS110 USB Debug Probe_0
+=== HALT #1 (immediately after connect) ===
+  PC1=0x3FDBA4 PC2=0x3FDBA4 (stable)
+dss.bat : SEVERE: identifier not found: g_self_test_code
+所在位置 行:1 字符: 45
++ ... :\Windows'; & 'D:\ti\ccs2101\ccs\ccs_base\scripting\bin\dss.bat' 'E:\ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SEVERE: identif..._self_test_code:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+SEVERE: Error evaluating "g_self_test_code": identifier not found: g_self_test_code
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+  symbols: g_self_test_code=null g_step_count=null
+  -- GPIOA data --
+  GPADAT   (GPIO0-31 latch) @0x7F00 = 0xD3C73AF7
+  GPASET @0x7F02 = 0x0
+  GPACLEAR @0x7F04 = 0x0
+  GPA TOGGLE @0x7F06 = 0x0
+  GPADAT_R (pin readback)   @0x7F80 = 0x0
+  -- GPIOA control --
+  GPAMUX1/2 (lo=MUX1,hi=MUX2) @0x7C06 = 0x0
+  GPAGMUX1/2 @0x7C07 = 0x0
+  GPADIR @0x7C08 = 0x0
+  GPAPUD @0x7C09 = 0x0
+  GPAINV @0x7C0A = 0x0
+  GPAODR @0x7C0B = 0xFFFF0000
+  GPAAMSEL @0x7C0C = 0xFFFFFFFF
+  GPAQSEL @0x7C05 = 0x0
+  GPACRCL @0x7C10 = 0x0
+  GPACRCH @0x7C11 = 0x0
+  LED decode: latch GPIO20=0 GPIO22=1 | pin GPIO20=0 GPIO22=0
+  mux20=0 mux22=0 mux28=0 mux29=0 (0=GPIO 1=SCIA for 28/29, 1=? for 20/22 see pin_map)
+  gmux20=0 gmux22=0 gmux28=0 gmux29=0
+  -- SCIA --
+    CCR  (0x7200)=0x0 CTL1 (0x7201)=0x0 CTL2 (0x7204)=0xC0
+    HBAUD(0x7202)=0x0 LBAUD(0x7203)=0x0 RXST (0x7205)=0x0
+    RXBUF(0x7207)=0x0 TXBUF(0x7209)=0x0 FFTX (0x720A)=0xA000 FFRX (0x720B)=0x201F FFCT (0x720C)=0x0
+  CTL1 decode: SWRESET=0 UARTEN=0 TXENA=0 RXENA=0
+  FFTX decode: SCIFFENA=0 TXFIFOSTS=0
+  -- CPUTIMER0 @0x0C00 --
+    TIM=0xFFF7 PRD=0xFFFF TCR=0x1 TPR=0x0+0x0
+  TCR decode: TIF(bit9)=0 TRUN=0(only while halted) TSBY=0
+
+SEVERE: identifier not found: code_start
+	 at PC=code_start
+SEVERE: Error evaluating "PC = code_start": identifier not found: code_start
+	 at PC=code_start
+PC=code_start failed: JavaException: com.ti.ccstudio.scripting.environment.ScriptingException: Error evaluating "PC = code_start": identifier not found: code_start
+	 at PC=code_start
+=== HALT #2 (2 s after cold-boot from code_start) ===
+  PC1=0x3FB8B9 PC2=0x3FB8B9 (stable)
+SEVERE: identifier not found: g_self_test_code
+SEVERE: Error evaluating "g_self_test_code": identifier not found: g_self_test_code
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+  symbols: g_self_test_code=null g_step_count=null
+  -- GPIOA data --
+  GPADAT   (GPIO0-31 latch) @0x7F00 = 0x11440000
+  GPASET @0x7F02 = 0x0
+  GPACLEAR @0x7F04 = 0x0
+  GPA TOGGLE @0x7F06 = 0x0
+  GPADAT_R (pin readback)   @0x7F80 = 0x0
+  -- GPIOA control --
+  GPAMUX1/2 (lo=MUX1,hi=MUX2) @0x7C06 = 0x0
+  GPAGMUX1/2 @0x7C07 = 0x0
+  GPADIR @0x7C08 = 0x0
+  GPAPUD @0x7C09 = 0x0
+  GPAINV @0x7C0A = 0x0
+  GPAODR @0x7C0B = 0xFFFF0000
+  GPAAMSEL @0x7C0C = 0xFFFFFFFF
+  GPAQSEL @0x7C05 = 0x0
+  GPACRCL @0x7C10 = 0x0
+  GPACRCH @0x7C11 = 0x0
+  LED decode: latch GPIO20=0 GPIO22=1 | pin GPIO20=0 GPIO22=0
+  mux20=0 mux22=0 mux28=0 mux29=0 (0=GPIO 1=SCIA for 28/29, 1=? for 20/22 see pin_map)
+  gmux20=0 gmux22=0 gmux28=0 gmux29=0
+  -- SCIA --
+    CCR  (0x7200)=0x0 CTL1 (0x7201)=0x0 CTL2 (0x7204)=0xC0
+    HBAUD(0x7202)=0x0 LBAUD(0x7203)=0x0 RXST (0x7205)=0x0
+    RXBUF(0x7207)=0x0 TXBUF(0x7209)=0x0 FFTX (0x720A)=0xA000 FFRX (0x720B)=0x201F FFCT (0x720C)=0x0
+  CTL1 decode: SWRESET=0 UARTEN=0 TXENA=0 RXENA=0
+  FFTX decode: SCIFFENA=0 TXFIFOSTS=0
+  -- CPUTIMER0 @0x0C00 --
+    TIM=0xE80A PRD=0xFFFF TCR=0x1 TPR=0x0+0x0
+  TCR decode: TIF(bit9)=0 TRUN=0(only while halted) TSBY=0
+
+=== RAPID SAMPLES (run 3ms / halt / read, x12) ===
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+SEVERE: identifier not found: g_step_count
+SEVERE: Error evaluating "g_step_count": identifier not found: g_step_count
+  0: GPADAT=0x53C40000 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  1: GPADAT=0xD7C73A77 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+  2: GPADAT=0xD3C43A77 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  3: GPADAT=0x11440000 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+  4: GPADAT=0xD3C60000 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  5: GPADAT=0x11440000 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+  6: GPADAT=0x11440000 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  7: GPADAT=0xD7C70812 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+  8: GPADAT=0x11443A77 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  9: GPADAT=0xD7C71853 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+  10: GPADAT=0xD7C73A77 GPADAT_R=0x0 steps=null PC=0x3FB8BA
+  11: GPADAT=0x11440000 GPADAT_R=0x0 steps=null PC=0x3FB8B9
+SEVERE: identifier not found: code_start
+	 at PC=code_start
+SEVERE: Error evaluating "PC = code_start": identifier not found: code_start
+	 at PC=code_start
+teardown warning: JavaException: com.ti.ccstudio.scripting.environment.ScriptingException: Error evaluating "PC = code_start": identifier not found: code_start
+	 at PC=code_start
+DIAG16 DONE

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "f280039c.state.v1",
+  "title": "f280039c-harness 项目运行时状态 projects/<proj>/state.json",
+  "description": "每个工程一份运行时状态快照，记录各阶段（环境/构建/主机单测/烧录/spec）最近一次结果。原则：各工具只读写自己负责的顶层字段；大数据产物留存在各自目录，state 只存指针与统计；本文件是快照而非真相来源——真相是实际产物与命令输出。",
+  "type": "object",
+  "required": ["meta"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["project", "target", "updated_at"],
+      "additionalProperties": false,
+      "properties": {
+        "project": { "type": "string", "minLength": 1, "description": "工程名（projects/<proj>）" },
+        "target": { "type": "string", "minLength": 1, "description": "目标 MPN（如 TMS320F280039C）" },
+        "board": { "type": ["string", "null"], "description": "板卡/套件名，未知为 null" },
+        "updated_at": { "type": "string", "description": "最近更新日期（ISO）" }
+      }
+    },
+    "env": {
+      "type": "object",
+      "description": "环境自检（doctor.ps1）结果",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["ok", "stale", "missing", "fail"] },
+        "manifest": { "type": "string", "description": "manifest.json 相对路径指针" },
+        "checked_at": { "type": ["string", "null"] }
+      }
+    },
+    "build": {
+      "type": "object",
+      "description": "最近一次构建（ccs.ps1 build/size）结果",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["ok", "fail", "not-run"] },
+        "config": { "type": ["string", "null"], "description": "CPU1_FLASH / CPU1_RAM" },
+        "artifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "产物相对路径指针（.out/.map）"
+        },
+        "size": {
+          "type": ["object", "null"],
+          "description": "ccs.ps1 size 的最近一次读数。C28x 为 16 位字寻址，map 的 origin/length 列都是「字」，1 word = 2 bytes（ADR 0002）；因此所有尺寸键必须以 _words 结尾，禁止无单位的裸数字。",
+          "additionalProperties": false,
+          "properties": {
+            "unit": { "type": "string", "description": "固定写明计量单位" },
+            "measured_by": { "type": "string", "description": "产出该读数的门禁命令（ccs.ps1 size）" },
+            "text_words": { "type": "integer", "minimum": 0 },
+            "const_words": { "type": "integer", "minimum": 0 },
+            "data_words": { "type": "integer", "minimum": 0 },
+            "bss_words": { "type": "integer", "minimum": 0 },
+            "args_words": { "type": "integer", "minimum": 0 },
+            "flash_words": { "type": "integer", "minimum": 0, "description": "落在 FLASH 区（0x080000-0x0AFFFF）的段字数合计" },
+            "flash_pct": { "type": ["number", "null"], "description": "相对 targets/<MPN>.json target.flash.words 的百分比" },
+            "ram_words": { "type": "integer", "minimum": 0, "description": "落在 RAM 区的段字数合计" },
+            "ram_pct": { "type": ["number", "null"], "description": "相对 target.sram.words 的百分比" }
+          }
+        },
+        "note": { "type": "string", "description": "人读的一次性说明（不是门禁判据）" },
+        "at": { "type": ["string", "null"] }
+      }
+    },
+    "host_tests": {
+      "type": "object",
+      "description": "主机侧单测（run-host-tests.ps1）结果",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "fail", "not-run", "no-toolchain"] },
+        "framework": { "type": ["string", "null"], "description": "如 Unity v2.6.0" },
+        "cases": { "type": ["integer", "null"], "minimum": 0 },
+        "at": { "type": ["string", "null"] }
+      }
+    },
+    "flash": {
+      "type": "object",
+      "description": "烧录（ccs.ps1 program）结果",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["ok", "fail", "not-run", "unavailable"] },
+        "probe": { "type": ["string", "null"], "description": "调试探针名（如 XDS110 TMDSEMU110-U / XDS110LP-CS）" },
+        "reason": { "type": ["string", "null"], "description": "不可用/失败原因（如未连接板、loadti 不可用）" },
+        "at": { "type": ["string", "null"] }
+      }
+    },
+    "hil": {
+      "type": "object",
+      "description": "硬件在环测试（run-hil.ps1）结果：JTAG连接/烧录/自检/主循环/流水灯极性与节拍/SCI日志",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "fail", "not-run", "unavailable"] },
+        "probe": { "type": ["string", "null"], "description": "调试探针与模式（如 XDS110 (cJTAG)）" },
+        "image": { "type": ["string", "null"], "description": "烧录的 .out 相对路径" },
+        "record": { "type": ["string", "null"], "description": "证据记录相对路径（harness/tests/on-target/records/）" },
+        "checks": {
+          "type": ["object", "null"],
+          "description": "各子检查布尔结果；null 表示该项未执行（如串口不可用）",
+          "additionalProperties": false,
+          "properties": {
+            "jtag": { "type": ["boolean", "null"] },
+            "flash": { "type": ["boolean", "null"] },
+            "selftest": { "type": ["boolean", "null"] },
+            "loop": { "type": ["boolean", "null"] },
+            "polarity": { "type": ["boolean", "null"] },
+            "sci": { "type": ["boolean", "null"] }
+          }
+        },
+        "fail_reason": { "type": ["string", "null"] },
+        "at": { "type": ["string", "null"] }
+      }
+    },
+    "specs": {
+      "type": "array",
+      "description": "本工程关联的 spec 及其状态（指针，真相在 specs/<id>/）",
+      "items": {
+        "type": "object",
+        "required": ["spec_id", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "spec_id": { "type": "string", "pattern": "^[0-9]{4}-[a-z0-9-]+$" },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "requirements-approved", "design-approved", "implementing", "done", "blocked"]
+          }
+        }
+      }
+    }
+  }
+}

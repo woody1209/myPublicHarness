@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "spec_id": "0000-template",
+    "title": "<特性名称>",
+    "status": "draft",
+    "schema_version": "1.0",
+    "created_at": "<YYYY-MM-DD>",
+    "updated_at": "<YYYY-MM-DD>",
+    "adr": null,
+    "project": "<proj>"
+  },
+  "feature": "<kebab-slug>",
+  "summary": "<一句话概述：做什么、给谁用、核心能力>",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "<需求标题>",
+      "user_story": "作为 <角色>，我想要 <能力>，以便 <收益>。",
+      "priority": "must",
+      "category": "functional",
+      "ears": [
+        "WHEN <触发>，THE SYSTEM SHALL <可观测行为>。",
+        "IF <异常条件>，THEN THE SYSTEM SHALL <可观测行为>。"
+      ],
+      "acceptance": [
+        "<可执行验收：命令或断言>"
+      ],
+      "design_ref": "design.md#<章节>",
+      "tasks": [
+        "T-001"
+      ]
+    }
+  ],
+  "out_of_scope": [
+    "<本次不实现的内容>"
+  ],
+  "open_questions": [
+    {
+      "question": "<待确认问题>",
+      "requirements": [
+        "REQ-001"
+      ],
+      "status": "pending"
+    }
+  ]
+}

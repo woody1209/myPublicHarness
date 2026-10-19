@@ -1,0 +1,70 @@
+﻿{
+    "meta":  {
+                 "project":  "launchxl-f280039c-led-chaser",
+                 "target":  "TMS320F280039C",
+                 "board":  "LAUNCHXL-F280039C",
+                 "updated_at":  "2026-10-18"
+             },
+    "env":  {
+                "status":  "ok",
+                "manifest":  "harness/env/manifest.json",
+                "checked_at":  "2026-10-18"
+            },
+    "build":  {
+                  "status":  "ok",
+                  "config":  "CPU1_FLASH",
+                  "artifacts":  [
+                                    "projects/launchxl-f280039c-led-chaser/CPU1_FLASH/launchxl-f280039c-led-chaser.out",
+                                    "projects/launchxl-f280039c-led-chaser/CPU1_FLASH/launchxl-f280039c-led-chaser.map"
+                                ],
+                  "size":  {
+                               "unit":  "C28x 16-bit words (1 word = 2 bytes)",
+                               "measured_by":  "ccs.ps1 size",
+                               "text_words":  3881,
+                               "const_words":  1162,
+                               "data_words":  14,
+                               "bss_words":  0,
+                               "args_words":  512,
+                               "flash_words":  5067,
+                               "flash_pct":  2.58,
+                               "ram_words":  1038,
+                               "ram_pct":  2.94
+                           },
+                  "note":  "2026-10-18: size 重新按字计量（旧报告把 map 的字长度列当字节，并把 RAM 段并入 flash 预算，1.55 % 实为 2.58 %）。2026-10-17: .text +242 words vs 10-16 baseline (startup fixes: ramfunc relocate/ready, PIE init, extra log lines); Makefile LDFLAGS +--args=0x200 (loadti 4011 fix, defines __c_args__, .args in RAM); board-verified firmware fixes same day: SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_SCIA) (SCI was clock-gated silent, ADR 0005) + CPUTimer_setEmulationMode(RUNFREE), timer period stays SYSCLK/tick (measured, ADR 0005)",
+                  "at":  "2026-10-18"
+              },
+    "host_tests":  {
+                       "status":  "pass",
+                       "framework":  "self-contained fw_test (fallback driver: MSVC cl.exe)",
+                       "cases":  20,
+                       "at":  "2026-10-18"
+                   },
+    "flash":  {
+                  "status":  "ok",
+                  "probe":  "XDS110 (VID 0x0451 PID 0xbef3, FW 3.0.0.43, SN CL391078, config Standard)",
+                  "reason":  "2026-10-18: ccs.ps1 probe 先只读确认探针在线（xdsdfu -e 报 Found 1 device，SN CL391078）-\u003e ccs.ps1 program -Project projects\\launchxl-f280039c-led-chaser -Yes 经 loadti 烧录 projects/launchxl-f280039c-led-chaser/CPU1_FLASH/launchxl-f280039c-led-chaser.out（ccxml projects/launchxl-f280039c-led-chaser/targetConfigs/TMS320F280039C_LaunchPad.ccxml，目标 TMS320F280039C），GEL Memory Map + DCSM 完成、Loading Done、program OK、exit 0；随后 verify.ps1 -Hil 9 腿全 PASS",
+                  "at":  "2026-10-18"
+              },
+    "specs":  [
+                  {
+                      "spec_id":  "0001-led-chaser",
+                      "status":  "done"
+                  }
+              ],
+    "hil":  {
+                "status":  "pass",
+                "probe":  "XDS110 (cJTAG)",
+                "image":  "projects/launchxl-f280039c-led-chaser/CPU1_FLASH/launchxl-f280039c-led-chaser.out",
+                "record":  "harness/tests/on-target/records/hil-2026-10-18-led-chaser.md",
+                "checks":  {
+                               "jtag":  true,
+                               "flash":  true,
+                               "selftest":  true,
+                               "loop":  true,
+                               "polarity":  true,
+                               "sci":  true
+                           },
+                "fail_reason":  null,
+                "at":  "2026-10-18"
+            }
+}

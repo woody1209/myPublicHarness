@@ -1,0 +1,72 @@
+﻿{
+    "schema_version":  "1.0",
+    "unit":  "words",
+    "word_bytes":  2,
+    "map":  "launchxl-f280039c-led-chaser.map",
+    "config":  "CPU1_FLASH",
+    "measured_at":  "2026-10-18 11:40:12",
+    "measured_by":  "harness/tools/ccs.ps1 size",
+    "budget":  {
+                   "flash_words":  196608,
+                   "ram_words":  35328
+               },
+    "flash_words":  5067,
+    "flash_pct":  2.58,
+    "ram_words":  1038,
+    "ram_pct":  2.94,
+    "max_flash_pct":  90,
+    "max_ram_pct":  90,
+    "verdict":  "PASS",
+    "sections":  [
+                     {
+                         "name":  "codestart",
+                         "region":  "FLASH",
+                         "words":  2
+                     },
+                     {
+                         "name":  ".cinit",
+                         "region":  "FLASH",
+                         "words":  18
+                     },
+                     {
+                         "name":  ".reset",
+                         "region":  "ROM/RESET",
+                         "words":  0
+                     },
+                     {
+                         "name":  ".stack",
+                         "region":  "RAM",
+                         "words":  512
+                     },
+                     {
+                         "name":  ".init_array",
+                         "region":  "FLASH",
+                         "words":  0
+                     },
+                     {
+                         "name":  ".data",
+                         "region":  "RAM",
+                         "words":  14
+                     },
+                     {
+                         "name":  ".const",
+                         "region":  "FLASH",
+                         "words":  1162
+                     },
+                     {
+                         "name":  ".TI.ramfunc",
+                         "region":  "FLASH",
+                         "words":  4
+                     },
+                     {
+                         "name":  ".args",
+                         "region":  "RAM",
+                         "words":  512
+                     },
+                     {
+                         "name":  ".text",
+                         "region":  "FLASH",
+                         "words":  3881
+                     }
+                 ]
+}

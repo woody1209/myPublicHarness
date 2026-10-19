@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "f280039c.manifest.v1",
+  "title": "f280039c-harness 环境快照 harness/env/manifest.json",
+  "description": "doctor.ps1 生成的开发环境快照。原则：只登记「实际跑起来过」的工具（Store 的 python.exe 别名桩会 exit 9009，不得入账）；本文件是快照而非真相来源，真相是 doctor 的输出与 `environment OK`。所有路径一律绝对路径，便于任何包装器直接消费。工具链/SDK 升级必须重跑 doctor 并在 ADR/提交信息说明（AGENTS.md §1）。",
+  "type": "object",
+  "required": ["generated", "os", "repo_root", "ccs", "toolchain", "sdk", "tools", "probes", "workspace", "problems"],
+  "additionalProperties": false,
+  "properties": {
+    "generated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+      "description": "生成本快照的时间（本地，秒级 ISO）"
+    },
+    "os": { "type": "string", "minLength": 1, "description": "操作系统与版本" },
+    "repo_root": { "type": "string", "minLength": 1, "description": "仓库根绝对路径" },
+    "ccs": {
+      "type": ["object", "null"],
+      "description": "Code Composer Studio 命令行组件根目录；未找到时为 null，同时 problems 必须有对应条目",
+      "required": ["root", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "description": "目标侧编译器，键为家族名（当前只有 c2000）",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "version": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "sdk": {
+      "type": "object",
+      "description": "厂商 SDK，键为 SDK 名（当前只有 c2000ware）",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["root", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "root": { "type": "string", "minLength": 1 },
+          "version": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "description": "已验证可运行的辅助工具：gmake / xdsdfu / loadti / sysconfig / sysconfig_version / cmake / host_cc / git / py。版本类条目（sysconfig_version、host_cc）是标识串，其余是绝对路径。cmake 缺失时由 run-host-tests.ps1 走 MSVC 回退路径。",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "probes": {
+      "type": "array",
+      "description": "xdsdfu -e 枚举到的调试探针；空数组 = 板子未连接，此时烧录/HIL 前提未满足",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "serial": { "type": ["string", "null"] },
+          "version": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "description": "仓库内可构建工程的盘点",
+      "required": ["app_dirs"],
+      "additionalProperties": false,
+      "properties": {
+        "app_dirs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "problems": {
+      "type": "array",
+      "description": "doctor 判定为硬失败的项目；非空时 doctor 退出码为 1，禁止继续干活",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

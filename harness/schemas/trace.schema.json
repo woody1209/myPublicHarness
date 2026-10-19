@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "f280039c.trace.v1",
+  "title": "f280039c-harness 追溯矩阵 trace.json",
+  "description": "specs/<NNNN-slug>/trace.json 的结构契约：REQ → 实现文件 / 测试 / 验证命令 / 状态。spec.ps1 check 校验其恰好覆盖 spec.json 全部 REQ-ID，不多不少。",
+  "type": "object",
+  "required": ["meta", "traces"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["spec_id", "generated_at", "schema_version"],
+      "additionalProperties": false,
+      "properties": {
+        "spec_id": { "type": "string", "pattern": "^[0-9]{4}-[a-z0-9-]+$" },
+        "generated_at": { "type": "string", "description": "生成日期（ISO）" },
+        "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+$" }
+      }
+    },
+    "traces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["requirement", "files", "verification", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "requirement": { "type": "string", "pattern": "^REQ-\\d{3}$", "description": "REQ-ID（对应 spec.json）" },
+          "files": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "实现本需求的仓库内相对路径"
+          },
+          "tests": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "description": "覆盖本需求的测试文件路径（可为空数组，但需 verification 兜底）"
+          },
+          "verification": {
+            "type": "string",
+            "minLength": 1,
+            "description": "验证命令（如 .\\harness\\tools\\run-host-tests.ps1）或人工复核说明。其中出现的文件路径必须真实存在，spec.ps1 check 会逐个 Test-Path。"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "verified", "waived"],
+            "description": "pending=待验证；verified=已验证（tests 或 verification 必须指向真实存在的证据路径）；waived=豁免（必须同时给出 waiver_reason）"
+          },
+          "waiver_reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "仅当 status=waived 时必填：谁豁免、为何豁免、什么条件下补齐。由 harness/tools/spec.ps1 check 强制（本 schema 子集无法表达条件必填）。"
+          }
+        }
+      }
+    }
+  }
+}

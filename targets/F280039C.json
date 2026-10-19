@@ -1,0 +1,171 @@
+{
+  "target": {
+    "mpn": "TMS320F280039C",
+    "family": "TI C2000 F28003x real-time MCU series",
+    "core": "TMS320C28x 32-bit DSP @ 120 MHz (FPU32 + TMU + VCRC) + CLA @ 120 MHz",
+    "package": "LQFP-100 (PZ)",
+    "flash": {
+      "base": "0x00080000",
+      "size_bytes": 393216,
+      "kb": 384,
+      "words": 196608,
+      "type": "ECC-protected, three independent banks of 128KB (64KW)",
+      "banks": [
+        { "name": "BANK0", "base": "0x00080000", "kb": 128 },
+        { "name": "BANK1", "base": "0x00090000", "kb": 128 },
+        { "name": "BANK2", "base": "0x000A0000", "kb": 128 }
+      ],
+      "note": "linker MEMORY uses 22-bit form 0x080000 / 0x090000 / 0x0A0000"
+    },
+    "sram": {
+      "size_bytes": 70656,
+      "kb": 69,
+      "words": 35328,
+      "type": "ECC-protected",
+      "blocks": [
+        { "name": "M0/M1", "base": "0x00000128", "words": 1872 },
+        { "name": "LS0-LS7", "base": "0x00008000", "words": 16384 },
+        { "name": "GS0-GS3", "base": "0x0000C000", "words": 16384 }
+      ]
+    },
+    "boot_rom": { "base": "0x003F8000", "kb_bytes": 32768 },
+    "clock": {
+      "internal_oscs_hz": [10000000, 10000000],
+      "intosc_names": ["INTOSC1", "INTOSC2"],
+      "external": "crystal oscillator or external clock input supported",
+      "sysclk_hz": 120000000,
+      "lspclk_hz": 30000000,
+      "harness_default": "INTOSC2 10MHz -> PLL IMULT(48)/REFDIV(1)/ODIV(4)/SYSDIV(1) = 120MHz; see ADR 0001"
+    },
+    "gpio": {
+      "count": 55,
+      "jtag_pins": [35, 36, 37, 38],
+      "warning": "Do NOT mux GPIO35-38 to digital I/O; JTAG becomes permanently unusable."
+    },
+    "gpio_registers_word_addresses": {
+      "note": "C28x word addressing: every address below is a 16-bit WORD address (linker .cmd, map file, DSS readWord, XARn all agree). 32-bit registers span two words. Verified on target 2026-10-17 (diag15 breakpoint-diff trace). See harness/docs/40 and ADR 0002.",
+      "gpioctrl_base": "0x7C00",
+      "gpiodata_base": "0x7F00",
+      "gpiodataread_base": "0x7F80",
+      "bank_stride_ctrl_words": 64,
+      "bank_stride_data_words": 8,
+      "regs": {
+        "GPAMUX1": "0x7C06",
+        "GPAMUX2": "0x7C08",
+        "GPADIR": "0x7C0A",
+        "GPAPUD": "0x7C0C",
+        "GPAINV": "0x7C10",
+        "GPAODR": "0x7C12",
+        "GPAGMUX1": "0x7C20",
+        "GPAGMUX2": "0x7C22",
+        "GPBCTRL": "0x7C40",
+        "GPBDIR": "0x7C4A",
+        "GPADAT": "0x7F00 (32-bit: word 0x7F00 = GPIO0-15, word 0x7F01 = GPIO16-31)",
+        "GPASET": "0x7F02",
+        "GPACLEAR": "0x7F04",
+        "GPATOGGLE": "0x7F06",
+        "GPBDAT": "0x7F08",
+        "GPADAT_R": "0x7F80 (32-bit pin-state readback: word 0x7F81 = GPIO16-31)"
+      },
+      "led_bits": {
+        "LED4_GPIO20": "GPADAT bit 20 = high-word 0x7F01 bit 4",
+        "LED5_GPIO22": "GPADAT bit 22 = high-word 0x7F01 bit 6"
+      },
+      "pud_semantics": "GPxPUD bit 1 = pull-up DISABLED; reset default all 1 (C2000 internal pull-ups are off by default; unused pins float and pick up noise)",
+      "driverlib_verdict": "driverlib GPIO addressing verified CORRECT: GPIO_writePin stores pinMask to GPASET(0x7F02)/GPACLEAR(0x7F04); on-target final state matches design (LED4 on, LED5 off, SCIA pins muxed). Do NOT bypass driverlib."
+    },
+    "address_model": {
+      "type": "16-bit word addressing",
+      "facts": [
+        "sizeof(uint32_t) = 2 words = 4 real bytes",
+        "map file size column is in words",
+        "*+XARn[N] displacement is N words",
+        "DSS memory.readWord(0, addr) reads ONE 16-bit word at word address addr",
+        "CHAR_BIT == 16 (a C byte is a 16-bit word)"
+      ],
+      "evidence": "linker .cmd FLASH_BANK0_SEC4 origin 0x84000 == map .const@0x84000; led_hw_channels (16 bytes) map size 0x08 = 8 words; disassembly MOVL XAR4,#0x084432; readWord(0,0x84432)=0x0014 (pin 20 low half)",
+      "adr": "harness/docs/adr/0002-C28x字地址模型与GPIO实证.md"
+    },
+    "startup_order": {
+      "note": "Hard constraint verified 2026-10-17 (ADR 0003, docs/40 '固件启动顺序'). Violating it kills the firmware milliseconds after start with no console output and no LED activity.",
+      "sequence": [
+        "0) .TI.ramfunc relocation (memcpy LOAD=FLASH_BANK0_SEC1 -> RUN=RAMLS0 0x8000) + word-by-word ready check",
+        "0b) SysCtl_disableWatchdog() (debugger loads can bypass code_start/wd_disable and land directly in main)",
+        "0c) Interrupt_initModule() + Interrupt_initVectorTable() (with PIE disabled, traps vector from boot ROM whose ITRAP handler enables the watchdog and resets)",
+        "1) clock: PLL 120MHz + LSPCLK/4 + readback verify",
+        "2) peripherals (GPIO/SCI)"
+      ],
+      "ramfunc_facts": [
+        "driverlib SysCtl_delay() is emitted as inline assembly into section .TI.ramfunc",
+        "flash linker cmd splits it: LOAD = FLASH_BANK0_SEC1, RUN = RAMLS0 (0x8000)",
+        "the C runtime (_c_int00) does NOT copy LOAD->RUN sections - an explicit memcpy is mandatory before any SysCtl_* call",
+        "symptom of omission: SysCtl_setClock -> SysCtl_delay branches into empty RAMLS0, executes 0x0000, ITRAP -> boot ROM watchdog reset; diagnostic clue: PC parks at board_clock_init, RESC=0"
+      ],
+      "adr": "harness/docs/adr/0003-ramfunc重定位与启动顺序.md"
+    },
+    "loadti": {
+      "note": "loadti loads via memory.loadProgram(file, argvArgs) and therefore requires the image to define __c_args__; DSS memory.loadProgram(file) (HIL path) does not. Verified 2026-10-17 (ADR 0004).",
+      "linker_flag": "--args=0x200 (in projects/*/Makefile LDFLAGS; defines __c_args__, .args section in RAM)",
+      "failure_mode": "SEVERE: __c_args__ not defined ... Error code #4011, load failed (affects ccs.ps1 program only)",
+      "self_check": "map file: __c_args__ = abs ffffffff means undefined",
+      "adr": "harness/docs/adr/0004-loadti与cargs链接约束.md"
+    },
+    "peripheral_clock_gates": {
+      "note": "F28003x peripheral clocks are OFF at reset (CPUSYS PCLKCRn bits). Accessing a gated peripheral works, but every REGISTER WRITE to it is silently dropped - no error, no bus fault, readback keeps 0x0000. C28x word addressing: driverlib adds the byte-style offset to the word base directly (CPUSYS_BASE 0x5D300).",
+      "cpusys_base": "0x5D300",
+      "PCLKCR0": "0x5D322 (bit 3 = CPUTIMER0 clock; measured live value 0x001000039 with the app running)",
+      "PCLKCR7": "0x5D330 (bit 0 = SCIA clock)",
+      "sci_failure_mode": "PCLKCR7.SCIA=0 -> SCI_setConfig/SCI_enableModule writes vanish: CTL1 stays 0x0000 (want 0x000B RXENA|TXENA|SWRESET), LBAUD stays 0x0000 (want 0x1F = 30MHz/(115200*8)-1), TX pin silent. A/B proven 2026-10-17 (diag17: write before/after setting the bit; diag18: forced boot of the unfixed image -> CTL1=0x0, 0 bytes on both XDS110 COM ports)",
+      "firmware_rule": "Any project driving a peripheral must call SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_x) BEFORE touching that peripheral. TI's own f28003x InitSysCtrl() (device_support/f28003x/common/source/f28003x_sysctrl.c:186) sets SCI_A for exactly this reason; a driverlib-only port that skips it loses all console output.",
+      "hil_guard": "hil_test.js H3 reads word 0x5D330 and fails with H3-sciclk if bit 0 is clear",
+      "adr": "harness/docs/adr/0005-外设时钟门控与定时器时基.md"
+    },
+    "cputimer": {
+      "base_words": { "CPUTIMER0": "0x0C00", "TIM": "0x0C00", "PRD": "0x0C02", "TCR": "0x0C04", "TPR": "0x0C06", "TPRH": "0x0C07" },
+      "timebase": "CPUTIMER0 decrements at SYSCLK (120MHz), NOT at LSPCLK/SYSCLK-4, with TPR=0 - measured halt-free 2026-10-17: PRD=30000 produced a 51.4ms mean LED flip interval (200 ticks x 257us). A period of SYSCLK/tick_hz is therefore correct; the SYSCLK/4 assumption made the chaser run 4x fast.",
+      "emulation_mode": "TCR bits 10-8 (ICEM) reset to 0 = stop at zero on halt. board_timer_init() now sets CPUTIMER_EMULATIONMODE_RUNFREE (0x0800).",
+      "halt_distortion": "TIF (TCR bit 15) is a single flag, so all overflows produced while the core is halted collapse into ONE increment when a polled main loop resumes. Any cadence measured through halt/read cycles is stretched by the halt duty (2026-10-17: 426ms reported for the 200ms step at ~50% halt duty). Measure timing halt-free (memory peeks while the core runs).",
+      "adr": "harness/docs/adr/0005-外设时钟门控与定时器时基.md"
+    },
+    "boot_mode": {
+      "note": "F28003x has no -TRST pin: the boot ROM reads RESC bit 31 (DCON = debugger connected) to choose Emulation Boot over Stand-Alone Boot. With a probe attached, an invalid emulation key sends the ROM to Wait/SCI-boot instead of jumping to flash 0x80000, so a debugger-issued reset NEVER hands off to the flashed application.",
+      "resc": "word 0x5D380 (CPUSYS_BASE 0x5D300 + SYSCTL_O_RESC 0x80; driverlib/inc/hw_sysctl.h:126). Bit decode (hw_sysctl.h:970-979): 0x1 POR, 0x2 XRSn, 0x4 WDRSn, 0x8 NMIWDRSn, 0x20 HWBISTn, 0x100 SCCRESETn, 0x40000000 XRSn pin status, 0x80000000 DCON",
+      "observed": "diag17/diag20 (2026-10-17): after target.reset() PC parks at 0x3FB8B9 (boot ROM SCI wait) and stays there for >5s with RESC=0xC0000004 (WDRSn + XRSn high + DCON); LED halt-free transitions = 0. Forcing PC=0x80000 (entry word 0x48 = LCR) boots the application immediately.",
+      "harness_consequence": "hil_test.js H6 starts the app with PC = code_start + runAsynch + disconnect, which is the documented stand-alone-equivalent start. Autonomous Stand-Alone boot (POR with no probe) is NOT covered by any automated gate - it needs a human power cycle.",
+      "adr": "harness/docs/adr/0006-仿真启动模式与H6冷启动.md",
+      "sources": ["TI C2000 TRM boot chapters (Emulation Boot vs Stand-Alone Boot, emulation key 0x5A)", "e2e.ti.com threads 756676 / 501033 (same park after CCS CPU reset, works after power cycle)"]
+    },
+    "hil_evidence": {
+      "note": "Runtime HIL results are deliberately NOT stored in this card. The card is board facts; a run result is project state, and two copies drift (the card claimed status=pass while state.json said unavailable). Truth = projects/<proj>/state.json hil block (contract harness/schemas/state.schema.json, written by run-hil.ps1) plus the evidence records. Durable method conclusions belong to the ADRs and to cputimer/boot_mode above, not here.",
+      "state_pointer": "projects/launchxl-f280039c-led-chaser/state.json",
+      "records_dir": "harness/tests/on-target/records"
+    },
+    "peripherals": [
+      "3x 12-bit SAR ADC (up to 23 channels)",
+      "16x PWM channels with HRPWM",
+      "2x CAN/CAN-FD (MCAN)",
+      "FSI up to 200 Mbps",
+      "2x SPI, 2x I2C, 4x SCI/UART (incl. LIN)",
+      "2x eQEP, 6-ch DMA",
+      "CLB (Configurable Logic Block)",
+      "Windowed watchdog, DCC, ERAD"
+    ],
+    "safety_security": ["Dual-zone security (DCSM)", "JTAGLOCK", "Zero-pin boot", "Functional Safety-Compliant"],
+    "sources": {
+      "product_page": "https://www.ti.com/product/TMS320F280039C",
+      "linker_cmd": "C2000Ware_26_01_00_00/device_support/f28003x/common/cmd/28003x_generic_flash_lnk.cmd",
+      "device_header": "C2000Ware_26_01_00_00/device_support/f28003x/common/include/device.h"
+    },
+    "board": {
+      "name": "LAUNCHXL-F280039C",
+      "user_leds": [
+        { "ref": "LED4", "color": "red", "gpio": 20, "active_low": true },
+        { "ref": "LED5", "color": "green", "gpio": 22, "active_low": true }
+      ],
+      "led_driver": "SN74LVC2G07DBVR, active-low configuration",
+      "debug_probe": "onboard XDS110 (cJTAG 1149.7 2-pin advanced)",
+      "virtual_com_uart": { "interface": "SCIA", "tx_gpio": 29, "rx_gpio": 28, "baud": 115200 },
+      "source": "TI SPRUJ31 LAUNCHXL-F280039C User's Guide, §3.1.3 (LED4=GPIO20, LED5=GPIO22, active-low)"
+    }
+  }
+}

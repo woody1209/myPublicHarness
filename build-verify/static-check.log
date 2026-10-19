@@ -1,0 +1,6 @@
+﻿[analyze] cl.exe /analyze /W4 over 7 host-compilable sources (14.29.30133)
+
+static check: projects/launchxl-f280039c-led-chaser/source + harness tools
+  scanned : 16 firmware sources, 12 PowerShell scripts, 3 manifest modules, 222 doc routes
+STATIC CHECK OK (0 violations)
+

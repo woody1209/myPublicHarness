@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "f280039c.project.config.v1",
+  "title": "f280039c-harness 工程配置 project.config.json",
+  "description": "工程级配置契约（与 C3M3-harness 同构的分层配置思想）。全局默认在 harness/env/，工程覆盖在 projects/<proj>/project.config.json，二者深合并。工具只读配置，不写配置。示例见 harness/env/project.config.example.json。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "project": {
+      "type": "object",
+      "description": "工程标识",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "description": "工程名（projects/<name>）" },
+        "target": { "type": "string", "minLength": 1, "description": "目标 MPN（如 TMS320F280039C）" },
+        "board": { "type": ["string", "null"], "description": "板卡/套件名（如 LAUNCHXL-F280039C）" },
+        "build_config": {
+          "type": "string",
+          "enum": ["CPU1_FLASH", "CPU1_RAM"],
+          "default": "CPU1_FLASH",
+          "description": "默认构建配置（是否含 _FLASH 定义决定 Flash/RAM 链接脚本与入口）"
+        },
+        "arch": {
+          "type": "string",
+          "enum": ["c28x"],
+          "default": "c28x",
+          "description": "内核架构（C28x + CLA + FPU32）"
+        },
+        "fpu": {
+          "type": "string",
+          "enum": ["fpu32", "softlib"],
+          "default": "fpu32",
+          "description": "浮点支持模式；决定 --float_support 编译选项"
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "description": "工程内相对路径（相对工程根 projects/<name>/）",
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string", "default": "source", "description": "纯逻辑与硬件源目录" },
+        "device": { "type": "string", "default": "device", "description": "器件相关源文件（codestart 等）" },
+        "target_configs": { "type": "string", "default": "targetConfigs", "description": "ccxml 目录" },
+        "host_tests": { "type": "string", "description": "主机单测目录指针（默认取 harness/tests/host）" },
+        "on_target_tests": { "type": "string", "description": "目标机自检清单指针（默认取 harness/tests/on-target）" }
+      }
+    },
+    "specs": {
+      "type": "object",
+      "description": "spec 模式开关",
+      "additionalProperties": false,
+      "properties": {
+        "require_spec": {
+          "type": "boolean",
+          "default": true,
+          "description": "非平凡改动是否强制 spec（对齐 specs/README.md 判定口径）"
+        },
+        "dir": { "type": "string", "default": "specs", "description": "spec 根目录（相对仓库根）" }
+      }
+    }
+  }
+}

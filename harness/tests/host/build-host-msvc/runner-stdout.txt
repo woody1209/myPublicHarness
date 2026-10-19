@@ -1,0 +1,33 @@
+
+=== host unit tests (f280039c-harness) ===
+
+=== led_pattern ===
+  - CHASE n=2 alternates and wraps
+  - CHASE n=4 walks 0..3 then wraps
+  - CHASE n=1 stays on channel 0
+  - BOUNCE n=4 reverses at the ends (period 2n-2 = 6)
+  - BOUNCE never repeats the end channel back to back
+  - BLINK alternates all-on / all-off
+  - invalid channel counts return 0 (no UB)
+  - maximum channel count (32) is handled without UB
+  - unknown mode yields an all-dark mask
+  - active-low inverts the lit bits, active-high passes through
+  - levels ignore bits outside the channel count
+  - FNV-1a reference matches the shared constant
+      FAIL [E:\AIcherry\C2000TI\F280039C-harness\harness\tools\..\tests\host\test\test_led_pattern.c:101] EQ_U32(LED_PATTERN_REF_FNV1A, led_pattern_reference_fnv1a((uint16_t)LED_PATTERN_REF_CHANNELS))
+  - reference is stable and mode dependent
+
+=== fmt ===
+  - decimal: zero and small values
+  - decimal: UINT32_MAX boundary
+  - hexadecimal: prefix, upper case, no leading zeros
+  - bounded: buffer too small is reported, not overrun
+  - bounded: zero size and NULL destination are rejected
+  - bounded: exact fit succeeds (no NUL overruns)
+
+=== on-target self test executed on host ===
+  - self_test_run() == SELF_TEST_OK
+      FAIL [E:\AIcherry\C2000TI\F280039C-harness\harness\tools\..\tests\host\runner\test_runner.c:34] EQ_I32((int32_t)SELF_TEST_OK, (int32_t)self_test_run())
+
+----------------------------------------
+cases: 20, failures: 2 -> FAIL

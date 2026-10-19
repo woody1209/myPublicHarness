@@ -1,0 +1,21 @@
+﻿[ OK ] Code Composer Studio 21.0.1.00010 at D:\ti\ccs2101\ccs
+[ OK ] cl2000 25.11.1
+[ OK ] gmake -> D:\ti\ccs2101\ccs\utils\bin\gmake.exe
+[ OK ] xdsdfu -> D:\ti\ccs2101\ccs\ccs_base\common\uscif\xds110\xdsdfu.exe
+[ OK ] loadti -> D:\ti\ccs2101\ccs\ccs_base\scripting\examples\loadti\loadti.bat
+[ OK ] sysconfig CLI -> D:\ti\ccs2101\ccs\utils\sysconfig_1.28.1\sysconfig_cli.bat
+[ OK ] C2000Ware 26.01.00.00
+[ OK ] driverlib f28003x present
+[ OK ] git -> D:\Program Files\Git\cmd\git.exe
+[INFO] python at C:\Users\wusda\AppData\Local\Microsoft\WindowsApps\python.exe does not run (exit 9009) - not recorded
+[ OK ] py -> C:\Windows\py.exe
+[WARN] cmake not found - host tests will use the MSVC cl.exe fallback (see tests/host/README.md). Install cmake for the preferred path: winget install Kitware.CMake
+[ OK ] host C compiler -> msvc
+[ OK ] Debug probe: XDS110 Embed with CMSIS-DAP SN=CL391078 FW=3.0.0.43
+[ OK ] projects: launchxl-f280039c-led-chaser
+[ OK ] target card present
+
+manifest written: E:\AIcherry\C2000TI\F280039C-harness\harness\env\manifest.json
+[ OK ] manifest validates against harness/schemas/manifest.schema.json
+environment OK
+

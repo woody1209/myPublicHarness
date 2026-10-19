@@ -1,0 +1,114 @@
+﻿C28xx_CPU1: GEL Output: 
+
+RAM initialization done
+
+
+C28xx_CPU1: GEL Output: 
+Memory Map Initialization Complete
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Start ... 
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Done ...
+
+connected: Texas Instruments XDS110 USB Debug Probe_0
+--- T0 (halted at attach) ---
+  PC=0x3FDBA4  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0xD7C70002  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+=== target.reset() + run, watch PC/register evolution ===
+C28xx_CPU1: GEL Output: ... DCSM Initialization Start ... 
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Done ...
+
+--- after reset + 50 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0x11440000  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+--- after reset + 200 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0x11440000  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+--- after reset + 500 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0x11440A72  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+--- after reset + 1000 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0xD7C70802  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+--- after reset + 2000 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0x11440000  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+--- after reset + 4000 ms ---
+  PC=0x3FB8B9  [BOOT ROM]
+  RESC      =0xC0000004  PCLKCR7   =0x0 (bit0=SCIA clock)
+  PCLKCR0   =0x0 (bit3=CPUTIMER0)
+  GPADAT    =0xD7C73A77  GPADAT_R=0x0
+  GPAMUX1/2 =0x0/0x0  GPAGMUX2=0x0  GPADIR=0x0
+  GPAPUD    =0xFFFFFFFF  GPAODR=0x0
+  mux20=0 mux22=0 mux28=0 mux29=0 (28/29: 1=SCIA)
+  SCIA CCR=0x0 CTL1=0x0 CTL2=0xC0 RXST=0x0
+  SCIA HBAUD=0x0 LBAUD=0x0 FFTX=0xA000 FFRX=0x201F
+  g_self_test_code(RAM 0xA80C)=0x0
+  CTL1: RXENA=0 TXENA=0 SWRESET=0 UARTEN expected bits0,1,3=0xB
+
+=== A/B: SCIA write with PCLKCR7 cleared vs set ===
+  PCLKCR7 now = 0x0
+  wrote CTL1=0x000B blind -> readback CTL1=0x0
+  after PCLKCR7|=1  -> CTL1=0x0
+DIAG17 DONE

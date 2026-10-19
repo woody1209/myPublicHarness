@@ -1,0 +1,28 @@
+﻿C28xx_CPU1: GEL Output: 
+
+RAM initialization done
+
+
+C28xx_CPU1: GEL Output: 
+Memory Map Initialization Complete
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Start ... 
+
+C28xx_CPU1: GEL Output: ... DCSM Initialization Done ...
+
+running from 0x80000 (no symbols loaded - halt-free mode)
+PRD      = 0x7530 (expect 30000=0x7530)
+TCR      = 0x801 TPR=0x0+0x0
+PCLKCR0  = 0x1000039 (bit3 CPUTIMER0 clk)
+PCLKCR7  = 0x1 (bit0 SCIA clk)
+SCIA CTL1= 0x23 HBAUD=0x0 LBAUD=0x1F
+GPIO MUX1/2 = 0x0/0x5000000 DIR=0x20500000 (want mux20=0 mux22=0 dir20=1 dir22=1)
+CTL1 expect 0x000B (RXENA|TXENA|SWRESET); HBAUD/LBAUD 15 for 115200@30MHz
+TIM live-peeks: 13 ok / 0 err over 1040 ms
+timer clock (measured) = 156808 Hz  (SYSCLK if /1; 30MHz => SYSCLK/4 at 120MHz)
+decrements=163080 PRD=30000 => tick rate = 5.2 Hz (want 1000)
+LED peeks done: 58 flips over 2984 ms
+mean flip interval = 51.4 ms (want 200 if step=200ms, 2 LEDs)
+intervals: 18,45,46,46,45,49,45,45,48,74,26,39,49,46,48,47,46,46,46,47,80,45,48,48
+g_self_test_code(RAM 0xA80C) = 0x0
+DIAG19 DONE - board left RUNNING

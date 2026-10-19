@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "spec_id": "0001-led-chaser",
+    "generated_at": "2026-10-16",
+    "schema_version": "1.0"
+  },
+  "traces": [
+    {
+      "requirement": "REQ-001",
+      "files": [
+        "projects/launchxl-f280039c-led-chaser/source/led_pattern.c",
+        "projects/launchxl-f280039c-led-chaser/source/led_pattern.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_led_pattern.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-002",
+      "files": [
+        "projects/launchxl-f280039c-led-chaser/source/board_pins.h",
+        "projects/launchxl-f280039c-led-chaser/source/led_hw.c",
+        "projects/launchxl-f280039c-led-chaser/source/led_hw.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_led_pattern.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1（极性用例）+ 上板 HIL H5 极性判定：以 GPADAT_R 逐样本断言任一时刻仅一灯为低；2026-10-18 真机 23 个 halt-free 样本全部满足，证据 harness/tests/on-target/records/hil-2026-10-18-led-chaser.md",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-003",
+      "files": [
+        "projects/launchxl-f280039c-led-chaser/source/board_clock.c",
+        "projects/launchxl-f280039c-led-chaser/source/board_clock.h",
+        "projects/launchxl-f280039c-led-chaser/source/main.c"
+      ],
+      "tests": [
+        "harness/tools/dss/hil_test.js"
+      ],
+      "verification": ".\\harness\\tools\\run-hil.ps1 的 H5（判据实现：harness/tools/dss/hil_test.js）：halt-free 20ms JTAG peek 相邻边沿间隔均值须落在 200ms ±25%（CADENCE_TOL=0.25）且跳变样本 ≥8；2026-10-18 真机四轮各 12 次跳变实测 mean=197.0 / 195.8 / 196.5 / 195.0ms（判据区间 150–250ms），证据 harness/tests/on-target/records/hil-2026-10-18-led-chaser.md；构建侧 .\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-led-chaser 链接 board_clock.c",
+      "status": "verified",
+      "waiver_reason": "±2% 精度带（REQ-003 第 2 条 EARS）不裁决：板上 JTAG peek 采样间隔 20ms，量化误差远大于 2%(4ms)，只能由逻辑分析仪/示波器判定；2026-10-18 用户决定外部仪器暂不接入（见 spec.json open_questions 第 3 条）。因此本条 verified 只覆盖 ±25% 带 + 计时源/线性/fail-safe 条款。"
+    },
+    {
+      "requirement": "REQ-004",
+      "files": [
+        "projects/launchxl-f280039c-led-chaser/source/self_test.c",
+        "projects/launchxl-f280039c-led-chaser/source/self_test.h",
+        "projects/launchxl-f280039c-led-chaser/source/main.c"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_led_pattern.c",
+        "harness/tests/host/test/test_fmt.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1（参考序列/参考校验值）+ 上板串口出现 self-test: pattern OK / fmt OK 且 g_self_test_code=0（2026-10-18 HIL H3 PASS）；负向路径（故障注入）已于 2026-10-18 执行：将 LED_PATTERN_REF_FNV1A 改为 0xDEADBEEFU 后主机侧 2 项断言失败、上板 g_self_test_code=1 且 GPADAT_R 在 0x0 与 0x500000（双灯同亮同灭）之间交替即 fail-safe 形态，证据 harness/tests/on-target/records/fault-injection-2026-10-18-led-chaser.md；常量已还原并复跑 HIL PASS",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-005",
+      "files": [
+        "projects/launchxl-f280039c-led-chaser/source/fmt.c",
+        "projects/launchxl-f280039c-led-chaser/source/fmt.h",
+        "projects/launchxl-f280039c-led-chaser/source/sci_log.c",
+        "projects/launchxl-f280039c-led-chaser/source/sci_log.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_fmt.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1 + 上板 115200-8N1 捕获 banner（MPN/板型/版本/SYSCLK 120000000/构建时间）、self-test OK 行、每 5s 一行 alive,steps=25；2026-10-18 真机 90s 窗口捕获到 steps=400..675 共 12 行心跳，证据 harness/tests/on-target/records/hil-2026-10-18-led-chaser.md；静默根因=SCIA 外设时钟门控，见 ADR 0005",
+      "status": "verified"
+    }
+  ]
+}

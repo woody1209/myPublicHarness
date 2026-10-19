@@ -1,0 +1,9 @@
+
+=== LAUNCHXL-F280039C LED chaser ===
+target : TMS320F280039C / LAUNCHXL-F280039C
+version: 1.0.0 (Oct 18 2026 04:05:33)
+ramfunc : 4 bytes relocated
+sysclk : 120000000 Hz
+step   : 200 ms
+self-test FAIL
+  code=1

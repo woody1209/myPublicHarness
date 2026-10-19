@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "spec_id": "0001-led-chaser",
+    "title": "LED 流水灯（led-chaser）",
+    "status": "done",
+    "schema_version": "1.0",
+    "created_at": "2026-10-16",
+    "updated_at": "2026-10-18",
+    "adr": "0001-平台与目标选型.md",
+    "project": "launchxl-f280039c-led-chaser"
+  },
+  "feature": "led-chaser",
+  "summary": "LAUNCHXL-F280039C 上的两颗用户 LED 流水灯：纯逻辑 pattern 引擎 + active-low 极性映射 + CPU Timer 节拍 + 上电自检与 fail-safe + SCI 日志。",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "流水图样引擎（纯逻辑）",
+      "user_story": "作为固件开发者，我想要一个与硬件无关的 pattern 引擎，以便在主机侧用单元测试完整覆盖其序列正确性，也不需要接板就能验证行为。",
+      "priority": "must",
+      "category": "functional",
+      "ears": [
+        "THE SYSTEM SHALL 提供 led_pattern_mask(mode, channel_count, step)，按模式与节拍序号返回点亮掩码，且不依赖任何硬件或全局状态。",
+        "WHEN 模式为 CHASE 且 step 递增到 channel_count 的整数倍，THE SYSTEM SHALL 将点亮位置回绕到第 0 通道。",
+        "WHEN 模式为 BOUNCE，THE SYSTEM SHALL 使点亮位置到达末通道后反向回走到第 0 通道（周期 2*n-2）。",
+        "WHEN 模式为 BLINK，THE SYSTEM SHALL 在相邻节拍交替输出全通道点亮与全通道熄灭。",
+        "IF channel_count 为 0 或大于 32，THEN THE SYSTEM SHALL 返回掩码 0 且不产生未定义行为。"
+      ],
+      "acceptance": [
+        ".\\harness\\tools\\run-host-tests.ps1：test_led_pattern.c 三种模式前 8 拍掩码逐项断言全部命中",
+        ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-led-chaser 成功"
+      ],
+      "design_ref": "design.md#3-组件与接口",
+      "tasks": [
+        "T-001",
+        "T-007",
+        "T-008"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "title": "板级引脚绑定与极性映射",
+      "user_story": "作为板级开发者，我想要 GPIO 引脚与点灯极性只在唯一一处定义，以便将来换板或改写引脚时不会出现多个真相。",
+      "priority": "must",
+      "category": "interface",
+      "ears": [
+        "THE SYSTEM SHALL 将 LED4 绑定到 GPIO20、LED5 绑定到 GPIO22，且该绑定只在 board_pins.h 出现一次。",
+        "WHEN 掩码某位为逻辑点亮，THE SYSTEM SHALL 因 active-low 而向对应 GPIO 写入低电平。",
+        "WHEN 掩码某位为逻辑熄灭，THE SYSTEM SHALL 向对应 GPIO 写入高电平。",
+        "THE SYSTEM SHALL 不得将 GPIO35-38 配置为 GPIO 功能。"
+      ],
+      "acceptance": [
+        ".\\harness\\tools\\run-host-tests.ps1：led_pattern_levels() 极性用例通过",
+        "上板自检：单亮 LED4 时测得 GPIO20 约 0V、GPIO22 约 3.3V（见 harness/tests/on-target/README.md）"
+      ],
+      "design_ref": "design.md#3-组件与接口",
+      "tasks": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-009"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "title": "节拍时序",
+      "user_story": "作为验证者，我想要流水灯步进周期稳定且可预测，以便用示波器或逻辑分析仪判定时序是否达标。",
+      "priority": "must",
+      "category": "performance",
+      "ears": [
+        "THE SYSTEM SHALL 在系统时钟 120MHz 下以默认 200ms 为步进周期推进流水灯，且该周期可由板上 HIL 在 ±25% 带宽内裁决（hil_test.js 的 CADENCE_TOL = 0.25）。",
+        "THE SYSTEM SHALL 使步进周期进一步落在 200ms ±2% 内；该带宽只能由外部时基仪器裁决，2026-10-18 经用户决定仪器暂不接入，故本条不进入当前门禁判据（见 open_questions 3），不得据此把 REQ-003 记为全量满足。",
+        "THE SYSTEM SHALL 使用 CPU Timer 作为计时源，并把溢出计数转换为节拍，不得依赖软件忙等近似值。",
+        "WHEN 修改编译期常量 LEDCHASER_STEP_MS，THE SYSTEM SHALL 使步进周期随之线性变化。",
+        "IF 系统时钟未按预期跑到 120MHz，THEN THE SYSTEM SHALL 进入 fail-safe 形态并在日志打印错误信息。"
+      ],
+      "acceptance": [
+        ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-led-chaser 成功且 board_clock.c 链接",
+        ".\\harness\\tools\\run-hil.ps1 的 H5（harness/tools/dss/hil_test.js）：halt-free peek 相邻边沿间隔均值落在 200ms ±25% 内且跳变样本 ≥ 8",
+        "延后（非当前门禁）：逻辑分析仪测 GPIO20 相邻边沿间隔 = 200ms ± 2%，仪器未接入前不据此判定通过"
+      ],
+      "design_ref": "design.md#5-时序与并发",
+      "tasks": [
+        "T-004",
+        "T-007",
+        "T-009"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "title": "上电自检与 fail-safe",
+      "user_story": "作为用这套 harness 长期维护该板软件的人，我想要每次上电自动校验核心逻辑，以便在后续任何改动引入回归时第一时间发现核心逻辑被改坏。",
+      "priority": "must",
+      "category": "constraint",
+      "ears": [
+        "WHEN 上电复位完成，THE SYSTEM SHALL 在启动 banner 之后执行 pattern 序列校验与格式化校验，并向 SCI 打印每条结果。",
+        "IF 自检全部通过，THEN THE SYSTEM SHALL 进入 normal 形态并按 REQ-003 推进流水灯。",
+        "IF 任一项自检失败，THEN THE SYSTEM SHALL 进入 fail-safe（双灯 100ms 同拍闪烁）、打印 self-test FAIL、并保留失败项编号供调试器读取。",
+        "THE SYSTEM SHALL 使主机侧单测与目标侧自检引用同一组参考常量（同一头文件），不允许出现两份不一致的参考值。"
+      ],
+      "acceptance": [
+        ".\\harness\\tools\\run-host-tests.ps1：参考序列与参考校验值用例通过",
+        "上板：串口出现 self-test: pattern OK 与 self-test: fmt OK；故障注入后转为 fail-safe 形态"
+      ],
+      "design_ref": "design.md#6-错误处理",
+      "tasks": [
+        "T-006",
+        "T-008",
+        "T-009"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "title": "SCI 日志输出",
+      "user_story": "作为调试者，我想要通过 XDS110 虚拟串口看到启动信息、自检结果与心跳，以便在不接额外串口硬件的情况下观察系统状态。",
+      "priority": "should",
+      "category": "interface",
+      "ears": [
+        "THE SYSTEM SHALL 将 SCIA 配置为 115200-8N1（TX = GPIO29，RX = GPIO28，LSPCLK 30MHz）。",
+        "WHEN 上电完成，THE SYSTEM SHALL 打印 banner：目标 MPN、板型、固件版本、SYSCLK、构建时间。",
+        "THE SYSTEM SHALL 每 5 秒打印一行心跳 alive, steps=<count>, mode=<mode>。",
+        "THE SYSTEM SHALL 仅使用带长度边界的格式化函数输出数字，禁止使用 sprintf 写入定长缓冲。"
+      ],
+      "acceptance": [
+        ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-led-chaser 成功且 fmt.c、sci_log.c 链接",
+        "上板：串口工具（115200-8N1）收到 banner、self-test OK、周期性心跳"
+      ],
+      "design_ref": "design.md#3-组件与接口",
+      "tasks": [
+        "T-002",
+        "T-005",
+        "T-008"
+      ]
+    }
+  ],
+  "out_of_scope": [
+    "按键或外部输入切换模式",
+    "PWM 调光（呼吸灯）",
+    "引入 RTOS（见 ADR 0001 的 FreeRTOS portasm.asm 工具链不兼容说明）",
+    "CAN/FSI/ADC 等其它外设驱动"
+  ],
+  "open_questions": [
+    {
+      "question": "是否需要按键切换 pattern 模式？",
+      "requirements": [
+        "REQ-001"
+      ],
+      "status": "resolved"
+    },
+    {
+      "question": "是否改用外部 20MHz 晶振以提升时钟精度？",
+      "requirements": [
+        "REQ-003"
+      ],
+      "status": "resolved"
+    },
+    {
+      "question": "200ms ±2% 由谁裁决？板上 JTAG peek 的采样间隔是 20ms，量化误差远大于 2%(4ms)，因此 ±2% 不能由 HIL 断言；当前只判 ±25%。接入逻辑分析仪/示波器后再把本条改为 resolved 并补记录。",
+      "requirements": [
+        "REQ-003"
+      ],
+      "status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+﻿cmake not found - falling back to MSVC cl.exe.
+  (for the preferred path: winget install Kitware.CMake)
+[msvc fallback] building host tests with cl.exe (14.29.30133) - 7 sources from modules.json
+fw_test.c
+led_pattern.c
+fmt.c
+self_test.c
+test_led_pattern.c
+test_fmt.c
+test_runner.c
+Generating Code...
+
+=== host unit tests (f280039c-harness) ===
+
+=== led_pattern ===
+  - CHASE n=2 alternates and wraps
+  - CHASE n=4 walks 0..3 then wraps
+  - CHASE n=1 stays on channel 0
+  - BOUNCE n=4 reverses at the ends (period 2n-2 = 6)
+  - BOUNCE never repeats the end channel back to back
+  - BLINK alternates all-on / all-off
+  - invalid channel counts return 0 (no UB)
+  - maximum channel count (32) is handled without UB
+  - unknown mode yields an all-dark mask
+  - active-low inverts the lit bits, active-high passes through
+  - levels ignore bits outside the channel count
+  - FNV-1a reference matches the shared constant
+  - reference is stable and mode dependent
+
+=== fmt ===
+  - decimal: zero and small values
+  - decimal: UINT32_MAX boundary
+  - hexadecimal: prefix, upper case, no leading zeros
+  - bounded: buffer too small is reported, not overrun
+  - bounded: zero size and NULL destination are rejected
+  - bounded: exact fit succeeds (no NUL overruns)
+
+=== on-target self test executed on host ===
+  - self_test_run() == SELF_TEST_OK
+
+----------------------------------------
+cases: 20, failures: 0 -> PASS
+[msvc fallback] runner exit code: 0
+all host unit tests passed
+

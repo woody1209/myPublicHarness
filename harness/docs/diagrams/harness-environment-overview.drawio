@@ -1,0 +1,165 @@
+<mxfile host="app.diagrams.net" modified="2026-10-18T00:00:00.000Z" agent="WorkBuddy" version="24.0.0">
+  <diagram id="env-overview" name="环境配置总览">
+    <mxGraphModel dx="1426" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="t1" value="F280039C-harness 环境配置总览（rule &#8594; agent &#8594; rule 三段式闭环；入口 = verify.ps1 -Hil &#8594; VERIFY OK 9 腿）" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="12" width="830" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="n0" value="AGENTS.md：强制规则（DoD &#183; 红线 &#183; spec 批准门）&#183; 每次会话先读 docs/00" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="900" y="12" width="340" height="34" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b2a" value="&#9312; rule &#8212; 确定性规则层（不生成内容）&#10;verify.ps1 聚合门 &#183; doctor &#183; static-check &#183; spec.ps1 check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="70" width="300" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2b" value="&#9313; agent &#8212; 生产内容层（需批准门）&#10;specs 三件套 &#183; source 分层 &#183; docs/ADR 0001-0009" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="480" y="70" width="300" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2c" value="&#9314; rule &#8212; 证据与状态收口层&#10;ccs.ps1 &#183; host-tests &#183; run-hil &#183; program &#183; state.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="890" y="70" width="300" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="产出受约束的内容" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="b2a" target="b2b">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" value="提交门禁验证" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;fontSize=10;fontColor=#333333;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="b2b" target="b2c">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eret" value="不达标 &#8594; 回退修复（门禁拦截，禁止带病前进）" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;strokeColor=#b85450;fontSize=10;fontColor=#b85450;labelBackgroundColor=#ffffff;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" edge="1" parent="1" source="b2c" target="b2a">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="166"/>
+              <mxPoint x="220" y="166"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="tA" value="harness/tools &#8212; 规则轨（确定性工具，AI 不得绕过）" style="swimlane;startSize=30;html=1;fillColor=#f5f5f5;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="210" width="380" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1" value="verify.ps1 &#8212; 聚合门：9 腿全 PASS = VERIFY OK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="40" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" value="doctor.ps1 &#8212; 环境自发现 &#8594; manifest.json（过 schema 校验）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="90" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="static-check.ps1 &#8212; 规则扫描 + cl /analyze /W4（0 违规）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="140" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="ccs.ps1 &#8212; build / rebuild / size / probe / program" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="190" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5" value="run-host-tests.ps1 &#8212; 主机纯逻辑单测（ADR 0008 已修）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="240" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a6" value="run-hil.ps1 &#8212; 上板 H1-H6 + SCI 串口捕获（exit 3 = UNAVAILABLE）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="290" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="a7" value="spec.ps1 &#8212; new / list / check / trace（七段校验）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tA">
+          <mxGeometry x="20" y="340" width="340" height="42" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tB" value="specs/ + projects/ &#8212; 内容轨（AI/人产出，批准门把关）" style="swimlane;startSize=30;html=1;fillColor=#f5f5f5;strokeColor=#82b366;fontSize=13;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="450" y="210" width="380" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="requirements.md &#8212; 用户故事 + EARS 验收（REQ-xxx）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="40" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="design.md &#8212; 架构 / 接口 / 时序 / 内存 / 风险" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="90" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="tasks.md &#8212; 可勾选 T-xxx（关联 REQ 与验证命令）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="140" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="source/ &#8212; 纯逻辑 + _hw.c + board_*.c（board_pins.h）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="190" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="targets/&lt;MPN&gt;.json &#8212; 引脚 / 时钟 / 启动顺序单一真相" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="240" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="docs/ + adr/0001-0009 &#8212; 踩坑清单与决策留痕" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="290" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="b7" value="schemas/*.schema.json &#8212; spec / trace / state / manifest 契约" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tB">
+          <mxGeometry x="20" y="340" width="340" height="42" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tC" value="产物与记录 &#8212; 证据轨（可判定的结果）" style="swimlane;startSize=30;html=1;fillColor=#f5f5f5;strokeColor=#d79b00;fontSize=13;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="860" y="210" width="380" height="400" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1" value=".out / .map &#8212; 含 .args 段与 __c_args__（ADR 0004）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="40" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" value="主机单测 20 cases &#8212; failures = 0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="90" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3" value="static-check &#8212; 0 violations（cl /analyze clean）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="140" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4" value="HIL 记录 H1-H6 + SCI 六项 &#8212; PASS（~196ms）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="190" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5" value="loadti 烧录 program OK（真板无 4011）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="240" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c6" value="state.json 快照 &#8212; 只存指针与统计（过 state.schema.json）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="290" width="340" height="42" as="geometry"/>
+        </mxCell>
+        <mxCell id="c7" value="memory 日志 + 提交留痕（Git 基线待用户接入）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tC">
+          <mxGeometry x="20" y="340" width="340" height="42" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="eA" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#6c8ebf;endArrow=block;exitX=0.5;exitY=1;entryX=0.08;entryY=0;" edge="1" parent="1" source="tA" target="tv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eB" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="tB" target="tv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eC" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;endArrow=block;exitX=0.5;exitY=1;entryX=0.92;entryY=0;" edge="1" parent="1" source="tC" target="tv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tv" value="真相源与沉淀（单一事实 &#8212; 同一事实只允许有一处定义，其余全是快照/指针）" style="swimlane;startSize=30;html=1;fillColor=#fafafa;strokeColor=#9673a6;fontSize=13;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="1200" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="v1" value="harness/env/manifest.json&#10;环境唯一出处（过 schema）&#10;工具链 / SDK / 探针" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tv">
+          <mxGeometry x="20" y="45" width="210" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="v2" value="harness/schemas/*.schema.json&#10;契约&#10;spec / trace / state / manifest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tv">
+          <mxGeometry x="250" y="45" width="210" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="v3" value="targets/&lt;MPN&gt;.json&#10;硬件唯一出处&#10;引脚 / 时钟 / 启动顺序" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tv">
+          <mxGeometry x="480" y="45" width="210" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="v4" value="specs/&lt;id&gt;/&#10;需求与追溯&#10;REQ &#8594; 文件 / 测试 / 命令" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tv">
+          <mxGeometry x="710" y="45" width="210" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="v5" value="projects/&lt;proj&gt;/state.json&#10;状态快照&#10;只存指针与统计" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="tv">
+          <mxGeometry x="940" y="45" width="210" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="lg" value="图例" style="swimlane;startSize=26;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=12;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="850" width="1200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="l1" value="规则轨：确定性工具（AI 不得绕过）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="lg">
+          <mxGeometry x="20" y="34" width="200" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="l2" value="内容轨：AI/人产出，需批准门" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="lg">
+          <mxGeometry x="250" y="34" width="200" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="l3" value="证据轨：可判定的产物与记录" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="lg">
+          <mxGeometry x="480" y="34" width="200" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="l4" value="真相源：单一事实，禁止多处定义" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="lg">
+          <mxGeometry x="710" y="34" width="200" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="l5" value="虚线红：门禁不达标 &#8594; 回退修复" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=11;dashed=1;fontColor=#333333;align=center;verticalAlign=middle;" vertex="1" parent="lg">
+          <mxGeometry x="940" y="34" width="200" height="46" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
