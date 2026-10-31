@@ -145,6 +145,24 @@
 - 验证：`.\harness\tools\verify.ps1 -Project launchxl-f280039c-full-platform -Hil`
   → **VERIFY OK - 11 legs PASS**（host 97 / SIL 15 / HIL PASS，`.text` 13994，SIZE FLASH 9.3 % / RAM 5.47 %）。
 
+### 需求→文件追溯闭合（2026-11-01，来源：82 §9 待办 A8 / A12）
+
+**A8 — 52 个派生源文件未被 trace 认领（已闭合，可复核）**
+- 按子系统归入 `specs/0002-full-platform/trace.json`，共新增 **53 条 `files` 条目**：
+  `accel_hw`/`math_ref`/`board_error`→REQ-005、`board_clock`/`dcc_mon_hw`→REQ-002、`cla_*`→REQ-004、
+  `adc_scan_hw`/`adc_stat`→REQ-006、`dac_cmpss_hw`→REQ-007、`pwm_bank_hw`→REQ-008、`cap_meas_hw`→REQ-009、
+  `qep_quadv_hw`→REQ-010、`spi_loop_hw`→REQ-011、`i2c_pair_hw`→REQ-012、`sci_log`/`serial_loop_hw`/`fmt`→REQ-013、
+  `can_loop_hw`→REQ-014、`fsi_loop_hw`→REQ-015、`dma_bank_hw`→REQ-016、`clb_demo_hw`→REQ-017、
+  `main.c`→REQ-018（看门狗服务点，实证 `main.c:203 SysCtl_serviceWatchdog()`）、
+  `frame_gen`/`led_hw`/`led_pattern`/`health.h`/`self_test.h`→REQ-020、`app_version.h`→REQ-001。
+- 另补 motor-pwm `svpwm_table.h` → `specs/0003-motor-pwm-skeleton/trace.json` REQ-006。
+- 验证：**未认领源文件 52 → 0**；`review.ps1` 的 WARN 由 38 条降为 **0**（`REVIEW OK (0 findings)` 且无 WARN 段）。
+
+**A12 — spec-check 警告 REQ-009 verification 缺可重跑命令（已闭合）**
+- 补 `.\harness\tools\run-hil.ps1 -Project projects\launchxl-f280039c-full-platform`
+  （或 `verify.ps1 ... -Hil`）。
+- 验证：`spec.ps1 check -Id 0002-full-platform` → **CHECK OK，0 警告**。
+
 ### PR 状态（2026-10-31）
 
 - 分支 `feat/full-platform-derivation-and-test-pyramid`（`7832eac`）**已推送**至远端 `myPublicHarness`。

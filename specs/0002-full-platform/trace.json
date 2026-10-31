@@ -12,7 +12,8 @@
         "projects/launchxl-f280039c-full-platform/source/main.c",
         "projects/launchxl-f280039c-full-platform/source/scheduler.c",
         "projects/launchxl-f280039c-full-platform/source/health.c",
-        "harness/tests/host/modules.json"
+        "harness/tests/host/modules.json",
+        "projects/launchxl-f280039c-full-platform/source/app_version.h"
       ],
       "verification": "M1 closed 2026-10-24: harness/tools/verify.ps1 -Hil -> VERIFY OK (9 legs PASS incl. on-target HIL H1-H6, H5 cadence 189.8ms, record harness/tests/on-target/records/hil-2026-10-24-launchxl-f280039c-full-platform.md); host gates: run-host-tests.ps1 42 cases 0 failures, static-check.ps1 0 violations; led-chaser regression unchanged.",
       "status": "pending"
@@ -21,7 +22,11 @@
       "requirement": "REQ-002",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/board_clock.c",
+        "projects/launchxl-f280039c-full-platform/source/board_clock.h",
+        "projects/launchxl-f280039c-full-platform/source/dcc_mon_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/dcc_mon_hw.h"
       ],
       "verification": "M2 verified on board 2026-10-25: dcc_mon windows clean (warm-up 20 windows, consec-gated), HIL H7 bit0=1; sporadic single DCC window errors traced to synchronizer settling and are not consecutive (REQ-002 band). Gate: .\\harness\tools\u000berify.ps1 -Project launchxl-f280039c-full-platform -Hil",
       "status": "verified",
@@ -43,7 +48,11 @@
       "requirement": "REQ-004",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/cla_app.cla",
+        "projects/launchxl-f280039c-full-platform/source/cla_app_shared.h",
+        "projects/launchxl-f280039c-full-platform/source/cla_cpu.c",
+        "projects/launchxl-f280039c-full-platform/source/cla_cpu.h"
       ],
       "verification": "M4 CLA integrated 2026-10-30: cla_app.cla task + MemCfg LS1 program master + msg RAMs + ADR-0003-class load copy; force gated after task execution still reset-looped the platform (WD RESC=0x4 evidence). REQ pending until CLA bring-up closes.",
       "status": "pending",
@@ -55,7 +64,12 @@
       "requirement": "REQ-005",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/accel_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/accel_hw.h",
+        "projects/launchxl-f280039c-full-platform/source/math_ref.c",
+        "projects/launchxl-f280039c-full-platform/source/math_ref.h",
+        "projects/launchxl-f280039c-full-platform/source/board_error.c"
       ],
       "verification": "M4 code integrated 2026-10-30: BGCRC golden-window + AES ECB roundtrip + TMU vs math_ref + EPG register-level (REQ-019 downgrade); VCRC has no CGT intrinsic/header in 25.11.1 (documented open). Tasks gated during comm bring-up; on-board verification pending stable H5.",
       "status": "pending",
@@ -67,7 +81,11 @@
       "requirement": "REQ-006",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/adc_scan_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/adc_scan_hw.h",
+        "projects/launchxl-f280039c-full-platform/source/adc_stat.c",
+        "projects/launchxl-f280039c-full-platform/source/adc_stat.h"
       ],
       "verification": "M2 verified on board 2026-10-25: adc_scan 3x2 SOC rotation healthy (adc errors=0, conversions monotonic, H7 bit1=1); DAC-loopback channel discovery still open (dacq SHOULD, downgrade documented). Gate: .\\harness\tools\u000berify.ps1 -Project launchxl-f280039c-full-platform -Hil",
       "status": "verified",
@@ -79,7 +97,9 @@
       "requirement": "REQ-007",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/dac_cmpss_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/dac_cmpss_hw.h"
       ],
       "verification": "M2 PARTIAL/degraded 2026-10-25: DAC-CMPSS loopback channel discovery found no responder (mux=255, dacq SHOULD severity) - the documented downgrade path applies; DACs configured and stepping (dlb counter advances). Revisit as dedicated bring-up task; H7 bit3 optional.",
       "status": "pending"
@@ -88,7 +108,9 @@
       "requirement": "REQ-008",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/pwm_bank_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/pwm_bank_hw.h"
       ],
       "verification": "M2 verified on board 2026-10-25: all 8 ePWM modules run (register readback verified every second, pwm errors=0, H7 bit6=1); 7 pins muxed+direction-set (GPADIR lesson). Gate: .\\harness\tools\u000berify.ps1 -Project launchxl-f280039c-full-platform -Hil",
       "status": "verified",
@@ -100,9 +122,11 @@
       "requirement": "REQ-009",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/cap_meas_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/cap_meas_hw.h"
       ],
-      "verification": "M2 verified on board 2026-10-25: eCAP1/2/3 pad-loopback measured 9999/19996/49979 Hz (0.02% vs config) with tear-guard + outlier filter; HRCAP high-resolution downgraded per requirement (HR enable froze the channel). Gate: HIL H5/H7 + health line m2:ecap=9999/19996/49979.",
+      "verification": "M2 verified on board 2026-10-25: eCAP1/2/3 pad-loopback measured 9999/19996/49979 Hz (0.02% vs config) with tear-guard + outlier filter; HRCAP high-resolution downgraded per requirement (HR enable froze the channel). Gate: HIL H5/H7 + health line m2:ecap=9999/19996/49979. Rerun: .\\harness\\tools\\run-hil.ps1 -Project projects\\launchxl-f280039c-full-platform (or .\\harness\\tools\\verify.ps1 -Project projects\\launchxl-f280039c-full-platform -Hil); eCAP evidence line is captured in the HIL record under harness/tests/on-target/records/.",
       "status": "verified",
       "tests": [
         "harness/tests/on-target/records/hil-2026-10-25-launchxl-f280039c-full-platform.md"
@@ -112,7 +136,9 @@
       "requirement": "REQ-010",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/qep_quadv_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/qep_quadv_hw.h"
       ],
       "verification": "M2 PARTIAL (bring-up open) 2026-10-25: eQEP source-select written and verified (QEPSRCSEL=0x8ca/0x8ed = PWMXBAR2/4/5/6) but position counters stay ~0 (EQEP deaf or decoder config open); monitor downgraded to SHOULD with H7 bit5 optional; H9 precise judgement planned M5 after bring-up. pad-loopback inputs via EPWM X-BAR trips verified live (eCAP path).",
       "status": "pending",
@@ -124,7 +150,9 @@
       "requirement": "REQ-011",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/spi_loop_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/spi_loop_hw.h"
       ],
       "verification": "M3 code complete + platform HIL PASS 2026-10-25; SPI loopback counters observed on m3 line but stuck (TX-complete/RX-empty - SPI FIFO bring-up open). REQ stays pending until byte-exact loopback verified. Bring-up next.",
       "status": "pending",
@@ -136,7 +164,9 @@
       "requirement": "REQ-012",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/i2c_pair_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/i2c_pair_hw.h"
       ],
       "verification": "M3 code complete + platform HIL PASS; I2CA loopback counters observed, stuck (bring-up open). REQ pending.",
       "status": "pending",
@@ -148,7 +178,13 @@
       "requirement": "REQ-013",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/sci_log.c",
+        "projects/launchxl-f280039c-full-platform/source/sci_log.h",
+        "projects/launchxl-f280039c-full-platform/source/serial_loop_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/serial_loop_hw.h",
+        "projects/launchxl-f280039c-full-platform/source/fmt.c",
+        "projects/launchxl-f280039c-full-platform/source/fmt.h"
       ],
       "verification": "PARTIAL verified 2026-10-25: SCIB internal loopback byte-exact on board (ser counter grows, m3 line); LINA/LINB digital-loopback still open. REQ stays pending until LIN verified.",
       "status": "pending",
@@ -160,7 +196,9 @@
       "requirement": "REQ-014",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/can_loop_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/can_loop_hw.h"
       ],
       "verification": "M3 code complete + platform HIL PASS; CAN loopback counters observed, stuck (bring-up open). REQ pending.",
       "status": "pending",
@@ -172,7 +210,9 @@
       "requirement": "REQ-015",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/fsi_loop_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/fsi_loop_hw.h"
       ],
       "verification": "M3 code complete + platform HIL PASS; FSI internal-loopback counters observed, stuck (bring-up open). REQ pending.",
       "status": "pending",
@@ -184,7 +224,9 @@
       "requirement": "REQ-016",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/dma_bank_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/dma_bank_hw.h"
       ],
       "verification": "M3 code complete + platform HIL PASS; DMA CH1-4 configured (SPIB TX/RX + 2 memory channels, fixed-FIFO-step lesson from NMI reset) - completion counters observed, stuck pending SPIB traffic. REQ pending.",
       "status": "pending",
@@ -196,7 +238,9 @@
       "requirement": "REQ-017",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/clb_demo_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/clb_demo_hw.h"
       ],
       "verification": "M4 CLB register-interface proof (GPREG write/readback via APB) integrated 2026-10-30; HLC logic needs the CLB Tool flow - open per open_questions 5. REQ pending.",
       "status": "pending",
@@ -208,7 +252,8 @@
       "requirement": "REQ-018",
       "files": [
         "specs/0002-full-platform/requirements.md",
-        "specs/0002-full-platform/design.md"
+        "specs/0002-full-platform/design.md",
+        "projects/launchxl-f280039c-full-platform/source/main.c"
       ],
       "verification": "M4 watchdog integrated (enable after init + per-pass service + DSS fault-inject hook); bring-up OPEN 2026-10-25/30: with WD enabled the platform resets at the exact /64 838ms window (RESC=0x4 WDRSn, 24 banners/20s) despite per-pass service - service/window interaction needs a focused session. WD disabled for stability. REQ pending.",
       "status": "pending",
@@ -233,7 +278,15 @@
       "files": [
         "projects/launchxl-f280039c-full-platform/source/health.c",
         "projects/launchxl-f280039c-full-platform/source/self_test.c",
-        "harness/tests/host/test/test_health.c"
+        "harness/tests/host/test/test_health.c",
+        "projects/launchxl-f280039c-full-platform/source/health.h",
+        "projects/launchxl-f280039c-full-platform/source/self_test.h",
+        "projects/launchxl-f280039c-full-platform/source/frame_gen.c",
+        "projects/launchxl-f280039c-full-platform/source/frame_gen.h",
+        "projects/launchxl-f280039c-full-platform/source/led_hw.c",
+        "projects/launchxl-f280039c-full-platform/source/led_hw.h",
+        "projects/launchxl-f280039c-full-platform/source/led_pattern.c",
+        "projects/launchxl-f280039c-full-platform/source/led_pattern.h"
       ],
       "verification": "health threshold/map/recovery invariants proven by harness/tools/run-host-tests.ps1 (test_health.c + extended self test on host, 2026-10-24); 5s health line + HIL capture pending M2/M5.",
       "status": "pending"

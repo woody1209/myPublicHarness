@@ -70,7 +70,8 @@
       "requirement": "REQ-006",
       "files": [
         "projects/launchxl-f280039c-motor-pwm/source/svpwm.c",
-        "projects/launchxl-f280039c-motor-pwm/source/svpwm.h"
+        "projects/launchxl-f280039c-motor-pwm/source/svpwm.h",
+        "projects/launchxl-f280039c-motor-pwm/source/svpwm_table.h"
       ],
       "tests": [
         "harness/tests/host/test/test_svpwm.c"
