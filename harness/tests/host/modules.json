@@ -1,33 +1,144 @@
 {
   "meta": {
-    "schema_version": "1.0",
-    "purpose": "Single declared truth for which firmware modules are host-tested. run-host-tests.ps1 builds its compiler list from here; static-check.ps1 asserts that CMakeLists.txt, test_runner.c and this file agree, and that every host-compilable module is declared.",
+    "schema_version": "2.0",
+    "purpose": "Single declared truth for which firmware modules are host-tested, per project. run-host-tests.ps1 builds one test runner per project from here; static-check.ps1 asserts that CMakeLists.txt, each project's runner and this file agree, and that every host-compilable module is declared. v2 (spec 0002 T-005): projects[] replaces the single-project fields; each project gets its own logic lib and runner executable so identical module names in different projects never collide.",
     "read_by": [
       "harness/tools/run-host-tests.ps1",
       "harness/tools/static-check.ps1"
-    ],
-    "project": "launchxl-f280039c-led-chaser",
-    "source_dir": "projects/launchxl-f280039c-led-chaser/source"
+    ]
   },
-  "logic": [
-    "led_pattern",
-    "fmt",
-    "self_test"
-  ],
   "framework": [
     "framework/fw_test.c"
   ],
-  "runner": "runner/test_runner.c",
-  "suites": [
+  "projects": [
     {
-      "file": "test/test_led_pattern.c",
-      "entry": "led_pattern_tests",
-      "covers": ["led_pattern", "self_test"]
+      "name": "launchxl-f280039c-led-chaser",
+      "source_dir": "projects/launchxl-f280039c-led-chaser/source",
+      "logic": [
+        "led_pattern",
+        "fmt",
+        "self_test"
+      ],
+      "cmake_lib": "fw_logic",
+      "cmake_exe": "test_runner",
+      "runner": "runner/test_runner.c",
+      "suites": [
+        {
+          "file": "test/test_led_pattern.c",
+          "entry": "led_pattern_tests",
+          "covers": [
+            "led_pattern",
+            "self_test"
+          ]
+        },
+        {
+          "file": "test/test_fmt.c",
+          "entry": "fmt_tests",
+          "covers": [
+            "fmt"
+          ]
+        }
+      ]
     },
     {
-      "file": "test/test_fmt.c",
-      "entry": "fmt_tests",
-      "covers": ["fmt"]
+      "name": "launchxl-f280039c-motor-pwm",
+      "source_dir": "projects/launchxl-f280039c-motor-pwm/source",
+      "logic": [
+        "angle_gen",
+        "svpwm",
+        "fmt",
+        "self_test"
+      ],
+      "cmake_lib": "fw_logic_mp",
+      "cmake_exe": "test_runner_mp",
+      "runner": "runner/test_runner_mp.c",
+      "suites": [
+        {
+          "file": "test/test_angle_gen.c",
+          "entry": "angle_gen_tests",
+          "covers": [
+            "angle_gen"
+          ]
+        },
+        {
+          "file": "test/test_svpwm.c",
+          "entry": "svpwm_tests",
+          "covers": [
+            "svpwm"
+          ]
+        },
+        {
+          "file": "test/test_mp_selftest.c",
+          "entry": "mp_selftest_tests",
+          "covers": [
+            "self_test",
+            "fmt"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "launchxl-f280039c-full-platform",
+      "source_dir": "projects/launchxl-f280039c-full-platform/source",
+      "logic": [
+        "scheduler",
+        "health",
+        "self_test",
+        "fmt",
+        "led_pattern",
+        "adc_stat",
+        "math_ref",
+        "frame_gen"
+      ],
+      "cmake_lib": "fw_logic_fp",
+      "cmake_exe": "test_runner_fp",
+      "runner": "runner/test_runner_fp.c",
+      "suites": [
+        {
+          "file": "test/test_scheduler.c",
+          "entry": "scheduler_tests",
+          "covers": [
+            "scheduler"
+          ]
+        },
+        {
+          "file": "test/test_health.c",
+          "entry": "health_tests",
+          "covers": [
+            "health"
+          ]
+        },
+        {
+          "file": "test/test_fp_selftest.c",
+          "entry": "fp_selftest_tests",
+          "covers": [
+            "self_test",
+            "fmt",
+            "led_pattern"
+          ]
+        },
+        {
+          "file": "test/test_adc_stat.c",
+          "entry": "adc_stat_tests",
+          "covers": [
+            "adc_stat"
+          ]
+        },
+        {
+          "file": "test/test_math_ref.c",
+          "entry": "math_ref_tests",
+          "covers": [
+            "math_ref"
+          ]
+        },
+        {
+          "file": "test/test_frame_gen.c",
+          "entry": "frame_gen_tests",
+          "covers": [
+            "frame_gen"
+          ]
+        }
+      ]
     }
   ]
 }

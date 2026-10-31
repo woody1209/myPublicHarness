@@ -1,0 +1,13 @@
+﻿
+=== SIL (launchxl-f280039c-motor-pwm) ===
+
+=== SIL motor waveform (launchxl-f280039c-motor-pwm) ===
+  - angle generator: 5.00 Hz at a 10 ms tick
+  - SVPWM: min-max aligned (floor phase == 0) and bounded
+  - SVPWM: centring offset cancels in every phase difference
+  - SVPWM: rotating 120 degrees permutes the three duties
+    [sil] worst 120-deg rotation mismatch: 2 per-mille
+  - SVPWM: illegal magnitude rejected, legal one stays bounded
+
+----------------------------------------
+cases: 5, failures: 0 -> PASS

@@ -3,7 +3,7 @@
                  "project":  "launchxl-f280039c-led-chaser",
                  "target":  "TMS320F280039C",
                  "board":  "LAUNCHXL-F280039C",
-                 "updated_at":  "2026-10-18"
+                 "updated_at":  "2026-10-31"
              },
     "env":  {
                 "status":  "ok",
@@ -55,7 +55,7 @@
                 "status":  "pass",
                 "probe":  "XDS110 (cJTAG)",
                 "image":  "projects/launchxl-f280039c-led-chaser/CPU1_FLASH/launchxl-f280039c-led-chaser.out",
-                "record":  "harness/tests/on-target/records/hil-2026-10-18-led-chaser.md",
+                "record":  "harness/tests/on-target/records/hil-2026-10-31-launchxl-f280039c-led-chaser.md",
                 "checks":  {
                                "jtag":  true,
                                "flash":  true,
@@ -65,6 +65,6 @@
                                "sci":  true
                            },
                 "fail_reason":  null,
-                "at":  "2026-10-18"
+                "at":  "2026-10-31"
             }
 }

@@ -1,0 +1,111 @@
+﻿{
+  "meta": {
+    "spec_id": "0003-motor-pwm-skeleton",
+    "generated_at": "2026-10-25",
+    "schema_version": "1.0"
+  },
+  "traces": [
+    {
+      "requirement": "REQ-001",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/board_pins.h",
+        "projects/launchxl-f280039c-motor-pwm/source/main.c"
+      ],
+      "tests": [
+        "harness/tools/static-check.ps1"
+      ],
+      "verification": ".\\harness\\tools\\static-check.ps1 -Project launchxl-f280039c-motor-pwm（引脚四规则 0 命中）；.\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-motor-pwm",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-002",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/board_epwm.c",
+        "projects/launchxl-f280039c-motor-pwm/source/board_epwm.h",
+        "projects/launchxl-f280039c-motor-pwm/source/main.c"
+      ],
+      "tests": [
+        "harness/tools/dss/hil_test_mp.js"
+      ],
+      "verification": ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-motor-pwm；HIL 寄存器回读见 harness/tools/dss/hil_test_mp.js H5；示波器死区/载波人工清单见 harness/tests/on-target/README.md",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-003",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/board_adc.c",
+        "projects/launchxl-f280039c-motor-pwm/source/board_adc.h"
+      ],
+      "tests": [
+        "harness/tools/dss/hil_test_mp.js"
+      ],
+      "verification": ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-motor-pwm；SCI motor: 行 adc= 值随 A2 电压变化（.\\harness\\tools\\run-hil.ps1 serialChecks）",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-004",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/board_cmpss.c",
+        "projects/launchxl-f280039c-motor-pwm/source/board_cmpss.h"
+      ],
+      "tests": [
+        "harness/tools/dss/hil_test_mp.js"
+      ],
+      "verification": ".\\harness\\tools\\ccs.ps1 build -Project projects\\launchxl-f280039c-motor-pwm；DAC 强制越限实验见 harness/tools/dss/hil_test_mp.js H5；正常上电 90 s SCI 无 FAULT 行",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-005",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/angle_gen.c",
+        "projects/launchxl-f280039c-motor-pwm/source/angle_gen.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_angle_gen.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1（test_angle_gen.c 覆盖速率/回绕/结合律/边界）",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-006",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/svpwm.c",
+        "projects/launchxl-f280039c-motor-pwm/source/svpwm.h",
+        "projects/launchxl-f280039c-motor-pwm/source/svpwm_table.h"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_svpwm.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1（test_svpwm.c 覆盖定心/线电压不变性/零幅度/过调制守卫/非法入参）",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-007",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/sci_log.c",
+        "projects/launchxl-f280039c-motor-pwm/source/sci_log.h",
+        "projects/launchxl-f280039c-motor-pwm/source/fmt.c",
+        "projects/launchxl-f280039c-motor-pwm/source/fmt.h",
+        "projects/launchxl-f280039c-motor-pwm/source/main.c"
+      ],
+      "tests": [
+        "harness/tools/run-hil.ps1"
+      ],
+      "verification": ".\\harness\\tools\\run-hil.ps1 -Project projects\\launchxl-f280039c-motor-pwm（serialChecks 九项全命中）",
+      "status": "verified"
+    },
+    {
+      "requirement": "REQ-008",
+      "files": [
+        "projects/launchxl-f280039c-motor-pwm/source/self_test.c",
+        "projects/launchxl-f280039c-motor-pwm/source/self_test.h",
+        "projects/launchxl-f280039c-motor-pwm/source/main.c"
+      ],
+      "tests": [
+        "harness/tests/host/test/test_mp_selftest.c"
+      ],
+      "verification": ".\\harness\\tools\\run-host-tests.ps1（self_test 参考序列）；HIL g_self_test_code==0 见 harness/tools/dss/hil_test_mp.js H3；故障注入后 FAULT: tz-latched 见于 SCI 日志",
+      "status": "verified"
+    }
+  ]
+}

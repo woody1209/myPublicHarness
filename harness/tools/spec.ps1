@@ -73,6 +73,9 @@ function Resolve-RepoPath {
     param([string]$Rel, [string]$SpecDir)
     if ([string]::IsNullOrWhiteSpace($Rel)) { return $null }
     $clean = $Rel.Trim() -replace '^\[+' -replace '\]+$' -replace '^`+' -replace '`+$'
+    # Windows 非法路径字符（模板占位符 <module> 之类）：绝不可能是真实路径，
+    # 直接按不存在处理，避免 Test-Path/IsPathRooted 抛"非法字符"异常污染输出。
+    if ($clean -match '[<>|?*"]') { return $null }
     $cands = @()
     if ([System.IO.Path]::IsPathRooted($clean)) {
         if (Test-Path $clean) { return $clean }

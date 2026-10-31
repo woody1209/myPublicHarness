@@ -1,0 +1,78 @@
+# myPublicHarness CI — 实例化于 2026-10-31（此前只有 harness/templates/ci 模板，仓库无 .github/）。
+#
+# 诚实边界（别把"没跑"读成"过了"）：
+#   - GitHub 托管 runner 上没有 CCS / cl2000 / C2000Ware / XDS110。
+#     所以固件构建与上板 HIL **不在托管 runner 上跑**，它们只能跑在装了工具链并插着
+#     探针的 self-hosted runner 上（见 job firmware-build 的 runs-on 与 if 条件）。
+#   - 本机全量门禁的唯一入口仍是 .\harness\tools\verify.ps1（-Hil 加上板腿）。
+#   - 每个 job 都必须能 FAIL：无 `|| true`、无 continue-on-error（ADR 0009）。
+name: harness-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host-tests:
+    name: Host unit tests (pure logic, ctest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S harness/tests/host -B harness/tests/host/build-ci
+      - name: Build
+        run: cmake --build harness/tests/host/build-ci
+      - name: Run
+        run: ctest --test-dir harness/tests/host/build-ci --output-on-failure
+
+  spec-check:
+    name: Spec contracts (schema + traceability + evidence paths)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate every spec
+        shell: pwsh
+        run: .\harness\tools\spec.ps1 check
+
+  static-check:
+    name: Static rules + MSVC /analyze (per project)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: led-chaser
+        shell: pwsh
+        run: .\harness\tools\static-check.ps1 -Project launchxl-f280039c-led-chaser
+      - name: motor-pwm
+        shell: pwsh
+        run: .\harness\tools\static-check.ps1 -Project launchxl-f280039c-motor-pwm
+
+  firmware-build:
+    name: Firmware build + size (requires CCS, C2000Ware, cl2000)
+    # 托管 runner 上没有 CCS/C2000Ware：默认不跑，避免"绿但没真跑"的假象。
+    # 启用方式：给仓库加变量 RUN_FW_BUILD=true，并提供带 CCS 的 self-hosted runner。
+    runs-on: [self-hosted, Windows, CCS]
+    if: ${{ vars.RUN_FW_BUILD == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [launchxl-f280039c-led-chaser, launchxl-f280039c-motor-pwm]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Environment self-check (doctor)
+        shell: pwsh
+        run: .\harness\tools\doctor.ps1
+      - name: Build CPU1_FLASH
+        shell: pwsh
+        run: .\harness\tools\ccs.ps1 build -Project projects\${{ matrix.project }} -Config CPU1_FLASH
+      - name: Build CPU1_RAM
+        shell: pwsh
+        run: .\harness\tools\ccs.ps1 build -Project projects\${{ matrix.project }} -Config CPU1_RAM
+      - name: Size report (C28x words)
+        shell: pwsh
+        run: .\harness\tools\ccs.ps1 size -Project projects\${{ matrix.project }} -Config CPU1_FLASH
+
+  # HIL 有意不接 CI：需要真板 + XDS110 探针，且会烧写 flash。
+  # 硬件腿由本机 .\harness\tools\verify.ps1 -Hil 强制，证据落在
+  # harness/tests/on-target/records/（见 harness/docs/50-CI与版本管理.md）。

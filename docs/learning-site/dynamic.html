@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态控制原理演示</title>
+<style>
+  :root {
+    --bg:#F1EFE8; --card:#fff; --ink:#2C2C2A; --muted:#5F5E5A; --line:#D3D1C7;
+    --blue:#185FA5; --blue-soft:#E6F1FB; --green:#0F6E56; --green-soft:#E1F5EE;
+    --amber:#854F0B; --amber-soft:#FAEEDA; --red:#8B2E2E; --red-soft:#FCEBEB;
+    --purple:#534AB7; --purple-soft:#EEEDFE;
+    --mono:"Cascadia Mono",Consolas,"Courier New",monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif; font-size:15px; line-height:1.7; }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:20px 32px; position:sticky; top:0; z-index:10; }
+  h1 { margin:0; font-size:21px; font-weight:500; }
+  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+  nav { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+  nav a { text-decoration:none; color:var(--ink); background:var(--bg); padding:5px 12px; border-radius:8px; font-size:13px; border:1px solid var(--line); }
+  nav a:hover { background:var(--blue-soft); color:var(--blue); }
+  main { max-width:1180px; margin:0 auto; padding:28px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:24px 28px; margin-bottom:24px; }
+  h2 { font-size:19px; font-weight:500; margin:0 0 8px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  h3 { font-size:15px; font-weight:500; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; background:var(--blue-soft); color:var(--blue); margin-left:8px; vertical-align:middle; }
+  .tag.green { background:var(--green-soft); color:var(--green); }
+  .tag.red { background:var(--red-soft); color:var(--red); }
+  .tag.amber { background:var(--amber-soft); color:var(--amber); }
+  .tag.purple { background:var(--purple-soft); color:var(--purple); }
+  canvas { display:block; width:100%; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .ctrl-row { display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin:14px 0; }
+  .ctrl { flex:1 1 220px; min-width:200px; }
+  .ctrl label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-bottom:4px; }
+  .ctrl .val { font-family:var(--mono); color:var(--ink); font-size:12.5px; }
+  input[type=range] { width:100%; }
+  button { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:7px 16px; font-size:13px; cursor:pointer; color:var(--ink); font-family:inherit; }
+  button:hover { background:var(--blue-soft); color:var(--blue); border-color:var(--blue); }
+  button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+  button.primary:hover { background:#0C447C; }
+  button.danger { background:var(--red-soft); color:var(--red); border-color:var(--red); }
+  button.danger:hover { background:#f5d8d8; }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:14px 0; }
+  .metric { background:var(--bg); border-radius:8px; padding:10px 12px; }
+  .metric .lbl { font-size:11.5px; color:var(--muted); }
+  .metric .num { font-family:var(--mono); font-size:19px; font-weight:500; margin-top:2px; }
+  .metric .num.blue { color:var(--blue); }
+  .metric .num.green { color:var(--green); }
+  .metric .num.amber { color:var(--amber); }
+  .metric .num.red { color:var(--red); }
+  .metric .num.purple { color:var(--purple); }
+  .callout { border-left:3px solid var(--amber); background:var(--amber-soft); padding:11px 15px; border-radius:0 8px 8px 0; margin:12px 0; font-size:13px; }
+  .callout.green { border-left-color:var(--green); background:var(--green-soft); }
+  .callout.red { border-left-color:var(--red); background:var(--red-soft); }
+  .callout.blue { border-left-color:var(--blue); background:var(--blue-soft); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; table-layout:fixed; }
+  th,td { border:1px solid var(--line); padding:7px 10px; text-align:left; word-break:break-word; }
+  th { background:var(--bg); font-weight:500; }
+  .mono { font-family:var(--mono); font-size:12px; }
+  .kv { display:flex; gap:12px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:10px 0; }
+  .kv .k { color:var(--muted); }
+  .kv .v { color:var(--ink); font-weight:500; }
+  .badge { display:inline-block; padding:3px 9px; border-radius:6px; font-size:11.5px; font-weight:500; }
+  .badge.ok { background:var(--green-soft); color:var(--green); }
+  .badge.warn { background:var(--amber-soft); color:var(--amber); }
+  .badge.fail { background:var(--red-soft); color:var(--red); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:800px) { .grid2 { grid-template-columns:1fr; } }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin:8px 0; }
+  .legend .sw { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>动态控制原理演示 <span class="tag green">交互式</span></h1>
+  <div class="sub">拖动参数看波形怎么变 · 与 firmware 同算法 · spec 0002 契约</div>
+  <nav>
+    <a href="index.html">理论首页</a>
+    <a href="#svpwm">SVPWM 三维</a>
+    <a href="#carrier">载波 + 三相 PWM</a>
+    <a href="#angle">电角度发生器</a>
+    <a href="#protect">保护时序状态机</a>
+    <a href="mcu.html">MCU 资源时序</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======== 1. SVPWM ======== -->
+<section id="svpwm">
+  <h2>1. SVPWM 三维联动 <span class="tag purple">算法</span></h2>
+  <p>三个视图同步更新：矢量空间 → 三相占空比 → 线电压。拖动电角度和幅度，看定心怎么只改共模、不改差模。</p>
+
+  <div class="ctrl-row">
+    <div class="ctrl">
+      <label>电角度 θ <span class="val" id="angVal">0°</span></label>
+      <input type="range" id="angSlider" min="0" max="3599" value="0">
+    </div>
+    <div class="ctrl">
+      <label>幅度 mag <span class="val" id="magVal">800‰</span></label>
+      <input type="range" id="magSlider" min="0" max="1000" value="800">
+    </div>
+    <div class="ctrl" style="flex:0 0 auto;">
+      <button id="svpwmPlay" class="primary">▶ 自动旋转</button>
+      <button id="svpwmZero">零矢量</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="lbl">α (cos 分量)</div><div class="num blue" id="mAlpha">0</div></div>
+    <div class="metric"><div class="lbl">β (sin 分量)</div><div class="num blue" id="mBeta">0</div></div>
+    <div class="metric"><div class="lbl">duty a</div><div class="num green" id="mA">500</div></div>
+    <div class="metric"><div class="lbl">duty b</div><div class="num green" id="mB">500</div></div>
+    <div class="metric"><div class="lbl">duty c</div><div class="num green" id="mC">500</div></div>
+    <div class="metric"><div class="lbl">线电压 a−b</div><div class="num amber" id="mAB">0</div></div>
+    <div class="metric"><div class="lbl">过调制守卫</div><div class="num red" id="mGuard">否</div></div>
+  </div>
+
+  <canvas id="svpwmCanvas" height="380"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#378ADD"></span>矢量 (α,β)</span>
+    <span><span class="sw" style="background:#0F6E56"></span>三相占空比柱</span>
+    <span><span class="sw" style="background:#BA7517"></span>线电压 a−b</span>
+    <span><span class="sw" style="background:#888780"></span>单位圆 (mag=1000)</span>
+  </div>
+
+  <div class="callout green">
+    <b>观察</b>：无论 θ 怎么转，<code>da−db</code> 始终等于 <code>ta−tb</code>（线电压不变）。
+    幅度 &gt; 666‰ 时触发过调制守卫，三相整体等比缩放。
+  </div>
+</section>
+
+<!-- ======== 2. 载波 + PWM ======== -->
+<section id="carrier">
+  <h2>2. 中心对齐载波 + 三相 PWM <span class="tag amber">硬件时序</span></h2>
+  <p>up-down 计数，10 kHz 载波。死区 1 µs 防直通。占空比 = CMPA / PRD。</p>
+
+  <div class="ctrl-row">
+    <div class="ctrl">
+      <label>占空比 a <span class="val" id="pwmaVal">50%</span></label>
+      <input type="range" id="pwma" min="0" max="100" value="50">
+    </div>
+    <div class="ctrl">
+      <label>占空比 b <span class="val" id="pwmbVal">50%</span></label>
+      <input type="range" id="pwmb" min="0" max="100" value="50">
+    </div>
+    <div class="ctrl">
+      <label>占空比 c <span class="val" id="pwmcVal">50%</span></label>
+      <input type="range" id="pwmc" min="0" max="100" value="50">
+    </div>
+    <div class="ctrl">
+      <label>死区 (TBCLK) <span class="val" id="dbVal">120 (=1µs)</span></label>
+      <input type="range" id="dbSlider" min="0" max="240" value="120">
+    </div>
+    <div class="ctrl" style="flex:0 0 auto;">
+      <button id="deadlockBtn" class="danger">⚠ 直通演示 (DB=0)</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="lbl">载波频率</div><div class="num blue">10.00 kHz</div></div>
+    <div class="metric"><div class="lbl">PRD</div><div class="num blue">6000</div></div>
+    <div class="metric"><div class="lbl">死区</div><div class="num amber" id="mDB">1.00 µs</div></div>
+    <div class="metric"><div class="lbl">上桥直通风险</div><div class="num red" id="mShoot">否</div></div>
+  </div>
+
+  <canvas id="carrierCanvas" height="340"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#378ADD"></span>载波 TBCTR (up-down)</span>
+    <span><span class="sw" style="background:#0F6E56"></span>相 A / A̅ (互补)</span>
+    <span><span class="sw" style="background:#BA7517"></span>相 B / B̅</span>
+    <span><span class="sw" style="background:#D85A30"></span>相 C / C̅</span>
+    <span><span class="sw" style="background:#B4537E"></span>死区窗口</span>
+  </div>
+
+  <div class="callout red">
+    <b>直通陷阱</b>：把死区调到 0，看上下桥边沿重叠——这就是为什么 DBRED/DBFED=120 是硬约束。
+    占空比调到 100% 时某相整周期为低（瞬时 GPIO 读全零是正常波形）。
+  </div>
+</section>
+
+<!-- ======== 3. 电角度发生器 ======== -->
+<section id="angle">
+  <h2>3. 开环电角度发生器 <span class="tag purple">算法</span></h2>
+  <p>定点积分器，0.1° 分辨率。观察 64 位余数累加怎么保证"任意 tick 拆分终点一致"。</p>
+
+  <div class="ctrl-row">
+    <div class="ctrl">
+      <label>电频率 rate_x100 <span class="val" id="rateVal">500 (5.00 Hz)</span></label>
+      <input type="range" id="rateSlider" min="10" max="50000" value="500">
+    </div>
+    <div class="ctrl">
+      <label>tick_us (每步微秒) <span class="val" id="tickVal">100</span></label>
+      <input type="range" id="tickSlider" min="1" max="10000" value="100">
+    </div>
+    <div class="ctrl" style="flex:0 0 auto;">
+      <button id="angPlay" class="primary">▶ 播放</button>
+      <button id="angReset">重置</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="lbl">angle_x10</div><div class="num purple" id="mAng">0</div></div>
+    <div class="metric"><div class="lbl">角度 (°)</div><div class="num purple" id="mAngDeg">0.0</div></div>
+    <div class="metric"><div class="lbl">accum (余数)</div><div class="num blue" id="mAccum">0</div></div>
+    <div class="metric"><div class="lbl">累计时间 µs</div><div class="num blue" id="mTime">0</div></div>
+    <div class="metric"><div class="lbl">一圈用时</div><div class="num amber" id="mRevTime">200.0 ms</div></div>
+    <div class="metric"><div class="lbl">tick 拆分一致性</div><div class="num green" id="mConsist">✓</div></div>
+  </div>
+
+  <canvas id="angleCanvas" height="220"></canvas>
+
+  <div class="callout blue">
+    <b>结合律</b>：同样 100000 µs 总时长，1×100000 / 100×1000 / 1000×100 三种拆分
+    终点 angle_x10 必须一致（主机单测 <code>test_angle_gen.c</code> 覆盖）。
+    你可以在浏览器控制台调用 <code>MCLab.angleAdvance</code> 验证。
+  </div>
+</section>
+
+<!-- ======== 4. 保护时序状态机 ======== -->
+<section id="protect">
+  <h2>4. 过流保护时序状态机 <span class="tag red">安全</span></h2>
+  <p>模拟 CMPSS→XBAR→DCBEVT1 硬件 trip 全过程。点击"注入过流"看状态跳转。</p>
+
+  <div class="ctrl-row">
+    <div class="ctrl">
+      <label>CMPSS DAC 阈值 <span class="val" id="dacVal">4095</span></label>
+      <input type="range" id="dacSlider" min="0" max="4095" value="4095">
+    </div>
+    <div class="ctrl">
+      <label>模拟 A2 输入 (ADC 码) <span class="val" id="a2Val">38</span></label>
+      <input type="range" id="a2Slider" min="0" max="4095" value="38">
+    </div>
+    <div class="ctrl" style="flex:0 0 auto;">
+      <button id="injectBtn" class="danger">⚡ 注入过流 (DAC→0)</button>
+      <button id="recoverBtn">↻ 恢复 (DAC→4095)</button>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="lbl">COMPSTS</div><div class="num red" id="mComp">0</div></div>
+    <div class="metric"><div class="lbl">TZSEL.DCBEVT1</div><div class="num amber" id="mTzSel">0x8000</div></div>
+    <div class="metric"><div class="lbl">TZFLG bit5</div><div class="num red" id="mTzFlg">0</div></div>
+    <div class="metric"><div class="lbl">六路 PWM</div><div class="num green" id="mPwmState">运行</div></div>
+    <div class="metric"><div class="lbl">dwell 计时</div><div class="num amber" id="mDwell">0 ms</div></div>
+    <div class="metric"><div class="lbl">状态机</div><div class="num purple" id="mFsm">RUN</div></div>
+  </div>
+
+  <canvas id="protectCanvas" height="200"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#0F6E56"></span>RUN (正常调制)</span>
+    <span><span class="sw" style="background:#D85A30"></span>TRIP (硬件锁存)</span>
+    <span><span class="sw" style="background:#BA7517"></span>DWELL (5s 等待)</span>
+    <span><span class="sw" style="background:#378ADD"></span>RECOVER (软件清 TZ)</span>
+  </div>
+
+  <div class="callout">
+    <b>契约</b>：<code>FAULT: tz-latched</code> 在锁存瞬间打印一次；dwell 5 s 且比较器回低于参考后
+    打印 <code>tz: cleared</code> 并恢复调制。HIL H5b 用 CMPA 寄存器变化证明"调制已恢复"，
+    不用瞬时 GPIO 读。
+  </div>
+</section>
+
+<section>
+  <h2>5. 三页联动 <span class="tag">导航</span></h2>
+  <table>
+    <tr><th style="width:25%">页面</th><th style="width:35%">内容</th><th>什么时候看</th></tr>
+    <tr><td><a href="index.html">index.html</a></td><td>静态理论（数学/契约/寄存器）</td><td>先建立概念地图</td></tr>
+    <tr><td><a href="dynamic.html">dynamic.html</a></td><td>本页 — 动态原理演示</td><td>理解参数怎么影响波形</td></tr>
+    <tr><td><a href="mcu.html">mcu.html</a></td><td>MCU 资源控制时序</td><td>理解寄存器读写与启动链</td></tr>
+  </table>
+</section>
+
+</main>
+
+<footer>motor-control-lab · 动态控制原理演示 · 与 firmware 同算法（MCLab core）</footer>
+
+<script src="js/core.js"></script>
+<script src="js/dynamic.js"></script>
+</body>
+</html>

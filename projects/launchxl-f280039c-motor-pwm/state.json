@@ -1,0 +1,70 @@
+﻿{
+    "meta":  {
+                 "project":  "launchxl-f280039c-motor-pwm",
+                 "target":  "TMS320F280039C",
+                 "board":  "LAUNCHXL-F280039C",
+                 "updated_at":  "2026-10-31"
+             },
+    "env":  {
+                "status":  "ok",
+                "manifest":  "harness/env/manifest.json",
+                "checked_at":  "2026-10-25"
+            },
+    "build":  {
+                  "status":  "ok",
+                  "config":  "CPU1_FLASH",
+                  "artifacts":  [
+                                    "projects/launchxl-f280039c-motor-pwm/CPU1_FLASH/launchxl-f280039c-motor-pwm.out",
+                                    "projects/launchxl-f280039c-motor-pwm/CPU1_FLASH/launchxl-f280039c-motor-pwm.map"
+                                ],
+                  "size":  {
+                               "unit":  "C28x 16-bit words (1 word = 2 bytes)",
+                               "measured_by":  "ccs.ps1 size",
+                               "text_words":  7457,
+                               "const_words":  2716,
+                               "data_words":  14,
+                               "bss_words":  2,
+                               "args_words":  512,
+                               "flash_words":  10207,
+                               "flash_pct":  5.19,
+                               "ram_words":  1040,
+                               "ram_pct":  2.94
+                           },
+                  "note":  "2026-10-25 收口（spec 0002 定稿 + HIL 二次 PASS）：.text 7457 words（.text.1=4096 + .text.2=3361）（+183 vs 7274，CMPSS 双向探针重构 board_cmpss_wait_status/清锁存 + CMPSS lo 满量程参考 + cmpss: 行 hi/lo 打印语义修正）；.const 2716 words 含 svpwm 四分之一波 sin 表 901 项；.cinit 28 + .TI.ramfunc 4 + codestart 2；FLASH 合计 10207 words = 5.19%；RAM 1040 words = 2.94%（.args 512 --args=0x200 / .stack 512 / .data 14 / .bss 2）。注：先前记忆中 10717/1552 口径含 .stack 且 .text.2 取 hex(0x0d21=3361)，本次以 ccs.ps1 size 实测为准。CPU1_RAM 双配置同源构建通过。",
+                  "at":  "2026-10-25"
+              },
+    "host_tests":  {
+                       "status":  "pass",
+                       "framework":  "self-contained fw_test (fallback driver: MSVC cl.exe)",
+                       "cases":  41,
+                       "at":  "2026-10-25"
+                   },
+    "flash":  {
+                  "status":  "not-run",
+                  "probe":  null,
+                  "reason":  null,
+                  "at":  null
+              },
+    "specs":  [
+                  {
+                      "spec_id":  "0003-motor-pwm-skeleton",
+                      "status":  "done"
+                  }
+              ],
+    "hil":  {
+                "status":  "pass",
+                "probe":  "XDS110 (cJTAG)",
+                "image":  "projects/launchxl-f280039c-motor-pwm/CPU1_FLASH/launchxl-f280039c-motor-pwm.out",
+                "record":  "harness/tests/on-target/records/hil-2026-10-31-launchxl-f280039c-motor-pwm.md",
+                "checks":  {
+                               "jtag":  true,
+                               "flash":  true,
+                               "selftest":  true,
+                               "loop":  true,
+                               "pwm":  true,
+                               "sci":  true
+                           },
+                "fail_reason":  null,
+                "at":  "2026-10-31"
+            }
+}

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU 资源控制时序</title>
+<style>
+  :root {
+    --bg:#F1EFE8; --card:#fff; --ink:#2C2C2A; --muted:#5F5E5A; --line:#D3D1C7;
+    --blue:#185FA5; --blue-soft:#E6F1FB; --green:#0F6E56; --green-soft:#E1F5EE;
+    --amber:#854F0B; --amber-soft:#FAEEDA; --red:#8B2E2E; --red-soft:#FCEBEB;
+    --purple:#534AB7; --purple-soft:#EEEDFE;
+    --mono:"Cascadia Mono",Consolas,"Courier New",monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif; font-size:15px; line-height:1.7; }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:20px 32px; position:sticky; top:0; z-index:10; }
+  h1 { margin:0; font-size:21px; font-weight:500; }
+  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+  nav { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+  nav a { text-decoration:none; color:var(--ink); background:var(--bg); padding:5px 12px; border-radius:8px; font-size:13px; border:1px solid var(--line); }
+  nav a:hover { background:var(--blue-soft); color:var(--blue); }
+  main { max-width:1180px; margin:0 auto; padding:28px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:24px 28px; margin-bottom:24px; }
+  h2 { font-size:19px; font-weight:500; margin:0 0 8px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  h3 { font-size:15px; font-weight:500; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; background:var(--blue-soft); color:var(--blue); margin-left:8px; vertical-align:middle; }
+  .tag.green { background:var(--green-soft); color:var(--green); }
+  .tag.red { background:var(--red-soft); color:var(--red); }
+  .tag.amber { background:var(--amber-soft); color:var(--amber); }
+  .tag.purple { background:var(--purple-soft); color:var(--purple); }
+  canvas { display:block; width:100%; background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .ctrl-row { display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin:14px 0; }
+  .ctrl { flex:1 1 220px; min-width:200px; }
+  .ctrl label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-bottom:4px; }
+  .ctrl .val { font-family:var(--mono); color:var(--ink); font-size:12.5px; }
+  input[type=range] { width:100%; }
+  button { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:7px 16px; font-size:13px; cursor:pointer; color:var(--ink); font-family:inherit; }
+  button:hover { background:var(--blue-soft); color:var(--blue); border-color:var(--blue); }
+  button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+  button.primary:hover { background:#0C447C; }
+  button.danger { background:var(--red-soft); color:var(--red); border-color:var(--red); }
+  button.danger:hover { background:#f5d8d8; }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:14px 0; }
+  .metric { background:var(--bg); border-radius:8px; padding:10px 12px; }
+  .metric .lbl { font-size:11.5px; color:var(--muted); }
+  .metric .num { font-family:var(--mono); font-size:19px; font-weight:500; margin-top:2px; }
+  .metric .num.blue { color:var(--blue); }
+  .metric .num.green { color:var(--green); }
+  .metric .num.amber { color:var(--amber); }
+  .metric .num.red { color:var(--red); }
+  .metric .num.purple { color:var(--purple); }
+  .callout { border-left:3px solid var(--amber); background:var(--amber-soft); padding:11px 15px; border-radius:0 8px 8px 0; margin:12px 0; font-size:13px; }
+  .callout.green { border-left-color:var(--green); background:var(--green-soft); }
+  .callout.red { border-left-color:var(--red); background:var(--red-soft); }
+  .callout.blue { border-left-color:var(--blue); background:var(--blue-soft); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; table-layout:fixed; }
+  th,td { border:1px solid var(--line); padding:7px 10px; text-align:left; word-break:break-word; }
+  th { background:var(--bg); font-weight:500; }
+  .mono { font-family:var(--mono); font-size:12px; }
+  pre { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow-x:auto; font-family:var(--mono); font-size:12px; line-height:1.6; margin:10px 0; }
+  pre code { background:none; padding:0; }
+  .kv { display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:10px 0; }
+  .kv .k { color:var(--muted); }
+  .kv .v { color:var(--ink); font-weight:500; }
+  .badge { display:inline-block; padding:3px 9px; border-radius:6px; font-size:11.5px; font-weight:500; }
+  .badge.ok { background:var(--green-soft); color:var(--green); }
+  .badge.warn { background:var(--amber-soft); color:var(--amber); }
+  .badge.fail { background:var(--red-soft); color:var(--red); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:800px) { .grid2,.grid3 { grid-template-columns:1fr; } }
+  .step-n { display:inline-block; width:22px; height:22px; border-radius:50%; background:var(--blue); color:#fff; font-size:12px; line-height:22px; text-align:center; margin-right:8px; font-weight:500; }
+  .step-n.red { background:var(--red); }
+  .step-n.green { background:var(--green); }
+  .step-n.amber { background:var(--amber); }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin:8px 0; }
+  .legend .sw { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:18px; }
+  .reg-mem { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+  .reg-cell { border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-family:var(--mono); font-size:12px; }
+  .reg-cell .addr { color:var(--blue); font-weight:500; }
+  .reg-cell .name { color:var(--muted); font-size:11px; margin-top:2px; }
+  .reg-cell .val { color:var(--ink); font-size:15px; font-weight:500; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MCU 资源控制时序 <span class="tag amber">TMS320F280039C</span></h1>
+  <div class="sub">寄存器字地址模型 · 启动顺序 · ePWM/ADC/CMPSS 时序 · 寄存器映像模拟器</div>
+  <nav>
+    <a href="index.html">理论首页</a>
+    <a href="dynamic.html">动态演示</a>
+    <a href="#startup">启动顺序</a>
+    <a href="#wordaddr">字地址模型</a>
+    <a href="#regmap">寄存器映像</a>
+    <a href="#bus">总线时序</a>
+    <a href="#dss">DSS 调试时序</a>
+    <a href="#fault">故障时序因果</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======== 1. 启动顺序 ======== -->
+<section id="startup">
+  <h2>1. MCU 启动顺序时序 <span class="tag red">硬顺序</span></h2>
+  <p>顺序错了会"启动几毫秒即死，无日志无灯"。点击每一步查看寄存器动作。</p>
+
+  <div class="ctrl-row">
+    <button class="primary" id="bootPlay">▶ 播放启动序列</button>
+    <button id="bootReset">↺ 重置</button>
+    <span class="mono" id="bootStatus" style="color:var(--muted);"></span>
+  </div>
+
+  <canvas id="bootCanvas" height="180"></canvas>
+
+  <div id="bootSteps" class="grid2" style="margin-top:18px;">
+    <div class="card-soft" data-step="0">
+      <h4><span class="step-n">1</span>.TI.ramfunc 重定位</h4>
+      <p>memcpy LOAD→RUN (FLASH_BANK0_SEC1 → RAMLS0 0x8000)。<code>_c_int00</code> 不做段拷贝。</p>
+      <pre><code>memcpy(&amp;ramfuncs_loadstart, &amp;ramfuncs_loadsize, &amp;ramfuncs_runstart);</code></pre>
+    </div>
+    <div class="card-soft" data-step="1">
+      <h4><span class="step-n red">2</span>禁看门狗</h4>
+      <p>WDCR.WDDIS=1。否则 ITRAP 后 boot ROM handler 使能看门狗复位。</p>
+      <pre><code>DisableDog();  // WDCR = 0x0068</code></pre>
+    </div>
+    <div class="card-soft" data-step="2">
+      <h4><span class="step-n amber">3</span>PIE init</h4>
+      <p>PIECTRL.ENPIE=1，向量表映射到 PIE RAM。本固件 IER 保持 0（无中断驱动）。</p>
+      <pre><code>InitPieCtrl(); InitPieVectTable();</code></pre>
+    </div>
+    <div class="card-soft" data-step="3">
+      <h4><span class="step-n">4</span>时钟 (SysCtl_setClock)</h4>
+      <p>PLL 配 120 MHz SYSCLK。<b>必须在 ramfunc 之后</b>——SysCtl_delay 编入 ramfunc。</p>
+      <pre><code>SysCtl_setClock(PLL_ENABLE | ...);  // 120 MHz</code></pre>
+    </div>
+    <div class="card-soft" data-step="4">
+      <h4><span class="step-n green">5</span>外设时钟门控</h4>
+      <p>PCLKCRn 复位后全关，写被静默丢弃。ePWM1/2/3 + ADCA + SCIA + CMPSS1。</p>
+      <pre><code>SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_EPWM1..3);
+SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_SCIA);</code></pre>
+    </div>
+    <div class="card-soft" data-step="5">
+      <h4><span class="step-n green">6</span>自检 → superloop</h4>
+      <p>pwm 回读 → CMPSS 双向探测 → 武装 TZ → 纯逻辑参考序列 → 进主循环。</p>
+      <pre><code>if (!self_test_run()) { fail_safe(); }
+for (;;) { motor_tick(); }</code></pre>
+    </div>
+  </div>
+
+  <div class="callout red">
+    <b>根因（ADR 0003）</b>：<code>.TI.ramfunc</code> 里 <code>SysCtl_delay()</code> 编译进
+    RAM 段（LOAD=FLASH_BANK0_SEC1 / RUN=RAMLS0 0x8000），<code>_c_int00</code> 不做段拷贝。
+    不先 memcpy 就调 <code>SysCtl_setClock</code> → 跳空 RAM 执行 0x0000 → ITRAP →
+    PIE 未初始化时向量取自 boot ROM → 看门狗复位。
+    <b>判读口诀</b>：PC 停在 <code>board_clock_init</code> 且 RESC=0 → 先查 ramfunc。
+  </div>
+</section>
+
+<!-- ======== 2. 字地址模型 ======== -->
+<section id="wordaddr">
+  <h2>2. C28x 字地址模型 <span class="tag red">硬事实</span></h2>
+  <p>ADR 0002 五方实证：<b>一切地址/长度都是 16 位字</b>，不是字节。</p>
+
+  <table>
+    <tr><th style="width:30%">概念</th><th style="width:25%">值</th><th>对比</th></tr>
+    <tr><td><code>sizeof(uint32_t)</code></td><td class="mono">2 字</td><td>x86 = 4 字节</td></tr>
+    <tr><td><code>CHAR_BIT</code></td><td class="mono">16</td><td>x86 = 8</td></tr>
+    <tr><td><code>*+XARn[N]</code> 位移</td><td class="mono">N 字</td><td>x86 = N 字节</td></tr>
+    <tr><td><code>readWord()</code></td><td class="mono">返回 1 个 16 位字</td><td>—</td></tr>
+    <tr><td>32 位寄存器</td><td class="mono">要读两个字拼接</td><td>x86 = 一次 dword</td></tr>
+    <tr><td>map 文件 size 列</td><td class="mono">字</td><td>16B 变量 → size 0x08</td></tr>
+  </table>
+
+  <h3>2.1 32 位寄存器对（CMPA/TBPRD）</h3>
+  <div class="reg-mem">
+    <div class="reg-cell">
+      <div class="addr">0x6A</div>
+      <div class="name">CMPA (低字) — 实为 CMPAHR</div>
+      <div class="val" style="color:var(--red)">0x0000 (恒 0)</div>
+    </div>
+    <div class="reg-cell">
+      <div class="addr">0x6B</div>
+      <div class="name">CMPA (高字) — 有效占空比</div>
+      <div class="val" style="color:var(--green)">CMPA 有效值</div>
+    </div>
+    <div class="reg-cell">
+      <div class="addr">0x62</div>
+      <div class="name">TBPRD (低字) — TBPRDHR</div>
+      <div class="val" style="color:var(--red)">0x0000 (恒 0)</div>
+    </div>
+    <div class="reg-cell">
+      <div class="addr">0x63</div>
+      <div class="name">TBPRD (高字) — 有效周期</div>
+      <div class="val" style="color:var(--green)">6000</div>
+    </div>
+  </div>
+  <div class="callout red">
+    <b>假 FAIL 根因</b>：HIL 读 0x6A 得到 CMPAHR（恒 0），误判"CMPA 不变"。
+    driverlib <code>EPWM_setCounterCompareValue</code> 写 <code>HWREGH(base+EPWM_O_CMPA+1)</code> = 高字 0x6B。
+  </div>
+</section>
+
+<!-- ======== 3. 寄存器映像模拟器 ======== -->
+<section id="regmap">
+  <h2>3. 寄存器映像模拟器 <span class="tag purple">交互</span></h2>
+  <p>写一个值，看它落到哪个字地址、对波形有什么影响。点击"写占空比"看 driverlib 实际写哪一字。</p>
+
+  <div class="ctrl-row">
+    <div class="ctrl">
+      <label>占空比 permille <span class="val" id="regDutyVal">500</span></label>
+      <input type="range" id="regDuty" min="0" max="1000" value="500">
+    </div>
+    <div class="ctrl" style="flex:0 0 auto;">
+      <button class="primary" id="regWrite">写 EPWM1 CMPA</button>
+      <button id="regRead">读 0x6A (低字)</button>
+      <button id="regReadHi">读 0x6B (高字)</button>
+    </div>
+  </div>
+
+  <div class="kv" id="regLog">
+    <span class="k">日志：</span><span class="v" id="regLogText">等待操作…</span>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3>寄存器映像</h3>
+      <div class="reg-mem" id="regGrid"></div>
+    </div>
+    <div>
+      <h3>位域布局 (CMPA:CMPAHR @ 0x6A:0x6B)</h3>
+      <canvas id="regCanvas" height="200"></canvas>
+      <div class="legend">
+        <span><span class="sw" style="background:#F1EFE8"></span>0</span>
+        <span><span class="sw" style="background:#0F6E56"></span>1</span>
+        <span><span class="sw" style="background:#B4537E"></span>高字 0x6B = 有效值</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <b>动手验证</b>：把占空比设成 1000 (=PRD)，看 CMPA=6000。此时某相 A/B <b>整周期都是低</b>
+    （两端谷 + 死区覆盖全周期），瞬时 GPIO 读全零是正常波形——H5-trip-resume 假 FAIL 的根因。
+  </div>
+</section>
+
+<!-- ======== 4. 总线时序 ======== -->
+<section id="bus">
+  <h2>4. 外设总线时序 <span class="tag amber">硬件</span></h2>
+  <p>三条独立时序链：ePWM 载波、ADC 触发、CMPSS 保护。它们通过 XBAR 硬连线。</p>
+
+  <canvas id="busCanvas" height="280"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#378ADD"></span>ePWM 载波 TBCTR</span>
+    <span><span class="sw" style="background:#0F6E56"></span>SOCA 触发脉冲</span>
+    <span><span class="sw" style="background:#BA7517"></span>ADC 转换 (SOC0)</span>
+    <span><span class="sw" style="background:#D85A30"></span>CMPSS 比较器</span>
+    <span><span class="sw" style="background:#8B2E2E"></span>TZ trip (DCBEVT1)</span>
+  </div>
+
+  <table>
+    <tr><th style="width:22%">链路</th><th style="width:30%">触发源</th><th style="width:18%">时序</th><th>关键寄存器</th></tr>
+    <tr>
+      <td>ePWM 载波</td>
+      <td>TBCLK = SYSCLK = 120 MHz</td>
+      <td>10 kHz 周期 (100 µs)</td>
+      <td class="mono">TBPRD=6000, CTRMODE=up-down</td>
+    </tr>
+    <tr>
+      <td>SOCA → ADC</td>
+      <td>TBCTR = PRD (载波谷底)</td>
+      <td>每周期 1 次</td>
+      <td class="mono">ETPS.SOCAPRD=1, SOCAPRD2=1</td>
+    </tr>
+    <tr>
+      <td>CMPSS 比较</td>
+      <td>异步（连续）</td>
+      <td>ns 级响应</td>
+      <td class="mono">COMPSTS, DACHVALS</td>
+    </tr>
+    <tr>
+      <td>CMPSS → TZ</td>
+      <td>XBAR TRIP4 → DCBH</td>
+      <td>硬件直通</td>
+      <td class="mono">TZSEL.DCBEVT1, TZFLG bit5</td>
+    </tr>
+    <tr>
+      <td>TZ 关 PWM</td>
+      <td>DCBEVT1 事件</td>
+      <td>一次性锁存</td>
+      <td class="mono">TZA/TZB = LOW</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <b>为什么在谷底采样</b>：开关噪声在载波峰/谷附近最严重，但谷底时所有桥臂占空比最稳定，
+    是电流采样窗口。SOCAPRD=1 保证"第一个事件就触发"（不是每 N 个）。
+  </div>
+</section>
+
+<!-- ======== 5. DSS 调试时序 ======== -->
+<section id="dss">
+  <h2>5. DSS 调试时序 <span class="tag green">验证</span></h2>
+  <p>HIL (Hardware-in-the-Loop) 用 DSS 脚本读寄存器、强制故障、验证恢复。时序很关键。</p>
+
+  <table>
+    <tr><th style="width:22%">阶段</th><th style="width:38%">动作</th><th>时序陷阱</th></tr>
+    <tr>
+      <td>H1 JTAG 连接</td>
+      <td>halt → 读 Device ID</td>
+      <td>cJTAG 2-pin，必须用 LaunchPad ccxml</td>
+    </tr>
+    <tr>
+      <td>H2 烧录</td>
+      <td>loadProgram() → runAsynch</td>
+      <td>需 <code>--args=0x200</code> 定义 <code>__c_args__</code>（ADR 0004）</td>
+    </tr>
+    <tr>
+      <td>H3 自检验证</td>
+      <td>halt → 读 g_self_test_code</td>
+      <td><b>halt 后立即读外设报 Error 0x20000</b>（时钟门/未 init）</td>
+    </tr>
+    <tr>
+      <td>H5 强制越限</td>
+      <td>写 CMPSS DAC=0 → 读 TZFLG</td>
+      <td>CMPA 要读 0x6B 不读 0x6A</td>
+    </tr>
+    <tr>
+      <td>H5b 恢复判定</td>
+      <td>清 TZ → 等 CMPA 变化</td>
+      <td>1-tick 竞态：先等 tzAllClear 再判 CMPA</td>
+    </tr>
+    <tr>
+      <td>H6 独立运行</td>
+      <td>PC=code_start, runAsynch</td>
+      <td>探针在线时 reset 不交接 flash（ADR 0006）</td>
+    </tr>
+  </table>
+
+  <div class="callout green">
+    <b>halt 后读外设报 Error 0x20000</b>：时钟门/未 init。需 <code>runAsynch</code> 让固件跑完再读。
+    HIL 脚本按此顺序。
+  </div>
+
+  <h3>5.1 H5 判据源码片段</h3>
+  <pre><code>// Prove modulation RESUMED after the latch clear. Do NOT use an
+// instantaneous GPADAT_R read for this: in this centre-aligned up-down
+// design a phase sitting at cmpa = PRD = 1000 keeps BOTH its A/B pins
+// low for the entire carrier cycle.
+function readCmpa3() {
+    return [readWordRetry(EPWM_BASES[0] + O_CMPA),   // O_CMPA = 0x6B
+            readWordRetry(EPWM_BASES[1] + O_CMPA),
+            readWordRetry(EPWM_BASES[2] + O_CMPA)];
+}
+var resumeBase = readCmpa3();
+// ... wait 1.5s, compare — any change = resumed</code></pre>
+</section>
+
+<!-- ======== 6. 故障时序因果 ======== -->
+<section id="fault">
+  <h2>6. 故障时序因果链 <span class="tag red">故障树</span></h2>
+  <p>5 条真机教训，每条都对应一次假 FAIL。点击展开因果链。</p>
+
+  <div class="grid2">
+    <div class="card-soft">
+      <h4>① ADC 轮询必超时</h4>
+      <p><span class="badge fail">adc=0xFFFF</span></p>
+      <p><b>因果链</b>：<code>INT1E=0</code> → ADCINTFLG 永不置位 → 轮询超时 → 占位 0xFFFF</p>
+      <p><b>教训</b>：外设"在跑"≠"状态可读"，标志位有自己的门。</p>
+    </div>
+    <div class="card-soft">
+      <h4>② SOC 永不触发</h4>
+      <p><span class="badge fail">adc 读数不更新</span></p>
+      <p><b>因果链</b>：SOCAPRD 未配 → SOCAPRD2=0 → 即使 SOCAEN=1 也不触发</p>
+      <p><b>教训</b>：触发链双向，任一端未使能即断链。</p>
+    </div>
+    <div class="card-soft">
+      <h4>③ cmpss: lo=1 假 FAIL</h4>
+      <p><span class="badge fail">自检 FAIL</span></p>
+      <p><b>因果链</b>：<code>wait_status(expect)</code> 返回匹配布尔被误当状态值用</p>
+      <p><b>教训</b>：API 语义 &gt; API 名字，契约必须写进 spec。</p>
+    </div>
+    <div class="card-soft">
+      <h4>④ "PWM 未恢复"假 FAIL</h4>
+      <p><span class="badge fail">H5 FAIL</span></p>
+      <p><b>因果链</b>：占空比=PRD 相整周期为低 → 瞬时 GPIO 读全零 → 误判未恢复</p>
+      <p><b>教训</b>：瞬时采样不能证明动态过程，要找"正在变化"的证据。</p>
+    </div>
+    <div class="card-soft">
+      <h4>⑤ 改代码跑旧镜像</h4>
+      <p><span class="badge warn">时间戳</span></p>
+      <p><b>因果链</b>：gmake 同分钟粒度时间戳 → 不触发重编 → 跑的是旧 .out</p>
+      <p><b>教训</b>：收口前 clean + 全量 rebuild（ADR 0007）。</p>
+    </div>
+    <div class="card-soft">
+      <h4>⑥ 启动几毫秒即死</h4>
+      <p><span class="badge fail">无日志无灯</span></p>
+      <p><b>因果链</b>：ramfunc 未重定位 → 跳空 RAM → ITRAP → 看门狗复位</p>
+      <p><b>教训</b>：硬顺序不可调换（ADR 0003）。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>7. 三页联动 <span class="tag">导航</span></h2>
+  <table>
+    <tr><th style="width:25%">页面</th><th style="width:35%">内容</th><th>什么时候看</th></tr>
+    <tr><td><a href="index.html">index.html</a></td><td>静态理论（数学/契约/寄存器）</td><td>先建立概念地图</td></tr>
+    <tr><td><a href="dynamic.html">dynamic.html</a></td><td>动态控制原理演示</td><td>理解参数怎么影响波形</td></tr>
+    <tr><td><a href="mcu.html">mcu.html</a></td><td>本页 — MCU 资源控制时序</td><td>理解寄存器读写与启动链</td></tr>
+  </table>
+</section>
+
+</main>
+
+<footer>motor-control-lab · MCU 资源控制时序 · 基于 myPublicHarness spec 0002 + ADR 0002/0003/0004/0007</footer>
+
+<script src="js/core.js"></script>
+<script src="js/mcu.js"></script>
+</body>
+</html>

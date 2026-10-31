@@ -1,0 +1,20 @@
+﻿[sil] building launchxl-f280039c-full-platform with cl.exe (14.29.30133) - 6 sources
+fw_test.c
+scheduler.c
+health.c
+sil_sched_timing.c
+sil_health_fsm.c
+sil_runner_fp.c
+Generating Code...
+[sil] launchxl-f280039c-full-platform runner exit 0 (10 cases, 0 failures) -> PASS
+[sil] building launchxl-f280039c-motor-pwm with cl.exe (14.29.30133) - 5 sources
+fw_test.c
+angle_gen.c
+svpwm.c
+sil_motor_wave.c
+sil_runner_mp.c
+Generating Code...
+[sil] launchxl-f280039c-motor-pwm runner exit 0 (5 cases, 0 failures) -> PASS
+cases: 15, failures: 0 -> PASS (all SIL projects aggregated)
+SIL RESULT: PASS
+

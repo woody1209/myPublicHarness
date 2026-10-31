@@ -1,21 +1,29 @@
 ﻿
-size report: launchxl-f280039c-led-chaser.map  (CPU1_FLASH)
+size report: launchxl-f280039c-full-platform.map  (CPU1_FLASH)
 units: C28x 16-bit WORDS (1 word = 2 bytes) - ADR 0002
 SECTION        REGION    ORIGIN        WORDS      BYTES        HEX
 ------------------------------------------------------------------
-.cinit         FLASH     0x81008          18         36       0x12
-.const         FLASH     0x84000        1162       2324      0x48A
-.text          FLASH     0x82000        3881       7762      0xF29
+.cinit         FLASH     0x81008         132        264       0x84
+.const         FLASH     0x87000        3966       7932      0xF7E
+.text.1        FLASH     0x82000        4096       8192     0x1000
+.text.2        FLASH     0x83000        4096       8192     0x1000
+.text.3        FLASH     0x84000        4095       8190      0xFFF
+.text.4        FLASH     0x85000        1707       3414      0x6AB
 .TI.ramfunc    FLASH     0x81000           4          8        0x4
+Cla1Prog       FLASH     0x8B000         196        392       0xC4
 codestart      FLASH     0x80000           2          4        0x2
 .args          RAM       0x128           512       1024      0x200
-.data          RAM       0xA800           14         28        0xE
+.bss           RAM       0xA800          574       1148      0x23E
+.data          RAM       0xAA3E          284        568      0x11C
+.scratchpad    RAM       0x9000           10         20        0xA
 .stack         RAM       0x400           512       1024      0x200
+Cla1ToCpuMsgRAM RAM       0x1480            8         16        0x8
+CpuToCla1MsgRAM RAM       0x1500           32         64       0x20
 ------------------------------------------------------------------
-FLASH                                   5067      10134   of 196608 words (2.58 % of budget)
-RAM                                     1038       2076   of 35328 words (2.94 % of budget)
+FLASH                                  18294      36588   of 196608 words (9.3 % of budget)
+RAM                                     1932       3864   of 35328 words (5.47 % of budget)
 
-machine-readable report: E:\AIcherry\C2000TI\F280039C-harness\projects\launchxl-f280039c-led-chaser\CPU1_FLASH\size-report.json
-size gate PASS (flash 2.58 % <= 90 %, ram 2.94 % <= 90 %)
+machine-readable report: E:\AIcherry\C2000TI\myPublicHarness\projects\launchxl-f280039c-full-platform\CPU1_FLASH\size-report.json
+size gate PASS (flash 9.3 % <= 90 %, ram 5.47 % <= 90 %)
 
 

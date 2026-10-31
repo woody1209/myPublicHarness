@@ -12,10 +12,10 @@
 [WARN] cmake not found - host tests will use the MSVC cl.exe fallback (see tests/host/README.md). Install cmake for the preferred path: winget install Kitware.CMake
 [ OK ] host C compiler -> msvc
 [ OK ] Debug probe: XDS110 Embed with CMSIS-DAP SN=CL391078 FW=3.0.0.43
-[ OK ] projects: launchxl-f280039c-led-chaser
+[ OK ] projects: launchxl-f280039c-full-platform, launchxl-f280039c-led-chaser, launchxl-f280039c-motor-pwm
 [ OK ] target card present
 
-manifest written: E:\AIcherry\C2000TI\F280039C-harness\harness\env\manifest.json
+manifest written: E:\AIcherry\C2000TI\myPublicHarness\harness\env\manifest.json
 [ OK ] manifest validates against harness/schemas/manifest.schema.json
 environment OK
 

@@ -1,0 +1,70 @@
+﻿{
+    "meta":  {
+                 "project":  "launchxl-f280039c-full-platform",
+                 "target":  "TMS320F280039C",
+                 "board":  "LAUNCHXL-F280039C",
+                 "updated_at":  "2026-11-01"
+             },
+    "env":  {
+                "status":  "ok",
+                "manifest":  "harness/env/manifest.json",
+                "checked_at":  "2026-10-24"
+            },
+    "build":  {
+                  "status":  "ok",
+                  "config":  "CPU1_FLASH",
+                  "artifacts":  [
+                                    "projects/launchxl-f280039c-full-platform/CPU1_FLASH/launchxl-f280039c-full-platform.out",
+                                    "projects/launchxl-f280039c-full-platform/CPU1_FLASH/launchxl-f280039c-full-platform.map"
+                                ],
+                  "size":  {
+                               "unit":  "C28x 16-bit words (1 word = 2 bytes)",
+                               "measured_by":  "ccs.ps1 size",
+                               "text_words":  14450,
+                               "const_words":  0,
+                               "data_words":  0,
+                               "bss_words":  0,
+                               "args_words":  512,
+                               "flash_words":  18745,
+                               "flash_pct":  9.53,
+                               "ram_words":  1805,
+                               "ram_pct":  5.11
+                           },
+                  "note":  "M3 bring-up night session (2026-10-25): platform stabilized after removing the PIE-side ADC INT1 enable (a latched group-1 flag was resetting the chip); DMA redesigned NMI-safe (v1 peripheral-frame walk = NMI; v2 = memory x3 + ADC RESULT1 single-word, XINT5 not SOFTWARE - PERINTSEL=0 is reserved); CAN clock source must be SYS (XTAL absent per ADR 0001, IF1CMD.BUSY hang); SCIB loopback VERIFIED on board (ser counter grows, REQ-013 partial). SPI/I2C/LIN/CAN/FSI/eQEP/DAC bring-up still open - counters observed on the m3 line. M4 (2026-10-30): accel(BGCRC golden/AES ECB roundtrip/TMU vs math_ref/EPG register-level) + clb GPREG proof + CLA task (MemCfg LS1 program master, msg RAMs, load-copy per ADR-0003 class) + watchdog (bring-up open: /64 window vs pass-time interaction, RESC=0x4 WDRSn evidence). Comm loopback tasks gated during bring-up.",
+                  "at":  "2026-10-25"
+              },
+    "host_tests":  {
+                       "status":  "pass",
+                       "framework":  "self-contained fw_test (fallback driver: MSVC cl.exe)",
+                       "cases":  56,
+                       "at":  "2026-10-24"
+                   },
+    "flash":  {
+                  "status":  "not-run",
+                  "probe":  null,
+                  "reason":  null,
+                  "at":  null
+              },
+    "specs":  [
+                  {
+                      "spec_id":  "0002-full-platform",
+                      "status":  "implementing"
+                  }
+              ],
+    "hil":  {
+                "status":  "pass",
+                "probe":  "XDS110 (cJTAG)",
+                "image":  "projects/launchxl-f280039c-full-platform/CPU1_FLASH/launchxl-f280039c-full-platform.out",
+                "record":  "harness/tests/on-target/records/hil-2026-11-01-launchxl-f280039c-full-platform.md",
+                "checks":  {
+                               "jtag":  true,
+                               "flash":  true,
+                               "selftest":  true,
+                               "loop":  true,
+                               "liveness":  true,
+                               "sci":  true
+                           },
+                "fail_reason":  null,
+                "at":  "2026-11-01"
+            }
+}

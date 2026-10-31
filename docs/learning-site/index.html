@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电机控制理论学习 · 静态版</title>
+<style>
+  :root {
+    --bg: #F1EFE8; --card: #ffffff; --ink: #2C2C2A; --muted: #5F5E5A;
+    --line: #D3D1C7; --blue: #185FA5; --blue-soft: #E6F1FB;
+    --green: #0F6E56; --green-soft: #E1F5EE;
+    --amber: #854F0B; --amber-soft: #FAEEDA;
+    --red: #8B2E2E; --red-soft: #FCEBEB;
+    --purple: #534AB7; --purple-soft: #EEEDFE;
+    --mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  header {
+    background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 22px 32px; position: sticky; top: 0; z-index: 10;
+  }
+  h1 { margin: 0; font-size: 22px; font-weight: 500; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  nav { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  nav a {
+    text-decoration: none; color: var(--ink); background: var(--bg);
+    padding: 5px 12px; border-radius: 8px; font-size: 13px; border: 1px solid var(--line);
+  }
+  nav a:hover { background: var(--blue-soft); color: var(--blue); }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px; }
+  section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 28px 32px; margin-bottom: 28px;
+  }
+  h2 {
+    font-size: 20px; font-weight: 500; margin: 0 0 6px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 16px; font-weight: 500; margin: 22px 0 8px; }
+  p { margin: 10px 0; }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 6px; background: var(--blue-soft); color: var(--blue);
+    vertical-align: middle; margin-left: 8px;
+  }
+  .tag.green { background: var(--green-soft); color: var(--green); }
+  .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  .tag.red { background: var(--red-soft); color: var(--red); }
+  .tag.purple { background: var(--purple-soft); color: var(--purple); }
+  table {
+    width: 100%; border-collapse: collapse; margin: 14px 0;
+    font-size: 13.5px; table-layout: fixed;
+  }
+  th, td {
+    border: 1px solid var(--line); padding: 8px 12px;
+    text-align: left; vertical-align: top; word-break: break-word;
+  }
+  th { background: var(--bg); font-weight: 500; }
+  code, .mono {
+    font-family: var(--mono); font-size: 12.5px;
+    background: var(--bg); padding: 1px 5px; border-radius: 4px;
+  }
+  pre {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-family: var(--mono);
+    font-size: 12.5px; line-height: 1.6; margin: 12px 0;
+  }
+  pre code { background: none; padding: 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card-soft {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .card-soft h4 { margin: 0 0 6px; font-size: 14px; font-weight: 500; }
+  .card-soft p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+  .callout {
+    border-left: 3px solid var(--amber); background: var(--amber-soft);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0;
+    font-size: 13.5px;
+  }
+  .callout.red { border-left-color: var(--red); background: var(--red-soft); }
+  .callout.green { border-left-color: var(--green); background: var(--green-soft); }
+  .callout.blue { border-left-color: var(--blue); background: var(--blue-soft); }
+  .formula {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 18px; margin: 12px 0; font-family: var(--mono);
+    font-size: 13px; overflow-x: auto;
+  }
+  .toc-list { columns: 2; column-gap: 32px; }
+  .toc-list li { break-inside: avoid; margin-bottom: 6px; }
+  .kbd {
+    font-family: var(--mono); font-size: 11px; border: 1px solid var(--line);
+    border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px;
+    background: var(--card);
+  }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+  .path-ref { color: var(--purple); font-family: var(--mono); font-size: 11.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>电机控制理论学习 · 静态版 <span class="tag green">无电机 / 无功率板</span></h1>
+  <div class="sub">TI TMS320F280039C · LAUNCHXL-F280039C · 基于 myPublicHarness spec 0002-motor-pwm-skeleton</div>
+  <nav>
+    <a href="#toc">目录</a>
+    <a href="#pyramid">控制金字塔</a>
+    <a href="#svpwm">SVPWM 数学</a>
+    <a href="#angle">开环电角度</a>
+    <a href="#deadband">死区与互补</a>
+    <a href="#sampling">采样时序</a>
+    <a href="#protect">过流保护链</a>
+    <a href="#startup">启动顺序</a>
+    <a href="#c28x">C28x 内存模型</a>
+    <a href="#pitfalls">真机教训</a>
+    <a href="#refs">参考</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="toc">
+  <h2>目录</h2>
+  <ol class="toc-list">
+    <li><a href="#pyramid">控制金字塔 — 四层各管什么</a></li>
+    <li><a href="#svpwm">SVPWM 数学 — min-max 定心</a></li>
+    <li><a href="#angle">开环电角度发生器 — 定点积分</a></li>
+    <li><a href="#deadband">死区与互补极性 — 防直通</a></li>
+    <li><a href="#sampling">ADC 采样时序 — SOCA 触发链</a></li>
+    <li><a href="#protect">过流保护链 — CMPSS→XBAR→TZ</a></li>
+    <li><a href="#startup">MCU 启动顺序 — ramfunc 重定位</a></li>
+    <li><a href="#c28x">C28x 字地址模型 — 寄存器读写位宽</a></li>
+    <li><a href="#pitfalls">真机教训 — 5 条时序因果</a></li>
+    <li><a href="#refs">参考文件与延伸</a></li>
+  </ol>
+  <div class="callout blue">
+    本页是<b>静态理论</b>版本，只讲原理与代码契约。想看波形怎么随参数实时变化，请打开同目录的
+    <a href="dynamic.html">动态控制原理演示</a> 与
+    <a href="mcu.html">MCU 资源控制时序</a>。
+  </div>
+</section>
+
+<section id="pyramid">
+  <h2>1. 控制金字塔 <span class="tag">架构</span></h2>
+  <p>电机控制软件是分层的，每层有独立的时间尺度。下层时序不确定，上层再精巧的算法也会失稳。</p>
+  <table>
+    <tr><th style="width:22%">层</th><th style="width:18%">时间尺度</th><th>职责</th><th style="width:22%">本项目状态</th></tr>
+    <tr>
+      <td>速度/位置环</td><td>10 ms ~ 100 ms</td>
+      <td>外环 PI，给定速度/位置，输出 Iq 电流参考</td>
+      <td><span class="tag red">未覆盖</span></td>
+    </tr>
+    <tr>
+      <td>电流环 PI (Id/Iq)</td><td>100 µs ~ 1 ms</td>
+      <td>解耦控制，输出电压矢量 u_d/u_q</td>
+      <td><span class="tag red">未覆盖（需真实相电流）</span></td>
+    </tr>
+    <tr>
+      <td>SVPWM + 开环电角度</td><td>10 µs ~ 100 µs</td>
+      <td>电压矢量 → 三相占空比；电角度积分器</td>
+      <td><span class="tag green">已实证（spec 0002）</span></td>
+    </tr>
+    <tr>
+      <td>ePWM / ADC / CMPSS / 启动</td><td>100 ns ~ 10 µs</td>
+      <td>硬件时基、采样触发、保护 trip、时钟门控</td>
+      <td><span class="tag green">已实证</span></td>
+    </tr>
+  </table>
+  <div class="callout">
+    <b>学习策略</b>：从最底层往上盖。先把 10 kHz 载波 + 1 µs 死区 + 载波谷底采样这套
+    <b>确定性时基</b>做扎实，电流环整定才有意义。
+  </div>
+</section>
+
+<section id="svpwm">
+  <h2>2. SVPWM 数学 — min-max 定心 <span class="tag purple">算法</span></h2>
+  <p>
+    SVPWM 把电压空间矢量 <code>(α, β)</code> 转成三相占空比。本项目采用
+    <b>min-max 定心</b>（零序注入），保证线电压不变、且占空比居中。
+  </p>
+  <h3>2.1 Clarke 逆变换</h3>
+  <div class="formula">
+α = mag · cos(θ) / 1000<br>
+β = mag · sin(θ) / 1000<br>
+ta = α<br>
+tb = −0.5·α + 0.866·β<br>
+tc = −0.5·α − 0.866·β
+  </div>
+  <h3>2.2 min-max 定心（零序偏移）</h3>
+  <div class="formula">
+off = min(ta, tb, tc)<br>
+da = ta − off &nbsp;&nbsp; db = tb − off &nbsp;&nbsp; dc = tc − off
+  </div>
+  <p>
+    定心只改<b>共模</b>，不改<b>差模</b>——这是线电压不变性的来源：
+  </p>
+  <div class="formula">da − db = ta − tb &nbsp;&nbsp;&nbsp; db − dc = tb − tc</div>
+  <h3>2.3 过调制守卫</h3>
+  <p>
+    当 <code>max − min &gt; 1000‰</code> 时，三相整体等比缩放，保证可表达（不追求过调制能力）。
+  </p>
+  <div class="formula">
+if (max − min &gt; 1000) { da,db,dc *= 1000/(max−min) }
+  </div>
+  <h3>2.4 零矢量</h3>
+  <p><code>mag = 0</code> 时输出三相 <code>500 / 500 / 500</code>（占空比 50%，零电压矢量）。</p>
+  <h3>2.5 四分之一波查表</h3>
+  <p>
+    sin/cos 用 901 项定点表（0..90°，每 0.1° 一项，int16 千分比，共 1802 B .const），
+    全波靠象限反射：<code>cos(x) = sin(x+90°)</code>。无浮点、无运行时 math 库。
+  </p>
+  <div class="callout green">
+    <b>验收</b>：主机单测 <code>test_svpwm.c</code> 断言线电压不变性、定心范围 0..1000、
+    过调制守卫、非法入参负码。参考 <span class="path-ref">harness/tests/host/test/test_svpwm.c</span>。
+  </div>
+</section>
+
+<section id="angle">
+  <h2>3. 开环电角度发生器 <span class="tag purple">算法</span></h2>
+  <p>
+    没有编码器时，用电角度积分器模拟转子位置。分辨率 0.1°（<code>0..3599</code>），
+    速率单位 0.01 Hz。核心是<b>精确有理累加</b>（64 位余数），保证任意 tick 拆分序列终点一致。
+  </p>
+  <div class="formula">
+accum += rate_x100 × tick_us × 3600<br>
+steps = accum / 100000000<br>
+accum %= 100000000<br>
+angle_x10 = (angle_x10 + steps) mod 3600
+  </div>
+  <table>
+    <tr><th style="width:30%">参数</th><th style="width:25%">默认</th><th>说明</th></tr>
+    <tr><td>电频率 rate_x100</td><td>500（= 5.00 Hz）</td><td>上限 50000（500 Hz）</td></tr>
+    <tr><td>分辨率</td><td>0.1°</td><td>angle_x10 范围 0..3599</td></tr>
+    <tr><td>结合律</td><td>—</td><td>相同总时长、不同 tick 拆分 → 终点一致（主机单测覆盖）</td></tr>
+    <tr><td>边界</td><td>—</td><td><code>tick_us=0</code> 或空指针 → 原样返回，不修改状态</td></tr>
+  </table>
+</section>
+
+<section id="deadband">
+  <h2>4. 死区与互补极性 <span class="tag amber">硬件</span></h2>
+  <p>
+    三相半桥的上下桥不能同时导通（直通短路）。死区在互补边沿间插入延时。
+  </p>
+  <div class="formula">
+DBCTL.POLSEL = 2 &nbsp;&nbsp;→&nbsp;&nbsp; OUTB = ¬OUTA（Active High Complementary）<br>
+RED = FED = 120 TBCLK cycles = 1 µs @ 120 MHz<br>
+计数：EPWM_DB_COUNTER_CLOCK_FULL_CYCLE
+  </div>
+  <h3>4.1 动作序列（AQ）</h3>
+  <div class="formula">
+ZRO → SET (HIGH)<br>
+UP_CMPA → CLEAR (LOW)<br>
+DOWN_CMPA → SET (HIGH)<br>
+占空比 = CMPA / PRD
+  </div>
+  <p>
+    中心对齐 up-down 计数（载波从 0 升到 PRD 再降回 0）。
+    频率 = <code>SYSCLK / (2·PRD) = 120MHz / (2×6000) = 10 kHz</code>。
+  </p>
+  <div class="callout red">
+    <b>物理陷阱</b>：占空比 = PRD = 1000 时，某相 A/B <b>整周期都是低</b>
+    （两端谷 + 死区覆盖全周期）。瞬时读 GPIO 全零是正常波形，不是"调制未恢复"。
+  </div>
+</section>
+
+<section id="sampling">
+  <h2>5. ADC 采样时序 — SOCA 触发链 <span class="tag amber">硬件</span></h2>
+  <p>
+    电流采样要避开开关噪声，所以在<b>载波谷底</b>（TBCTR = PRD）触发。
+    触发链是双向的——ADC 侧和 ePWM 侧都要使能。
+  </p>
+  <div class="formula">
+ADC 侧：SOC0 ← ADC_TRIGGER_EPWM1_SOCA, 通道 A2 (ADC_CH_ADCIN2)<br>
+ePWM 侧：EPWM_setADCTriggerSource(EPWM1, SOC_A, TBCTR_PERIOD)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ EPWM_enableADCTrigger(EPWM1, SOC_A)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ EPWM_setADCTriggerEventPrescale(EPWM1, SOC_A, 1)  ← SOCAPRD=1 必修
+  </div>
+  <div class="callout red">
+    <b>静默失效</b>：只配 ADC 侧触发源而不开 ePWM SOCA 输出，或不设 SOCAPRD，SOC 永远不触发。
+    表现为轮询永远超时、<code>adc=0xFFFF</code> 占位。
+  </div>
+  <h3>5.1 ADCINTFLG 的门（INT1E）</h3>
+  <div class="formula">
+ADC_setInterruptSource(ADCA, INT1, SOC0)<br>
+ADC_enableInterrupt(ADCA, INT1)   ← INT1E，缺它则 ADCINTFLG 永不置位
+  </div>
+  <p>
+    F28003x 的 ADCINTFLG 位只在 <code>INT1E=1</code> 时才会置起。缺它时转换照常完成
+    （RESULT0 更新）但标志永不置位，任何 EOC 轮询必然超时。INT1E 不是 PIE 中断使能
+    （本固件从不 EINT、IER 保持 0），脉冲只落在 PIE IFR，无向量风险。
+  </p>
+</section>
+
+<section id="protect">
+  <h2>6. 过流保护链 — CMPSS→XBAR→TZ <span class="tag red">安全</span></h2>
+  <p>
+    这条链是<b>纯硬件</b>的，不依赖软件响应。即使固件卡死，功率桥也不会在故障下继续收到驱动信号。
+  </p>
+  <div class="formula">
+CMPSS1 正端 = CMPIN1P（与 A2 共脚，CMPHPMUX 复位值 0 已选中）<br>
+CMPSS1 负端 = 内部 DAC（shadow 模式，SWLOADSEL=0 = SYSCLK 自动加载）<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DAC 上电默认 4095（最大阈值，浮置噪声不误触发）<br>
+<br>
+XBAR TRIP4 ← CMPSS1_CTRIPH (mux00)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ ePWM1/2/3 DCBH<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ DCBEVT1 (EPWM_TZ_EVENT_DCXH_HIGH)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ TZA/TZB = LOW（六路 PWM 全关）<br>
+<br>
+一次性锁存：不清源不恢复，须软件显式清 TZ
+  </div>
+  <h3>6.1 自检双向探测契约</h3>
+  <p>上电自检用 COMPSTS 双向探测验证链路，不触发 Trip：</p>
+  <table>
+    <tr><th style="width:30%">DAC 设置</th><th style="width:25%">期望 COMPSTS</th><th>含义</th></tr>
+    <tr><td>实测 − 512</td><td>1（跳断）</td><td>CMPIN1P 高于参考 → 比较器跳断</td></tr>
+    <tr><td>满量程 4095</td><td>0（免跳）</td><td>物理上界，规避 A2 悬空噪声误判</td></tr>
+  </table>
+  <div class="callout">
+    <b>API 语义陷阱</b>：<code>board_cmpss_wait_status(expect)</code> 返回的是
+    <b>"状态是否匹配 expect"</b>的布尔，<b>不是状态值</b>。probe 判定用
+    <code>hi_ok &amp;&amp; lo_ok</code>；打印行的 <code>hi=/lo=</code> 才是比较器实际状态。
+  </div>
+  <h3>6.2 故障恢复</h3>
+  <p>
+    TZ 锁存后打印 <code>FAULT: tz-latched</code>、停角度推进、LED4 慢闪。
+    dwell 5 秒且比较器回低于参考后，软件清 TZ 并打印 <code>tz: cleared</code>。
+  </p>
+</section>
+
+<section id="startup">
+  <h2>7. MCU 启动顺序 <span class="tag amber">硬件</span></h2>
+  <p>
+    这是硬顺序，顺序错了会"启动几毫秒即死，无日志无灯"。
+  </p>
+  <div class="formula">
+.TI.ramfunc 重定位 (memcpy LOAD→RUN)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;→ 禁看门狗<br>
+&nbsp;&nbsp;&nbsp;&nbsp;→ PIE init<br>
+&nbsp;&nbsp;&nbsp;&nbsp;→ 时钟 (SysCtl_setClock)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;→ 外设时钟门控 (SysCtl_enablePeripheral)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;→ 自检 → superloop
+  </div>
+  <div class="callout red">
+    <b>根因</b>：driverlib <code>SysCtl_delay()</code> 编入 <code>.TI.ramfunc</code>
+    （LOAD=FLASH_BANK0_SEC1 / RUN=RAMLS0 0x8000），<code>_c_int00</code> 不做段拷贝。
+    不先 memcpy 就调 <code>SysCtl_setClock</code> → 跳空 RAM 执行 0x0000 → ITRAP →
+    PIE 未初始化时向量取自 boot ROM → 看门狗复位。
+  </div>
+  <p>
+    <b>判读口诀</b>：PC 停在 <code>board_clock_init</code> 且 RESC=0 → 先查 ramfunc 重定位。
+  </p>
+</section>
+
+<section id="c28x">
+  <h2>8. C28x 字地址模型 <span class="tag amber">硬件</span></h2>
+  <p>
+    C28x 是 <b>16 位字寻址</b>——一切地址/长度都是字，不是字节。这是本仓库第一条硬事实（ADR 0002）。
+  </p>
+  <table>
+    <tr><th style="width:35%">概念</th><th>值</th></tr>
+    <tr><td><code>sizeof(uint32_t)</code></td><td>2 字（不是 4 字节）</td></tr>
+    <tr><td><code>CHAR_BIT</code></td><td>16（不是 8）</td></tr>
+    <tr><td><code>*+XARn[N]</code> 位移</td><td>N 字（不是 N 字节）</td></tr>
+    <tr><td><code>memory.readWord()</code></td><td>只返回 1 个 16 位字</td></tr>
+    <tr><td>32 位寄存器</td><td>要读两个字拼接</td></tr>
+    <tr><td>map 文件 size 列</td><td>字（led_hw_channels 16B → size 0x08=8 字）</td></tr>
+  </table>
+  <h3>8.1 ePWM 寄存器对（关键）</h3>
+  <div class="formula">
+CMPA:CMPAHR &nbsp; @字 0x6A : 0x6B &nbsp;&nbsp;→ 有效占空比在<b>高字 0x6B</b><br>
+TBPRD:TBPRDHR @字 0x62 : 0x63 &nbsp;&nbsp;→ 有效周期在<b>高字 0x63</b><br>
+<br>
+driverlib EPWM_setCounterCompareValue 写 HWREGH(base + EPWM_O_CMPA + 1)
+  </div>
+  <div class="callout red">
+    <b>假 FAIL 根因</b>：HIL 读 0x6A 得到的是 CMPAHR（恒 0），误判"CMPA 不变"。
+    必须读高字 0x6B 才是有效占空比。
+  </div>
+  <h3>8.2 GPIO 字地址表</h3>
+  <table>
+    <tr><th>寄存器</th><th>字地址</th><th>用途</th></tr>
+    <tr><td>GpioCtrlRegs</td><td>0x7C00</td><td>GPAMUX1=0x7C06 / GPADIR=0x7C0A / GPAPUD=0x7C0C</td></tr>
+    <tr><td>GpioDataRegs</td><td>0x7F00</td><td>GPADAT=0x7F00（32b）/ GPASET=0x7F02 / GPACLEAR=0x7F04</td></tr>
+    <tr><td>GpioDataReadRegs</td><td>0x7F80</td><td>GPADAT_R=0x7F80（32b），LED 位在高字 0x7F01</td></tr>
+    <tr><td>CMPSS1</td><td>0x5C80</td><td>COMPSTS=0x2 / DACHVALS=0x6 / COMPSTSCLR=0x3</td></tr>
+    <tr><td>ePWM1</td><td>0x4000</td><td>DBCTL=0x0B / DBRED=0x0C / DBFED=0x0E / TZSEL=0x80 / TZFLG=0x93</td></tr>
+    <tr><td>ADC RESULT0</td><td>0x0B00</td><td>SOC0 结果（12 位）</td></tr>
+  </table>
+</section>
+
+<section id="pitfalls">
+  <h2>9. 真机教训 — 5 条时序因果 <span class="tag red">故障树</span></h2>
+  <p>每条都对应一次真机假 FAIL，根因都出在时序/语义/位宽，不是算法。</p>
+  <table>
+    <tr><th style="width:28%">现象</th><th style="width:36%">根因</th><th>教训</th></tr>
+    <tr>
+      <td>ADC 轮询必超时，adc=0xFFFF</td>
+      <td>INT1E=0 时 ADCINTFLG 永不置位</td>
+      <td>外设"在跑"≠"状态可读"，标志位有自己的门</td>
+    </tr>
+    <tr>
+      <td>SOC 永不触发</td>
+      <td>SOCAPRD 未配（SOCAPRD2=0）</td>
+      <td>触发链双向，任一端未使能即断链</td>
+    </tr>
+    <tr>
+      <td>cmpss: lo=1 假 FAIL</td>
+      <td><code>wait_status(expect)</code> 误当状态值用</td>
+      <td>API 语义 &gt; API 名字，契约必须写进 spec</td>
+    </tr>
+    <tr>
+      <td>"PWM 未恢复"假 FAIL</td>
+      <td>占空比=PRD 的相整周期为低，瞬时读全零</td>
+      <td>瞬时采样不能证明动态过程，要找"正在变化"的证据</td>
+    </tr>
+    <tr>
+      <td>改代码跑的是旧镜像</td>
+      <td>gmake 同分钟粒度时间戳不触发重编</td>
+      <td>收口前 clean + 全量 rebuild（ADR 0007）</td>
+    </tr>
+  </table>
+  <div class="callout green">
+    <b>检验你是否掌握</b>：能解释为什么 HIL 要读 0x6B 不读 0x6A，且能手算
+    <code>motor: ang=... a=... b=... c=...</code> 三相占空比是否自洽
+    （线电压不变性 <code>da − db = ta − tb</code>）。
+  </div>
+</section>
+
+<section id="refs">
+  <h2>10. 参考文件与延伸</h2>
+  <table>
+    <tr><th style="width:35%">主题</th><th>文件</th></tr>
+    <tr><td>工作流总览 / 三段式</td><td><span class="path-ref">harness/docs/00-harness工作流总览.md</span></td></tr>
+    <tr><td>C28x 字地址实证</td><td><span class="path-ref">harness/docs/adr/0002-C28x字地址模型与GPIO实证.md</span></td></tr>
+    <tr><td>启动顺序 / ramfunc</td><td><span class="path-ref">harness/docs/adr/0003-*.md</span> + <span class="path-ref">40-烧录与调试手册.md</span></td></tr>
+    <tr><td>时序实证值</td><td><span class="path-ref">specs/0002-motor-pwm-skeleton/design.md §3</span></td></tr>
+    <tr><td>需求契约（EARS）</td><td><span class="path-ref">specs/0002-motor-pwm-skeleton/requirements.md</span></td></tr>
+    <tr><td>HIL 判据源码</td><td><span class="path-ref">harness/tools/dss/hil_test_mp.js</span></td></tr>
+    <tr><td>板级源码</td><td><span class="path-ref">projects/launchxl-f280039c-motor-pwm/source/</span></td></tr>
+    <tr><td>Spec 驱动开发</td><td><span class="path-ref">harness/docs/70-Spec驱动开发.md</span></td></tr>
+    <tr><td>电流环 KP 公式（后续闭环）</td><td>一阶模型 <code>G(s)=1/(R+sL)</code>，<code>Kp = ωc·L·(ADC_VREF·Max_Duty)/(Rshunt·Gain_shunt·2^ADC_bits·V_bus)</code></td></tr>
+  </table>
+  <div class="callout blue">
+    <b>下一步</b>：接功率板后写 spec 0003 电流环，包含 ADC 采样偏置标定与 PI KP 公式。
+    别跳过开环直接做闭环——PWM 时序确定性是电流环整定的前提。
+  </div>
+</section>
+
+</main>
+
+<footer>
+  motor-control-lab · 静态理论学习页 · 基于 myPublicHarness spec 0002 · 仅供学习
+</footer>
+
+</body>
+</html>

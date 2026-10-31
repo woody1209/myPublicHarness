@@ -6,6 +6,12 @@
 >
 > 规则的强制版在 `AGENTS.md`；本文给的是**全流程地图 + 每步落在哪个设施**。
 > 本仓库（f280039c-harness）本身就是"换平台"这条流程的产物——文中以它自证。
+>
+> **工程清单（2026-10-31 现状，勿按旧快照读）**：仓库现有 **3 个固件工程** ——
+> `launchxl-f280039c-led-chaser`（参考工程，spec `0001`）、`launchxl-f280039c-motor-pwm`
+> （spec `0003-motor-pwm-skeleton`）、`launchxl-f280039c-full-platform`（spec `0002-full-platform`，
+> 22 REQ，2026-10-31 由基线派生）。另有教学站点 `docs/learning-site/`（静态理论 / 动态演示 /
+> MCU 控制时序三页）。本文 §2 之后的流程对三者一律适用。
 
 ---
 
@@ -32,7 +38,9 @@
 | `harness/tools/run-hil.ps1` | 硬件在环（DSS H1–H6 + SCI 串口捕获 + 证据留档） | `harness/tests/on-target/` |
 | `harness/tools/spec.ps1` | spec 新建/列表/校验/追溯（new/list/check/trace） | `harness/schemas/spec.schema.json` + `harness/schemas/trace.schema.json` |
 | `harness/tools/static-check.ps1` | 代码/脚本/文档路线的静态门禁（含 DOC-DEAD-ROUTE） | `STATIC CHECK OK (0 violations)` |
-| `harness/tools/verify.ps1` | 一条命令串起聚合门的全部腿（9 条；#7 连接确认、#8 loadti 烧录、#12 文档回写不在其中，见 AGENTS.md §2 的覆盖范围说明），退出码即 DoD 结论 | 跳过 = `VERIFY INCOMPLETE` + 退出 1 |
+| `harness/tools/review.ps1` | **代码审查门禁（#1b）**：TODO 未挂 spec/ADR/issue、字面外设地址传 `HWREG*`、头文件缺 include guard、单文件 > 1000 行（ERROR）；源文件未被 spec trace 认领（WARN） | `REVIEW OK (0 findings)`，注入探针可证红 |
+| `harness/tools/run-sil-tests.ps1` | **软测 SIL（#2b）**：单测测不到的时间序列性质（调度节拍/相位错峰/卡顿不补拍、健康 FSM 锁存、SVPWM 波形不变性） | `SIL RESULT: PASS` |
+| `harness/tools/verify.ps1` | 一条命令串起聚合门的全部腿（**11 条**：原 9 条 + #1b review + #2b sil；#7 连接确认、#8 loadti 烧录、#12 文档回写不在其中，见 AGENTS.md §2 的覆盖范围说明），退出码即 DoD 结论 | 跳过 = `VERIFY INCOMPLETE` + 退出 1 |
 | `specs/<id>/` | 需求→设计→任务→追溯的规格档案 | 批准门状态机驱动 |
 | `targets/<MPN>.json` | 芯片规格卡：**板级事实的单一真相** | LED/串口/调试/字地址/启动顺序/loadti 段 |
 | `projects/<proj>/` | 参考工程（spec 的活范例 + 新坑的踩平场） | `project.config.json` + `state.json` |

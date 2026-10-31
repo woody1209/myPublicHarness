@@ -1,0 +1,19 @@
+﻿
+=== SIL (launchxl-f280039c-full-platform) ===
+
+=== SIL scheduler timing (launchxl-f280039c-full-platform) ===
+  - nominal cadence: 1000 ms window, 1/10/10/100/1000 ms tasks
+  - phase offset keeps two 10 ms tasks off the same millisecond
+  - 900 ms stall: one run, lateness recorded, no catch-up
+  - registry rejects phase >= period and NULL tick
+  - period 0 = every main-loop iteration
+
+=== SIL health FSM (launchxl-f280039c-full-platform) ===
+  - MUST subsystem: fail-safe latches at 3 consecutive errors
+  - one good beat clears the consecutive-error budget
+  - SHOULD/COULD subsystems degrade but never latch fail-safe
+  - mixed fleet: noisy COULD subsystem must not arm fail-safe
+  - registry: name lookup, count, and NULL rejection
+
+----------------------------------------
+cases: 10, failures: 0 -> PASS
