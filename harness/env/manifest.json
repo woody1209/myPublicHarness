@@ -1,5 +1,5 @@
 ﻿{
-    "generated":  "2026-11-01T00:34:06",
+    "generated":  "2026-11-01T00:54:43",
     "os":  "Windows_NT 10.0.26300.0",
     "repo_root":  "E:\\AIcherry\\C2000TI\\myPublicHarness",
     "ccs":  {
@@ -29,11 +29,7 @@
                   "host_cc":  "msvc"
               },
     "probes":  [
-                   {
-                       "name":  "XDS110 Embed with CMSIS-DAP",
-                       "serial":  "CL391078",
-                       "version":  "3.0.0.43"
-                   }
+
                ],
     "workspace":  {
                       "app_dirs":  [

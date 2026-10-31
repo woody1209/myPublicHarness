@@ -11,7 +11,7 @@
 [ OK ] py -> C:\Windows\py.exe
 [WARN] cmake not found - host tests will use the MSVC cl.exe fallback (see tests/host/README.md). Install cmake for the preferred path: winget install Kitware.CMake
 [ OK ] host C compiler -> msvc
-[ OK ] Debug probe: XDS110 Embed with CMSIS-DAP SN=CL391078 FW=3.0.0.43
+[INFO] No XDS110 probe detected (connect LAUNCHXL-F280039C USB-C before flashing)
 [ OK ] projects: launchxl-f280039c-full-platform, launchxl-f280039c-led-chaser, launchxl-f280039c-motor-pwm
 [ OK ] target card present
 

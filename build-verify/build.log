@@ -1,2 +1,546 @@
 ﻿[ccs.ps1] gmake all CONFIG=CPU1_FLASH (E:\AIcherry\C2000TI\myPublicHarness\projects\launchxl-f280039c-full-platform)
+'C2000 Compiler - building file: "source/accel_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/accel_hw.d" --obj_directory="CPU1_FLASH" "source/accel_hw.c"
+powershell.exe : "source/accel_hw.c", line 49: warning #179-D: variable "i" was
+ declared but never referenced
+所在位置 E:\AIcherry\C2000TI\myPublicHarness\harness\tools\verify.ps1:104 字符: 12
++     $out = & powershell.exe @child 2>&1
++            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ("source/accel_h...ever referenced 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+"source/accel_hw.c", line 96: warning #225-D: function "memset" declared implic
+itly
+'C2000 Compiler - building file: "source/adc_scan_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/adc_scan_hw.d" --obj_directory="CPU1_FLASH" "source/adc_scan_hw.c"
+"source/adc_scan_hw.c", line 95: warning #190-D: enumerated type mixed with ano
+ther type
+'C2000 Compiler - building file: "source/adc_stat.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/adc_stat.d" --obj_directory="CPU1_FLASH" "source/adc_stat.c"
+'C2000 Compiler - building file: "source/board_clock.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/board_clock.d" --obj_directory="CPU1_FLASH" "source/board_clock.c"
+'C2000 Compiler - building file: "source/board_error.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/board_error.d" --obj_directory="CPU1_FLASH" "source/board_error.c"
+'C2000 Compiler - building file: "source/can_loop_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/can_loop_hw.d" --obj_directory="CPU1_FLASH" "source/can_loop_hw.c"
+'C2000 Compiler - building file: "source/cap_meas_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/cap_meas_hw.d" --obj_directory="CPU1_FLASH" "source/cap_meas_hw.c"
+'C2000 Compiler - building file: "source/cla_cpu.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/cla_cpu.d" --obj_directory="CPU1_FLASH" "source/cla_cpu.c"
+"source/cla_cpu.c", line 57: warning #551-D: variable "i" is used before its va
+lue is set
+"source/cla_cpu.c", line 22: warning #552-D: variable "cla_ref_sum" was set but
+ never used
+"source/cla_cpu.c", line 23: warning #552-D: variable "cla_ref_min" was set but
+ never used
+"source/cla_cpu.c", line 24: warning #552-D: variable "cla_ref_max" was set but
+ never used
+'C2000 Compiler - building file: "source/clb_demo_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/clb_demo_hw.d" --obj_directory="CPU1_FLASH" "source/clb_demo_hw.c"
+'C2000 Compiler - building file: "source/dac_cmpss_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/dac_cmpss_hw.d" --obj_directory="CPU1_FLASH" "source/dac_cmpss_hw.c"
+"source/dac_cmpss_hw.c", line 176: warning #190-D: enumerated type mixed with a
+nother type
+'C2000 Compiler - building file: "source/dcc_mon_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/dcc_mon_hw.d" --obj_directory="CPU1_FLASH" "source/dcc_mon_hw.c"
+'C2000 Compiler - building file: "source/dma_bank_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/dma_bank_hw.d" --obj_directory="CPU1_FLASH" "source/dma_bank_hw.c"
+"source/dma_bank_hw.c", line 45: warning #169-D: argument of type "uint32_t" is
+ incompatible with parameter of type "const void *"
+"source/dma_bank_hw.c", line 45: warning #169-D: argument of type "uint32_t" is
+ incompatible with parameter of type "const void *"
+"source/dma_bank_hw.c", line 49: warning #190-D: enumerated type mixed with ano
+ther type
+'C2000 Compiler - building file: "source/fmt.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/fmt.d" --obj_directory="CPU1_FLASH" "source/fmt.c"
+'C2000 Compiler - building file: "source/frame_gen.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/frame_gen.d" --obj_directory="CPU1_FLASH" "source/frame_gen.c"
+'C2000 Compiler - building file: "source/fsi_loop_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/fsi_loop_hw.d" --obj_directory="CPU1_FLASH" "source/fsi_loop_hw.c"
+"source/fsi_loop_hw.c", line 54: warning #190-D: enumerated type mixed with ano
+ther type
+'C2000 Compiler - building file: "source/health.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/health.d" --obj_directory="CPU1_FLASH" "source/health.c"
+'C2000 Compiler - building file: "source/i2c_pair_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/i2c_pair_hw.d" --obj_directory="CPU1_FLASH" "source/i2c_pair_hw.c"
+'C2000 Compiler - building file: "source/led_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/led_hw.d" --obj_directory="CPU1_FLASH" "source/led_hw.c"
+'C2000 Compiler - building file: "source/led_pattern.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/led_pattern.d" --obj_directory="CPU1_FLASH" "source/led_pattern.c"
+'C2000 Compiler - building file: "source/main.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/main.d" --obj_directory="CPU1_FLASH" "source/main.c"
+"source/main.c", line 117: warning #552-D: variable "g_h_accel" was set but nev
+er used
+"source/main.c", line 118: warning #552-D: variable "g_h_clb" was set but never
+ used
+"source/main.c", line 119: warning #552-D: variable "g_h_cla" was set but never
+ used
+"source/main.c", line 173: warning #179-D: variable "g_task_spi" was declared b
+ut never referenced
+"source/main.c", line 175: warning #179-D: variable "g_task_i2c" was declared b
+ut never referenced
+"source/main.c", line 177: warning #179-D: variable "g_task_ser" was declared b
+ut never referenced
+"source/main.c", line 179: warning #179-D: variable "g_task_can" was declared b
+ut never referenced
+"source/main.c", line 181: warning #179-D: variable "g_task_fsi" was declared b
+ut never referenced
+"source/main.c", line 185: warning #179-D: variable "g_task_accel" was declared
+ but never referenced
+"source/main.c", line 187: warning #179-D: variable "g_task_clb" was declared b
+ut never referenced
+'C2000 Compiler - building file: "source/math_ref.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/math_ref.d" --obj_directory="CPU1_FLASH" "source/math_ref.c"
+"source/math_ref.c", line 25 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 25 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 27 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 32 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 32 (col. 17): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 32 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 32 (col. 26): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 32 (col. 26): advice #2614-D: (Performance) Use --fp_
+mode=relaxed to enable TMU hardware support for FP division.
+"source/math_ref.c", line 39 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 39 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 44 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 46 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 46 (col. 20): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 7): advice #3195-D: (Performance) EABI doubl
+e precision is 64-bits as opposed to 32-bits for COFF. Consider changing double
+s to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 35): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 35): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 40): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 47 (col. 44): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 48 (col. 8): advice #3195-D: (Performance) EABI doubl
+e precision is 64-bits as opposed to 32-bits for COFF. Consider changing double
+s to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 48 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 9): advice #3195-D: (Performance) EABI doubl
+e precision is 64-bits as opposed to 32-bits for COFF. Consider changing double
+s to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 13): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 42): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 72): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 49): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 31): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 20): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 25): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 43): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 37): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 66): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 60): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 49 (col. 55): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 36): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 30): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 25): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 20): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 69): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 63): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 58): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 53): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 50 (col. 48): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 51 (col. 9): advice #3195-D: (Performance) EABI doubl
+e precision is 64-bits as opposed to 32-bits for COFF. Consider changing double
+s to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 51 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 52 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 56 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 56 (col. 15): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 60 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 62 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 62 (col. 30): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 62 (col. 46): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 62 (col. 46): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 62 (col. 51): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 64 (col. 16): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 66 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 66 (col. 31): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 66 (col. 47): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 66 (col. 47): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 66 (col. 52): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 70 (col. 11): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 70 (col. 27): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 70 (col. 27): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 77 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 77 (col. 16): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 79 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 79 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 80 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 80 (col. 30): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 80 (col. 36): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 81 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 81 (col. 18): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 81 (col. 32): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 81 (col. 21): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 82 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 82 (col. 19): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 60): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 40): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 29): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 34): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 52): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 83 (col. 46): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 84 (col. 40): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 84 (col. 34): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 84 (col. 29): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 54): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 35): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 24): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 29): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 47): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 41): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 71): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 65): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 85 (col. 60): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 91 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 92 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 92 (col. 24): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 93 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 93 (col. 24): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 94 (col. 22): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 96 (col. 12): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 101 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 101 (col. 16): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 102 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 102 (col. 16): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 105 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 105 (col. 26): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 109 (col. 11): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 111 (col. 19): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 114 (col. 7): advice #3195-D: (Performance) EABI doub
+le precision is 64-bits as opposed to 32-bits for COFF. Consider changing doubl
+es to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 114 (col. 18): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 114 (col. 18): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 114 (col. 21): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 115 (col. 11): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 117 (col. 11): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 117 (col. 16): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 117 (col. 29): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 117 (col. 49): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 119 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 124 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 124 (col. 62): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 124 (col. 47): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 124 (col. 41): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 124 (col. 17): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 125 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 125 (col. 16): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 127 (col. 11): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 128 (col. 11): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 129 (col. 12): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+"source/math_ref.c", line 129 (col. 24): advice #3195-D: (Performance) EABI dou
+ble precision is 64-bits as opposed to 32-bits for COFF. Consider changing doub
+les to floats for improved performance in FPU32-mode.
+'C2000 Compiler - building file: "source/pwm_bank_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/pwm_bank_hw.d" --obj_directory="CPU1_FLASH" "source/pwm_bank_hw.c"
+"source/pwm_bank_hw.c", line 104: warning #190-D: enumerated type mixed with an
+other type
+"source/pwm_bank_hw.c", line 109: warning #70-D: integer conversion resulted in
+ truncation
+'C2000 Compiler - building file: "source/qep_quadv_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/qep_quadv_hw.d" --obj_directory="CPU1_FLASH" "source/qep_quadv_hw.c"
+'C2000 Compiler - building file: "source/scheduler.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/scheduler.d" --obj_directory="CPU1_FLASH" "source/scheduler.c"
+'C2000 Compiler - building file: "source/sci_log.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/sci_log.d" --obj_directory="CPU1_FLASH" "source/sci_log.c"
+'C2000 Compiler - building file: "source/self_test.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/self_test.d" --obj_directory="CPU1_FLASH" "source/self_test.c"
+'C2000 Compiler - building file: "source/serial_loop_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/serial_loop_hw.d" --obj_directory="CPU1_FLASH" "source/serial_loop_hw.c"
+'C2000 Compiler - building file: "source/spi_loop_hw.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --preproc_dependency="CPU1_FLASH/spi_loop_hw.d" --obj_directory="CPU1_FLASH" "source/spi_loop_hw.c"
+"source/spi_loop_hw.c", line 52: warning #190-D: enumerated type mixed with ano
+ther type
+"source/spi_loop_hw.c", line 64: warning #190-D: enumerated type mixed with ano
+ther type
+'CLA Compiler - building file: "source/cla_app.cla"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --define=CLA_C --obj_directory="CPU1_FLASH" "source/cla_app.cla"
+"source/cla_app.cla", line 43: warning #30013-D: Comparison operation uses inte
+ger comparison instruction, which does not operate properly for values that wou
+ld overflow subtraction.  Use --cla_signed_compare_workaround=on to have the co
+mpiler work around this issue.
+"source/cla_app.cla", line 44: warning #30013-D: Comparison operation uses inte
+ger comparison instruction, which does not operate properly for values that wou
+ld overflow subtraction.  Use --cla_signed_compare_workaround=on to have the co
+mpiler work around this issue.
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/spi.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_spi.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/spi.c"
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/can.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_can.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/can.c"
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/i2c.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_i2c.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/i2c.c"
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/lin.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_lin.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/lin.c"
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/fsi.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_fsi.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/fsi.c"
+'C2000 Compiler - building driverlib module: "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/dma.c"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" --temp_directory="CPU1_FLASH" --output_file="CPU1_FLASH/dlib_dma.obj" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/dma.c"
+'C2000 Assembler - building file: "device/f28003x_codestartbranch.asm"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH --include_path="source" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/device_support/f28003x/common/include" --include_path="D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib" --include_path="D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --obj_directory="CPU1_FLASH" "device/f28003x_codestartbranch.asm"
+'C2000 Linker - building target: "CPU1_FLASH/launchxl-f280039c-full-platform.out"'
+"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --abi=eabi --gen_func_subsections=on --diag_warning=225 --diag_suppress=10063 --display_error_number --diag_wrap=off --preproc_with_compile --define=_LAUNCHXL_F280039C --define=DEBUG --define=_FLASH -z -m"CPU1_FLASH/launchxl-f280039c-full-platform.map" --stack_size=0x200 --heap_size=0x100 --warn_sections -i"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/lib" -i"D:\ti\ccs2101\C2000Ware_26_01_00_00" -i"D:\ti\ccs2101\ccs\tools\compiler\ti-cgt-c2000_25.11.1.LTS/include" --reread_libs --display_error_number --diag_wrap=off --entry_point=code_start --rom_model --args=0x200 --xml_link_info="CPU1_FLASH/launchxl-f280039c-full-platform_linkInfo.xml" -o "CPU1_FLASH/launchxl-f280039c-full-platform.out" CPU1_FLASH/accel_hw.obj CPU1_FLASH/adc_scan_hw.obj CPU1_FLASH/adc_stat.obj CPU1_FLASH/board_clock.obj CPU1_FLASH/board_error.obj CPU1_FLASH/can_loop_hw.obj CPU1_FLASH/cap_meas_hw.obj CPU1_FLASH/cla_cpu.obj CPU1_FLASH/clb_demo_hw.obj CPU1_FLASH/dac_cmpss_hw.obj CPU1_FLASH/dcc_mon_hw.obj CPU1_FLASH/dma_bank_hw.obj CPU1_FLASH/fmt.obj CPU1_FLASH/frame_gen.obj CPU1_FLASH/fsi_loop_hw.obj CPU1_FLASH/health.obj CPU1_FLASH/i2c_pair_hw.obj CPU1_FLASH/led_hw.obj CPU1_FLASH/led_pattern.obj CPU1_FLASH/main.obj CPU1_FLASH/math_ref.obj CPU1_FLASH/pwm_bank_hw.obj CPU1_FLASH/qep_quadv_hw.obj CPU1_FLASH/scheduler.obj CPU1_FLASH/sci_log.obj CPU1_FLASH/self_test.obj CPU1_FLASH/serial_loop_hw.obj CPU1_FLASH/spi_loop_hw.obj CPU1_FLASH/cla_app.obj CPU1_FLASH/dlib_spi.obj CPU1_FLASH/dlib_can.obj CPU1_FLASH/dlib_i2c.obj CPU1_FLASH/dlib_lin.obj CPU1_FLASH/dlib_fsi.obj CPU1_FLASH/dlib_dma.obj CPU1_FLASH/f28003x_codestartbranch.obj "28003x_full_platform_flash_lnk.cmd" "D:\ti\ccs2101\C2000Ware_26_01_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib" -llibc.a
+<Linking>
+'Finished building target: "CPU1_FLASH/launchxl-f280039c-full-platform.out"'
 

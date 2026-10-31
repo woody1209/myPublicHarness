@@ -172,5 +172,12 @@
   `harness/docs/83-PR-变更记录.md` 承担变更记录职责（标题 / 正文 / 证据表 / 遗留项齐备，见 83 §3）。
 - 合并前置门禁（全绿，实测）：`verify.ps1 -Project launchxl-f280039c-full-platform -Hil`
   → **VERIFY OK - 11 legs PASS**（host 97 / SIL 15 / HIL PASS，`.text` 13994，FLASH 9.3 % / RAM 5.47 %）。
+- **主干复跑（合入后实测）**：`verify.ps1 -Project launchxl-f280039c-full-platform`
+  → **10 legs PASS，hil = NOT RUN**。中途曾红一条：`static-check` 报
+  `[CFG-BUILD-CONFIG] launchxl-f280039c-led-chaser 的 build_config 'CPU1_FLASH' 无对应输出目录`
+  → 根因是该工程在本机从未构建（目录缺失），**执行 `ccs.ps1 build -Project projects\launchxl-f280039c-led-chaser`
+  （EXIT=0）后转绿**，非代码缺陷。HIL 腿因 **XDS110 掉线**（`ccs.ps1 probe` → Found 0 devices）未能复跑；
+  最近的 HIL 通过证据为 `harness/tests/on-target/records/hil-2026-11-01-launchxl-f280039c-full-platform.md`
+  （11 legs PASS）。**探针重连后应补跑一次 `-Hil`**（DoD：跳过 = 判据未被证明，ADR 0009）。
 - 合并后待办（不因合入而消失）：**A7** 看门狗间歇复位、**A9** m3 通信未活动、**A3 正文**
   按三工程改写 80/81、**G4** CI 首次运行结果回填、**A5** cmake（均在 82 §9 待办表留痕）。
