@@ -103,9 +103,20 @@
 - `harness/tests/on-target/records/hil-2026-10-31-launchxl-f280039c-motor-pwm.md`：
   2026-10-31 真板 HIL 记录（`verify.ps1 -Hil` → VERIFY OK - 9 legs PASS）。
 
-### 已知缺口（不在本次整改范围，见 82 §9）
+### 已知缺口（见 82 §9）
 
-- **G7**：基线 `specs/0002-full-platform` 未派生，缺 16 类外设子系统 → 待用户决策 D1
-- **G8**：`harness/docs/80`、`81` 未覆盖 motor-pwm（motor-pwm 之前的快照）
-- **G9**：`harness/docs/50-CI与版本管理.md` 仍写"Git 未初始化提交"
-- **G10**：本机无 cmake，主机单测走 MSVC `cl.exe` fallback
+- ~~**G7**~~ ✅ **已闭合**（2026-10-31）：基线 `specs/0002-full-platform` 已派生进本仓库，
+  22 REQ / 58 源文件 / 4 份上板证据齐全，`verify.ps1 -Hil` = 11 legs PASS。
+- **G8**（原编号，对应待办 A3/A4）：`harness/docs/80-harness闭环符合性审计.md`、
+  `harness/docs/81-AIDLC符合性审计.md` 未覆盖 motor-pwm 与 full-platform
+  （仍是 motor-pwm 之前的快照）；`00-harness工作流总览.md` 缺 motor-pwm / 学习站点入口。**未处理**。
+- ~~**G9**~~ ✅ **已闭合**：`harness/docs/50-CI与版本管理.md` 已改为 Git 现状
+  （main `2e97505` + 特性分支 `7832eac` 已推送 + PR 待创建）。
+- **G10**：本机无 cmake，主机单测走 MSVC `cl.exe` fallback（首选路径未启用）。
+
+### PR 状态（2026-10-31）
+
+- 分支 `feat/full-platform-derivation-and-test-pyramid`（`7832eac`）**已推送**至远端 `myPublicHarness`。
+- **PR 本体待创建**：本机 git 走 TortoiseGit（无 PR API），`gh` 未认证。
+  标题/正文/证据/创建入口见 **`harness/docs/83-PR-变更记录.md`**；
+  compare 链接：`https://github.com/woody1209/myPublicHarness/compare/main...feat/full-platform-derivation-and-test-pyramid?expand=1`
