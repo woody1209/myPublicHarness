@@ -1,6 +1,6 @@
 ﻿[analyze] cl.exe /analyze /W4 over 30 host-compilable sources (14.29.30133)
 
 static check: projects/launchxl-f280039c-motor-pwm/source + harness tools
-  scanned : 57 firmware sources, 14 PowerShell scripts, 15 manifest modules in 3 projects, 342 doc routes
+  scanned : 57 firmware sources, 14 PowerShell scripts, 15 manifest modules in 3 projects, 345 doc routes
 STATIC CHECK OK (0 violations)
 

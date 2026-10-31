@@ -5,7 +5,5 @@
 
 == 0003-motor-pwm-skeleton ==
 
-警告 1 条：
-  ! [0002-full-platform/REQ-009] verified 的 verification 未包含可重跑命令（含 .ps1）：M2 verified on board 2026-10-25: eCAP1/2/3 pad-loopback measured 9999/19996/49979 Hz (0.02% vs config) with tear-guard + outlier filter; HRCAP high-resolution downgraded per requirement (HR enable froze the channel). Gate: HIL H5/H7 + health line m2:ecap=9999/19996/49979.
 CHECK OK
 

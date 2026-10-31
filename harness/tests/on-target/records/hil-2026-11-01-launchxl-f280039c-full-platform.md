@@ -1,6 +1,6 @@
 ﻿# HIL record - launchxl-f280039c-full-platform
 
-- date: 2026-11-01 00:26:10
+- date: 2026-11-01 00:36:45
 - operator: automated (run-hil.ps1 + dss hil_test_fp.js)
 - board: LAUNCHXL-F280039C / TMS320F280039C (cJTAG 2-pin)
 - image: E:\AIcherry\C2000TI\myPublicHarness\projects\launchxl-f280039c-full-platform\CPU1_FLASH\launchxl-f280039c-full-platform.out
@@ -24,7 +24,7 @@
 
 ## SCI console log (COM5)
 
-capture: OK (E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-sci-2026-11-01_002435.log)
+capture: OK (E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-sci-2026-11-01_003508.log)
 
 | expected line | found |
 |---|---|
@@ -52,5 +52,5 @@ self-test: health OK
 
 ## artifacts
 
-- dss log: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-dss-2026-11-01_002435.log
-- sci log: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-sci-2026-11-01_002435.log
+- dss log: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-dss-2026-11-01_003508.log
+- sci log: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-sci-2026-11-01_003508.log
