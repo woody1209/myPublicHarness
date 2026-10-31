@@ -1,0 +1,62 @@
+# .gitignore — myPublicHarness
+#
+# 依据 AGENTS.md §6「禁止把 build 产物提交入库（.gitignore 已覆盖）」。
+# 2026-10-31 审计发现：本文件此前根本不存在，导致 38 个 .obj/.exe/.pdb 与
+# 41 个 CPU1_* 构建产物被 git 跟踪。本文件建立后这些产物已用
+# `git rm -r --cached` 从索引移除（工作区文件保留，不删盘）。
+#
+# 不排除的东西（有意为之，别顺手加）：
+#   build-verify/*.log       门禁运行的记录，是 DoD 的证据链
+#   harness/tests/on-target/records/*.md   HIL / 故障注入记录，被 trace.json 引用
+#   projects/*/state.json    体积与 HIL 状态快照，受 state.schema.json 约束
+
+# ---- 编译器 / 链接器产物 ------------------------------------------------
+*.obj
+*.o
+*.d
+*.out
+*.map
+*.pdb
+*.ilk
+*.lib
+*.a
+*.hex
+*.bin
+*_linkInfo.xml
+*.nativecodeanalysis.xml
+vc140.pdb
+
+# ---- CCS / Eclipse 构建目录与 IDE 文件 ----------------------------------
+projects/*/CPU1_FLASH/
+projects/*/CPU1_RAM/
+.settings/
+*.launch
+.cproject
+.project
+.ccsproject
+.metadata/
+
+# ---- 主机单测构建输出 ----------------------------------------------------
+harness/tests/host/build-analyze/*.obj
+harness/tests/host/build-analyze/*.pdb
+harness/tests/host/build-msvc/
+harness/tests/host/build-host-msvc/*.obj
+harness/tests/host/build-host-msvc/*.exe
+harness/tests/host/build-host-msvc/*.pdb
+harness/tests/host/build-host-msvc/*.ilk
+harness/tests/host/build-host-msvc/*.txt
+
+# ---- 原始运行日志（散、每次运行都变；结论以 records/*.md 为准）----------
+harness/tests/on-target/records/hil-dss-*.log
+harness/tests/on-target/records/hil-sci-*.log
+harness/tests/on-target/records/diag*-out.log
+harness/tests/on-target/records/diag*-com*.log
+harness/tests/on-target/records/diag*-dss.log
+harness/tests/on-target/records/loadti-sci-test.log
+harness/tests/on-target/records/diag15-*.log
+
+# ---- OS / 编辑器噪声 -----------------------------------------------------
+Thumbs.db
+Desktop.ini
+*.swp
+*~

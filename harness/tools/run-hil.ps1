@@ -51,6 +51,40 @@ function Fail([string]$msg) { Write-Host "[FAIL] $msg" -ForegroundColor Red; exi
 function Info([string]$msg) { Write-Host "[hil ] $msg" -ForegroundColor Cyan }
 
 # ---------------------------------------------------------------- environment
+$projName = Split-Path -Leaf $ProjDir
+# Project-specific DSS script: each project's H5 proves its own hardware
+# chain (led-chaser: LED polarity+cadence; motor-pwm: ePWM/TZ/CMPSS register
+# readback + forced over-limit experiment). The output contract is shared:
+# "H1..Hn PASS" lines plus a final "HIL RESULT: PASS/FAIL <reason>".
+if ($projName -eq 'launchxl-f280039c-motor-pwm') {
+    $dssScriptName = 'hil_test_mp.js'
+}
+elseif ($projName -eq 'launchxl-f280039c-full-platform') {
+    # full-platform: liveness is judged from the watchdog service counter and
+    # the three subsystem status words (halp-free sampling - see the header of
+    # hil_test_fp.js). It drives every peripheral on the board, so there is no
+    # single "the one output" to watch the way the LED is for led-chaser.
+    $dssScriptName = 'hil_test_fp.js'
+}
+else {
+    $dssScriptName = 'hil_test.js'
+}
+# full-platform's init walks every peripheral before the scheduler starts, and
+# its health line is on a 5 s cadence: widen the SCI capture unless the caller
+# pinned it (an empty log would fail every serial check for probe reasons).
+if ($projName -eq 'launchxl-f280039c-full-platform' -and
+    -not $PSBoundParameters.ContainsKey('SerialSeconds')) {
+    $SerialSeconds = 120
+}
+# motor-pwm's DSS script runs a forced over-limit experiment with a 5 s
+# firmware dwell before H6's standalone re-boot, which pushes the re-printed
+# banner ~15 s later than led-chaser's. Unless the caller pinned -SerialSeconds
+# explicitly, widen the capture window so the H6 banner is not missed (an
+# empty SCI log would fail every serial check - a probe artifact, not firmware).
+if ($projName -eq 'launchxl-f280039c-motor-pwm' -and
+    -not $PSBoundParameters.ContainsKey('SerialSeconds')) {
+    $SerialSeconds = 120
+}
 $ccsRoot = Find-CcsRoot
 if (-not $ccsRoot) { Fail "CCS root not found (run doctor.ps1)" }
 $dssBat = Join-Path $ccsRoot 'ccs_base\scripting\bin\dss.bat'
@@ -81,7 +115,7 @@ $recDir   = Join-Path $RepoRoot 'harness\tests\on-target\records'
 if (-not (Test-Path $recDir)) { New-Item -ItemType Directory -Path $recDir | Out-Null }
 $dssLog   = Join-Path $recDir "hil-dss-$stamp.log"
 $sciLog   = Join-Path $recDir "hil-sci-$stamp.log"
-$report   = Join-Path $recDir "hil-$($stamp.Substring(0,10))-led-chaser.md"
+$report   = Join-Path $recDir ("hil-{0}-{1}.md" -f $stamp.Substring(0,10), (Split-Path -Leaf $ProjDir))
 
 # --------------------------------- AIDLC: honest UNAVAILABLE (never a false FAIL)
 # A missing/absent debug probe is a PRECONDITION failure, not a firmware
@@ -94,10 +128,10 @@ function Invoke-Unavailable {
     param([string]$Reason)
 
     $md = @"
-# HIL record - launchxl-f280039c-led-chaser
+# HIL record - $projName
 
 - date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-- operator: automated (run-hil.ps1)
+- operator: automated (run-hil.ps1 + dss $dssScriptName)
 - board: LAUNCHXL-F280039C / TMS320F280039C (cJTAG 2-pin)
 - image: $($out.FullName)
 - overall: **UNAVAILABLE** - hardware precondition not met, NOT a firmware failure
@@ -178,8 +212,9 @@ if ($ComPort) {
 }
 
 # ------------------------------------------------- 2) run the DSS HIL script
-Info "running DSS HIL test (program + verify) ..."
-$dssArgs = @("$PSScriptRoot\dss\hil_test.js", $ccxml, $out.FullName)
+$dssScript = Join-Path $PSScriptRoot ("dss\" + $dssScriptName)
+Info "running DSS HIL test ($dssScriptName : program + verify) ..."
+$dssArgs = @($dssScript, $ccxml, $out.FullName)
 $dssOutput = & $dssBat @dssArgs 2>&1 | ForEach-Object { "$_" }
 $dssOutput | Tee-Object -FilePath $dssLog | ForEach-Object { Write-Host "  $_" }
 $dssText = ($dssOutput | Out-String)
@@ -210,13 +245,67 @@ if (-not $hilPass) {
 # File::WriteAllText produced BOM-less UTF-8; without -Encoding, PS 5.1 would
 # decode any non-ASCII target byte as GBK and the expected-line match would lie.
 $sciText = if ($serialOk) { Get-Content -Raw -Encoding UTF8 $sciLog } else { '' }
-$serialChecks = [ordered]@{
-    'banner'        = ($sciText -match 'LAUNCHXL-F280039C LED chaser')
-    'sysclk=120MHz' = ($sciText -match 'sysclk\s*:\s*120000000')
-    'step=200ms'    = ($sciText -match 'step\s*:\s*200\s*ms')
-    'selftest-pattern-OK' = ($sciText -match 'self-test:\s*pattern OK')
-    'selftest-fmt-OK'     = ($sciText -match 'self-test:\s*fmt OK')
-    'heartbeat-alive'     = ($sciText -match 'alive,\s*steps=')
+# Expected serial lines are the project's console contract (project README /
+# spec). Each project must add its own map here or the serial leg will judge it
+# against the wrong strings.
+if ($projName -eq 'launchxl-f280039c-motor-pwm') {
+    # motor-pwm console contract (specs/0003-motor-pwm-skeleton): pure-logic
+    # self-test trio, ePWM register readback, CMPSS bidirectional COMPSTS
+    # probe, TZ chain armed, the motor telemetry line, the heartbeat.
+    # FAULT semantics: the DSS H5 stage INJECTS one over-limit trip on purpose
+    # (hil_test_mp.js), so the capture must show exactly one
+    # "FAULT: tz-latched" followed by "tz: cleared" - the firmware's
+    # autonomous recovery. A FAULT before "tz: chain armed" would be a
+    # spurious trip (fail-safe semantics violated), and a second FAULT would
+    # mean the trip did not actually clear.
+    $armedIdx  = $sciText.IndexOf('tz: chain armed')
+    $faultIdx  = $sciText.IndexOf('FAULT: tz-latched')
+    $faultCnt  = ([regex]::Matches($sciText, 'FAULT:\s*tz-latched')).Count
+    $serialChecks = [ordered]@{
+        'banner'              = ($sciText -match 'LAUNCHXL-F280039C motor-pwm')
+        'sysclk=120MHz'       = ($sciText -match 'sysclk\s*:\s*120000000')
+        'selftest-logic-OK'   = ($sciText -match 'self-test:\s*svpwm/angle/fmt OK')
+        'pwm-regs-OK'         = ($sciText -match 'pwm:\s*prd=6000 db=120 pol=2 OK')
+        'cmpss-bidir-OK'      = ($sciText -match 'cmpss:\s*adc=\d+\s+hi=1 lo=0 OK')
+        'tz-armed'            = ($sciText -match 'tz:\s*chain armed')
+        'motor-line'          = ($sciText -match 'motor:\s*ang=\d+\s+mag=\d+')
+        'heartbeat-alive'     = ($sciText -match 'alive,\s*ticks=')
+        'fault-injected-once' = ($faultCnt -eq 1)
+        'fault-recovered'     = ($sciText -match 'tz:\s*cleared')
+        'no-spurious-fault'   = ($faultIdx -lt 0 -or ($armedIdx -ge 0 -and $faultIdx -gt $armedIdx))
+    }
+    # state.json hil.checks key that records the H5 result for this project.
+    $stateH5Key = 'pwm'
+}
+elseif ($projName -eq 'launchxl-f280039c-full-platform') {
+    # full-platform console contract (specs/0002-full-platform): banner,
+    # 120 MHz sysclk, the four self-test lines, the periodic health line and
+    # the per-milestone subsystem lines. REQ-018 (windowed watchdog) bring-up
+    # is OPEN, so the watchdog line is reported but NOT made a gate here: if
+    # the device resets, hil_test_fp.js H5b catches it on the DSS side with a
+    # concrete reason instead of this leg silently averaging it away.
+    $serialChecks = [ordered]@{
+        'banner'              = ($sciText -match 'LAUNCHXL-F280039C full-platform')
+        'sysclk=120MHz'       = ($sciText -match 'sysclk\s*:\s*120000000')
+        'selftest-pattern-OK' = ($sciText -match 'self-test:\s*pattern OK')
+        'selftest-fmt-OK'     = ($sciText -match 'self-test:\s*fmt OK')
+        'selftest-sched-OK'   = ($sciText -match 'self-test:\s*scheduler OK')
+        'selftest-health-OK'  = ($sciText -match 'self-test:\s*health OK')
+        'health-line'         = ($sciText -match 'health:\s*up=')
+        'no-selftest-fail'    = ($sciText -notmatch 'self-test FAIL')
+    }
+    $stateH5Key = 'liveness'
+}
+else {
+    $serialChecks = [ordered]@{
+        'banner'        = ($sciText -match 'LAUNCHXL-F280039C LED chaser')
+        'sysclk=120MHz' = ($sciText -match 'sysclk\s*:\s*120000000')
+        'step=200ms'    = ($sciText -match 'step\s*:\s*200\s*ms')
+        'selftest-pattern-OK' = ($sciText -match 'self-test:\s*pattern OK')
+        'selftest-fmt-OK'     = ($sciText -match 'self-test:\s*fmt OK')
+        'heartbeat-alive'     = ($sciText -match 'alive,\s*steps=')
+    }
+    $stateH5Key = 'polarity'
 }
 $serialPass = $true
 foreach ($k in $serialChecks.Keys) { if (-not $serialChecks[$k]) { $serialPass = $false } }
@@ -227,31 +316,70 @@ $overall = if ($hilPass -and ($serialOk -eq $false -or $serialPass)) { 'PASS' } 
 $pcLine  = ($dssText -split "`n" | Where-Object { $_ -match '^PC\s*=' } | Select-Object -First 1)
 $stLine  = ($dssText -split "`n" | Where-Object { $_ -match 'g_self_test_code' } | Select-Object -First 1)
 $cadLine = ($dssText -split "`n" | Where-Object { $_ -match 'transition period' } | Select-Object -First 1)
-$banner  = ($sciText -split "`r?`n" | Where-Object { $_ -match 'LAUNCHXL-F280039C LED chaser|self-test:|alive,|sysclk|step\s+:' } | Select-Object -First 12)
+$banner  = ($sciText -split "`r?`n" | Where-Object { $_ -match 'motor-pwm|LED chaser|self-test:|alive,|sysclk|step\s+:' } | Select-Object -First 12)
+
+# DSS check labels are project-specific (hil_test.js emits H1..Hn per project).
+# H1-H4/H6 are shared; H5 is the project's own hardware proof.
+if ($projName -eq 'launchxl-f280039c-motor-pwm') {
+    $dssLabels = [ordered]@{
+        'H1' = 'JTAG connect (cJTAG)'
+        'H2' = 'flash programmed (code_start non-blank)'
+        'H3' = 'power-on self test (g_self_test_code==0)'
+        'H4' = 'PC inside application main loop'
+        'H5' = 'ePWM/TZ/CMPSS register readback + forced over-limit trip and autonomous recovery'
+        'H6' = 'left running standalone'
+    }
+}
+elseif ($projName -eq 'launchxl-f280039c-full-platform') {
+    $dssLabels = [ordered]@{
+        'H1' = 'JTAG connect (cJTAG)'
+        'H2' = 'flash programmed (code_start non-blank, 5 HIL symbols resolve)'
+        'H3' = 'power-on self test (g_self_test_code==0)'
+        'H4' = 'PC inside application main loop'
+        'H5' = 'halt-free liveness: watchdog service advances, no reset, subsystem status non-zero'
+        'H6' = 'left running standalone'
+    }
+}
+else {
+    $dssLabels = [ordered]@{
+        'H1' = 'JTAG connect (cJTAG)'
+        'H2' = 'flash programmed (code_start non-blank)'
+        'H3' = 'power-on self test (g_self_test_code==0)'
+        'H4' = 'PC inside application main loop'
+        'H5' = 'LED polarity + 200ms cadence'
+        'H6' = 'left running standalone'
+    }
+}
+$dssRows = ($dssLabels.GetEnumerator() | ForEach-Object {
+    "| $($_.Key) $($_.Value) | $(if ($dssText -match "$($_.Key) PASS") {'PASS'} else {'FAIL'}) |"
+}) -join "`n"
 
 $serialMd = 'serial capture skipped'
 if ($serialOk) {
+$rows = ($serialChecks.GetEnumerator() | ForEach-Object { "| $($_.Key) | $(if ($_.Value) {'yes'} else {'NO'}) |" }) -join "`n"
+# A markdown fence inside a double-quoted here-string is a TRAP: the backtick
+# is PowerShell's escape character there, so three backticks swallow the
+# following newline (odd count -> the terminating "@ is glued onto the previous
+# line and the here-string never ends; every brace after it becomes string
+# content and the script dies with "missing }" hundreds of lines later).
+# Interpolating the fence from a variable keeps it literal.
+$fence = '```'
 $serialMd = @"
 | expected line | found |
 |---|---|
-| boot banner | $(if ($serialChecks['banner']) {'yes'} else {'NO'}) |
-| sysclk 120000000 Hz | $(if ($serialChecks['sysclk=120MHz']) {'yes'} else {'NO'}) |
-| step 200 ms | $(if ($serialChecks['step=200ms']) {'yes'} else {'NO'}) |
-| self-test: pattern OK | $(if ($serialChecks['selftest-pattern-OK']) {'yes'} else {'NO'}) |
-| self-test: fmt OK | $(if ($serialChecks['selftest-fmt-OK']) {'yes'} else {'NO'}) |
-| alive, steps= heartbeat | $(if ($serialChecks['heartbeat-alive']) {'yes'} else {'NO'}) |
+$rows
 
-```
+$fence
 $($banner -join "`n")
-```
+$fence
 "@
 }
 
 $md = @"
-# HIL record - launchxl-f280039c-led-chaser
+# HIL record - $projName
 
 - date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-- operator: automated (run-hil.ps1 + dss hil_test.js)
+- operator: automated (run-hil.ps1 + dss $dssScriptName)
 - board: LAUNCHXL-F280039C / TMS320F280039C (cJTAG 2-pin)
 - image: $($out.FullName)
 - overall: **$overall**
@@ -260,12 +388,7 @@ $md = @"
 
 | check | result |
 |---|---|
-| H1 JTAG connect (cJTAG) | $(if ($dssText -match 'H1 PASS') {'PASS'} else {'FAIL'}) |
-| H2 flash programmed (code_start non-blank) | $(if ($dssText -match 'H2 PASS') {'PASS'} else {'FAIL'}) |
-| H3 power-on self test (g_self_test_code==0) | $(if ($dssText -match 'H3 PASS') {'PASS'} else {'FAIL'}) |
-| H4 PC inside application main loop | $(if ($dssText -match 'H4 PASS') {'PASS'} else {'FAIL'}) |
-| H5 LED polarity + 200ms cadence | $(if ($dssText -match 'H5 PASS') {'PASS'} else {'FAIL'}) |
-| H6 left running standalone | $(if ($dssText -match 'H6 PASS') {'PASS'} else {'FAIL'}) |
+$dssRows
 
 - $stLine
 - $pcLine
@@ -288,6 +411,17 @@ Set-Content -Path $report -Value $md -Encoding UTF8
 Info "evidence record: $report"
 
 # ------------------------------------------------- 6) refresh state.json
+# H5's state.json key is project-specific (polarity for led-chaser, pwm for
+# motor-pwm) - state.schema.json declares both as optional properties.
+$hilChecks = [ordered]@{
+    jtag     = ($dssText -match 'H1 PASS')
+    flash    = ($dssText -match 'H2 PASS')
+    selftest = ($dssText -match 'H3 PASS')
+    loop     = ($dssText -match 'H4 PASS')
+}
+$hilChecks[$stateH5Key] = ($dssText -match 'H5 PASS')
+$hilChecks['sci'] = if ($serialOk) { $serialPass } else { $null }
+
 $statePath = Join-Path $ProjDir 'state.json'
 if (Test-Path $statePath) {
     # -Encoding UTF8 is load-bearing: state.json is a truth source holding
@@ -301,14 +435,7 @@ if (Test-Path $statePath) {
         probe   = 'XDS110 (cJTAG)'
         image   = $out.FullName.Replace("$RepoRoot\", '').Replace('\', '/')
         record  = $report.Replace("$RepoRoot\", '').Replace('\', '/')
-        checks  = [pscustomobject]@{
-            jtag     = ($dssText -match 'H1 PASS')
-            flash    = ($dssText -match 'H2 PASS')
-            selftest = ($dssText -match 'H3 PASS')
-            loop     = ($dssText -match 'H4 PASS')
-            polarity = ($dssText -match 'H5 PASS')
-            sci      = if ($serialOk) { $serialPass } else { $null }
-        }
+        checks  = $hilChecks
         fail_reason = if ($failReason) { $failReason } else { $null }
         at = (Get-Date -Format 'yyyy-MM-dd')
     }
@@ -326,7 +453,7 @@ Write-Host ""
 if ($overall -eq 'PASS') {
     Write-Host "[hil ] ================================================" -ForegroundColor Green
     Write-Host "[hil ]  HARDWARE-IN-THE-LOOP: PASS" -ForegroundColor Green
-    Write-Host "[hil ]  board is running the chaser standalone" -ForegroundColor Green
+    Write-Host "[hil ]  board is running $projName standalone" -ForegroundColor Green
     Write-Host "[hil ] ================================================" -ForegroundColor Green
     exit 0
 }

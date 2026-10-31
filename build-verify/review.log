@@ -1,0 +1,17 @@
+﻿review: 57 firmware sources scanned, rules: R1-TODO, R2-MAGIC-ADDR, R3-GUARD, R4-SIZE, R5-TRACE
+--- WARN findings (non-blocking, 40) ---
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/accel_hw.c:1  accel_hw.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/accel_hw.h:1  accel_hw.h is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/adc_scan_hw.c:1  adc_scan_hw.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/adc_scan_hw.h:1  adc_scan_hw.h is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/adc_stat.c:1  adc_stat.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/adc_stat.h:1  adc_stat.h is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/app_version.h:1  app_version.h is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/board_error.c:1  board_error.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/can_loop_hw.c:1  can_loop_hw.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/can_loop_hw.h:1  can_loop_hw.h is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/cap_meas_hw.c:1  cap_meas_hw.c is not claimed by any specs/*/trace.json
+  REVIEW-SPEC-UNTRACED  projects/launchxl-f280039c-full-platform/source/cap_meas_hw.h:1  cap_meas_hw.h is not claimed by any specs/*/trace.json
+  ... 28 more (see build-verify/review.log)
+REVIEW OK (0 findings)
+

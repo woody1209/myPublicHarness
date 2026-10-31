@@ -23,7 +23,9 @@
 它逐条执行门禁、原样上报每条**自己的**退出码与量化判据，任何一条没能真正计数都不算 PASS；
 `-Skip` 或省略 `-Hil` 时矩阵打印 `VERIFY INCOMPLETE` 并退出 1——跳过不等于通过（ADR 0009）。
 
-覆盖范围要说清，免得把"没跑"读成"过了"：`verify.ps1` 的腿 = #0 #1 #2 #3 #4 #5 #6 #9(-Hil) #10，
+覆盖范围要说清，免得把"没跑"读成"过了"：`verify.ps1` 的腿 = #0 #1 #1b #2 #2b #3 #4 #5 #6 #9(-Hil) #10，
+其中 **#1b 代码审查**（`review.ps1`，ERROR 级 0 findings）与 **#2b 软测 SIL**（`run-sil-tests.ps1`，
+时间序列性质）是 2026-10-31 补的第九、十条腿——测试金字塔从此是三层：**单测(#3) → SIL(#2b) → HIL(#9)**，
 #11 由 #0 的 trace 证据路径核对机器承担。**#7 连接确认、#8 loadti 烧录路径、#12 文档回写不在聚合门里**：
 `-Hil` 的 HIL 腿自带探针预检与 DSS 烧写，但它**不经过** `ccs.ps1 program`，所以 #7/#8 要按 §3
 报告 ccxml／MPN／`.out`／加载结果后单独执行；#12 只能人工评审（`DOC-DEAD-ROUTE` 只保证路线可走，不保证内容已更新）。
@@ -32,7 +34,9 @@
 |---|---|---|---|
 | 0 | 规格先行 | 非平凡改动（新模块/新外设/协议/时钟策略/跨文件重构/链接脚本或启动代码变更）已先写 `specs/<id>/` 三件套并经用户确认（§7）；每条 `REQ-XXX` 有 EARS 验收句 + 可执行验收；`spec.json`/`trace.json` 过 schema；trace 里每条证据路径**真实存在**；`status=verified` 与"延后/未执行"表述冲突时必须给 `waiver_reason` | `.\harness\tools\spec.ps1 check` → `CHECK OK`，退出 0 |
 | 1 | 环境发现 | `harness/env/manifest.json` 与本机一致；CCS / CGT / C2000Ware / gmake / loadti / xdsdfu 全部解析 | `.\harness\tools\doctor.ps1` → `environment OK` |
+| 1b | 代码审查 | **ERROR 级 0 findings**：`REVIEW-TODO-UNTRACKED`（TODO/FIXME 必须带 spec/ADR/issue 引用）、`REVIEW-MAGIC-REG-ADDR`（禁止把字面地址传给 `HWREG*`，字寻址下这是静默 bug 类）、`REVIEW-GUARD-MISSING`（头文件守卫）、`REVIEW-LONG-FILE`（>1000 行）。**WARN 级不阻断**：`REVIEW-SPEC-UNTRACED`（追溯债务，记入审计待办）。门必须能红——已用注入探针验证过 REVIEW FAILED / exit 1 | `.\harness\tools\review.ps1 [-Project <proj>]` → `REVIEW OK (0 findings)` |
 | 2 | 静态检查 | 规则 linter **0 findings**（JTAG 引脚复用、裸引脚号、裸 `sprintf`/`stdio`/动态内存、driverlib 分层、裸工具链调用）＋ `cl /W4 /analyze` 对主机可编译源 0 诊断 ＋ 主机测试模块清单与 `CMakeLists.txt`/`test_runner.c` **双向一致** ＋ `project.config.json` **过契约** ＋ 全部文档路线**可走**（`DOC-DEAD-ROUTE` 0 条） | `.\harness\tools\static-check.ps1` → `STATIC CHECK OK (0 violations)` |
+| 2b | 软测 SIL | **时间序列性质**（不是单返回值）：`cases > 0` 且 `failures == 0`，且输出 `SIL RESULT: PASS`。清单 `harness/tests/sil/modules.json`。SIL 跑真实模块于仿真主循环内：调度器节拍/相位错峰/卡顿无 backlog、健康监视 MUST 阈值锁存与恢复、SVPWM 整周波的定心与线电压不变性 | `.\harness\tools\run-sil-tests.ps1` → `SIL RESULT: PASS` |
 | 3 | 单元测试 | `cases > 0` **且** `failures == 0`（跑了 0 个用例不算通过） | `.\harness\tools\run-host-tests.ps1` |
 | 4 | 固件构建 | 目标 `CONFIG` 链接成功，退出码 0 | `.\harness\tools\ccs.ps1 build -Project <proj>` |
 | 5 | 体积预算 | 按 **C28x 字**计量（1 字 = 2 字节，ADR 0002）：FLASH ≤ 90 %／RAM ≤ 90 %，预算读自 `targets/F280039C.json` | `.\harness\tools\ccs.ps1 size -Project <proj>` → `size gate PASS` |
@@ -109,7 +113,9 @@
 | 需求／设计／任务／追溯 | `specs/<id>/`（`spec.ps1 new` 生成骨架） |
 | 上板与故障注入证据 | `harness/tests/on-target/records/`（HIL 记录由 `run-hil.ps1` 自动写） |
 | 对外行为与体积／引脚事实 | `projects/<proj>/README.md` + `projects/<proj>/state.json`（后者受 `state.schema.json` 约束） |
-| 门禁链与符合性审计结论 | `harness/docs/80-harness闭环符合性审计.md`、`harness/docs/81-AIDLC符合性审计.md` |
+| 门禁链与符合性审计结论 | `harness/docs/80-harness闭环符合性审计.md`（motor-pwm 前的快照）、`harness/docs/81-AIDLC符合性审计.md`（同上）、`harness/docs/82-工程完备性审计.md`（覆盖两个工程 + 基线对比，最新） |
+| 变更记录（来源/改动/验证） | `CHANGELOG.md`（2026-10-31 建立；此前仓库无变更记录） |
+| 学习材料（电机控制时序/原理演示/MCU 资源时序） | `docs/learning-site/`（`index.html` 静态理论 / `dynamic.html` 动态演示 / `mcu.html` MCU 时序；算法核 `docs/learning-site/js/core.js` 与 firmware 同算法） |
 
 ## 6. 禁止事项
 

@@ -64,7 +64,13 @@ var CODE_START      = 0x00080000;   // map file: code_start (flash entry)
 var STEP_MS         = 200;          // LEDCHASER_STEP_MS (main.c)
 var CADENCE_TOL     = 0.25;         // +/-25 % around STEP_MS (mean chase period)
 var SAMPLE_GAP_MS   = 20;           // spacing between halt-free register peeks (<< STEP_MS)
-var SAMPLE_WINDOW_MS= 2500;         // total LED sampling window (~12 chase steps)
+// 2026-10-31: the PEEK got slower on this host, not the firmware. In a 2500 ms
+// window only 16-17 samples arrived (floor is 20) and the leg failed twice while
+// SCI capture kept showing a healthy chase. Widening the window buys the floor
+// back; it does NOT relax the gate - the 20-sample floor and the +/-25 % cadence
+// tolerance below are unchanged, and the measured peek period is now printed
+// BEFORE the floor is judged so a slow probe is visible instead of silent.
+var SAMPLE_WINDOW_MS= 6000;         // total LED sampling window (~30 chase steps)
 
 function now() { return new Date().getTime(); }
 function sleep(ms) { java.lang.Thread.sleep(ms); }
@@ -224,10 +230,9 @@ while (now() - sampleStart < SAMPLE_WINDOW_MS) {
     samples.push({ t: now(), dat: g.dat, pin: g.pin });
     sleep(SAMPLE_GAP_MS);
 }
-if (samples.length < 20) {
-    fail("H5-sample (" + samples.length + " halt-free peeks, " + peekErr +
-         " failed - cannot judge cadence)");
-}
+// Print the sampling diagnostics BEFORE judging the floor: when the probe/host
+// is slow the reason must be visible in the record, not hidden behind a bare
+// "cannot judge cadence" (2026-10-31).
 var spanMs = samples[samples.length - 1].t - samples[0].t;
 var samplePeriod = spanMs / (samples.length - 1);
 log("LED samples: " + samples.length + " halt-free peeks over " +
@@ -236,6 +241,10 @@ log("LED samples: " + samples.length + " halt-free peeks over " +
 if (samplePeriod > STEP_MS * 0.7) {
     log("warning: peek period " + samplePeriod.toFixed(0) +
         " ms approaches the 200 ms step - cadence measurement may be coarse");
+}
+if (samples.length < 20) {
+    fail("H5-sample (" + samples.length + " halt-free peeks, " + peekErr +
+         " failed - cannot judge cadence)");
 }
 for (j = 0; j < samples.length; j++) {
     log("  sample[" + j + "] GPADAT=0x" + samples[j].dat.toString(16).toUpperCase() +

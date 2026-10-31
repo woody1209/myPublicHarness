@@ -6,7 +6,9 @@
 #
 # Legs (in order):
 #   doctor        harness/tools/doctor.ps1          env manifest matches this machine
+#   review        harness/tools/review.ps1          code-review rules (0 findings)
 #   static-check  harness/tools/static-check.ps1    0 rule findings + cl /analyze clean
+#   sil-tests     harness/tools/run-sil-tests.ps1   SIL time-series properties hold
 #   host-tests    harness/tools/run-host-tests.ps1  failures == 0 AND cases > 0
 #   spec-check    harness/tools/spec.ps1 check      schema + trace + evidence paths resolve
 #   state-schema  harness/tools/lib/JsonSchema.ps1  projects/<proj>/state.json validates
@@ -60,6 +62,15 @@ if (-not $ProjName) { Bad-Usage '-Project is empty' }
 $ProjDir = Join-Path $RepoRoot "projects\$ProjName"
 if (-not (Test-Path (Join-Path $ProjDir 'Makefile'))) {
     Bad-Usage "no Makefile under $ProjDir (check -Project)"
+}
+# Child gates take the BARE project name (that is their documented contract -
+# static-check.ps1 joins "projects\$Project" itself). Pass $ProjName, never the
+# raw -Project spelling, or a repo-relative value doubles the path segment.
+# motor-pwm's HIL script adds a ~15 s forced-trip experiment before H6's
+# re-boot banner; widen its capture window unless the caller pinned it.
+if ($ProjName -eq 'launchxl-f280039c-motor-pwm' -and
+    -not $PSBoundParameters.ContainsKey('HilSerialSeconds')) {
+    $HilSerialSeconds = 120
 }
 
 $LogDir = Join-Path $RepoRoot 'build-verify'
@@ -146,13 +157,37 @@ $gates = @(
         Check = { param($t, $c) if ($t -notmatch 'environment OK') { return 'no "environment OK" verdict' }; return $null }
     }
     [pscustomobject]@{
+        Name = 'review'; Script = 'review.ps1'
+        Args = @('-Project', $ProjName)
+        Criterion = '0 ERROR-level review findings (WARN debt is reported, not blocking)'
+        Check = { param($t, $c)
+                  if ($t -match 'REVIEW FAILED \((\d+)') { return "$($Matches[1]) review finding(s), see build-verify/review.log" }
+                  if ($t -notmatch 'REVIEW OK \((\d+) findings\)') { return 'no machine-readable review verdict line' }
+                  if ([int]$Matches[1] -ne 0) { return "findings=$($Matches[1])" }
+                  return $null }
+    }
+    [pscustomobject]@{
         Name = 'static-check'; Script = 'static-check.ps1'
-        Args = @('-Project', $Project)
+        Args = @('-Project', $ProjName)
         Criterion = '0 rule violations AND cl /analyze clean over the host-testable sources'
         Check = { param($t, $c)
                   if ($t -match 'STATIC CHECK FAILED \((\d+)') { return "$($Matches[1]) finding(s), see build-verify/static-check.log" }
                   if ($t -notmatch 'STATIC CHECK OK \((\d+) violations\)') { return 'no machine-readable verdict line' }
                   if ([int]$Matches[1] -ne 0) { return "violations=$($Matches[1])" }
+                  return $null }
+    }
+    [pscustomobject]@{
+        Name = 'sil-tests'; Script = 'run-sil-tests.ps1'
+        Args = @()
+        Criterion = '"SIL RESULT: PASS" AND cases > 0 (time-series properties hold in the loop)'
+        Check = { param($t, $c)
+                  if ($t -match 'cases:\s*(\d+),\s*failures:\s*(\d+)') {
+                      $cases = [int]$Matches[1]; $failures = [int]$Matches[2]
+                      if ($failures -gt 0) { return "failures=$failures" }
+                      if ($cases -le 0) { return 'cases=0 - no SIL scenario actually ran' }
+                  }
+                  else { return 'no countable SIL verdict line' }
+                  if ($t -notmatch 'SIL RESULT: PASS') { return 'no "SIL RESULT: PASS" verdict' }
                   return $null }
     }
     [pscustomobject]@{
@@ -170,7 +205,7 @@ $gates = @(
     }
     [pscustomobject]@{
         Name = 'spec-check'; Script = 'spec.ps1'
-        Args = @('check', '-Project', $Project)
+        Args = @('check', '-Project', $ProjName)
         Criterion = 'spec.json/trace.json validate, every REQ traced, every evidence path exists'
         Check = { param($t, $c) if ($t -notmatch 'CHECK OK') { return 'no CHECK OK verdict' }; return $null }
     }
@@ -182,13 +217,13 @@ $gates = @(
     }
     [pscustomobject]@{
         Name = 'build'; Script = 'ccs.ps1'
-        Args = @('build', '-Project', $Project, '-Config', $Config)
+        Args = @('build', '-Project', $ProjName, '-Config', $Config)
         Criterion = "the wrapper build target completes with exit 0 for $Config"
         Check = { param($t, $c) if ($t -match '\berror\b.*\*\*\*') { return 'compiler/linker error in the build log' }; return $null }
     }
     [pscustomobject]@{
         Name = 'size'; Script = 'ccs.ps1'
-        Args = @('size', '-Project', $Project, '-Config', $Config, '-MaxFlashPct', "$MaxFlashPct", '-MaxRamPct', "$MaxRamPct")
+        Args = @('size', '-Project', $ProjName, '-Config', $Config, '-MaxFlashPct', "$MaxFlashPct", '-MaxRamPct', "$MaxRamPct")
         Criterion = "FLASH <= $MaxFlashPct % AND RAM <= $MaxRamPct % of the hardware card, in C28x WORDS"
         Check = { param($t, $c)
                   if ($t -match 'size gate FAIL: (.+)') { return "gate reason: $($Matches[1].Trim())" }
@@ -203,7 +238,7 @@ $gates = @(
     }
     [pscustomobject]@{
         Name = 'hil'; Script = 'run-hil.ps1'
-        Args = @('-Project', $Project, '-Config', $Config, '-SerialSeconds', "$HilSerialSeconds")
+        Args = @('-Project', $ProjName, '-Config', $Config, '-SerialSeconds', "$HilSerialSeconds")
         Criterion = 'HIL RESULT: PASS with H1-H6 each PASS (exit 3 = probe absent = UNAVAILABLE)'
         Check = { param($t, $c)
                   if ($c -eq 3) { return 'probe not connected - precondition unmet, NOT a firmware pass' }
@@ -280,7 +315,13 @@ foreach ($g in $gates) {
         }
         else {
             $r = Get-Content -Raw -Encoding UTF8 $rep | ConvertFrom-Json
-            $text = [int64](($r.sections | Where-Object { $_.name -eq '.text' } | Measure-Object -Sum words).Sum)
+            # .text may be SPLIT across flash sectors when it outgrows one
+            # (the linker/map then emits .text.1/.text.2/...): sum every
+            # section named .text or .text.<n>, else a >4K-word .text reads
+            # as 0 and this leg lies (found 2026-10-24 on full-platform M1).
+            $text = [int64](($r.sections |
+                             Where-Object { $_.name -match '^\.text(\.\d+)?$' } |
+                             Measure-Object -Sum words).Sum)
             if (-not $text) { $text = 0L }
             $base = $null
             $sp = Join-Path $ProjDir 'state.json'

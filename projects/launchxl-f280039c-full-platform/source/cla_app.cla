@@ -1,0 +1,50 @@
+//#############################################################################
+//
+// FILE:   cla_app.cla
+//
+// TITLE:  CLA Task 1 - integer stats over the CPU message block (REQ-004).
+//
+// DESCRIPTION:
+//   Task 1: sum/min/max over cla_in[16] into cla_sum/cla_min/cla_max, then
+//   cla_done = 0xA5A5. Pure register arithmetic - the CLA has no runtime
+//   library. Data lives in the CLA<->CPU message RAMs (shared sections in
+//   cla_app_shared.h + the linker command).
+//
+// LICENSE: BSD-3-Clause style, consistent with TI C2000Ware driverlib.
+//
+//#############################################################################
+
+#include "cla_app_shared.h"
+
+#pragma DATA_SECTION(cla_in,   "CpuToCla1MsgRAM");
+#pragma DATA_SECTION(cla_sum,  "Cla1ToCpuMsgRAM");
+#pragma DATA_SECTION(cla_min,  "Cla1ToCpuMsgRAM");
+#pragma DATA_SECTION(cla_max,  "Cla1ToCpuMsgRAM");
+#pragma DATA_SECTION(cla_done, "Cla1ToCpuMsgRAM");
+
+uint32_t cla_in[CLA_N_IN];
+uint32_t cla_sum;
+uint32_t cla_min;
+uint32_t cla_max;
+uint32_t cla_done;
+
+interrupt void Cla1Task1(void)
+{
+    uint32_t s = 0U;
+    uint32_t mn = 0xFFFFFFFFU;
+    uint32_t mx = 0U;
+    uint16_t i;
+
+    for (i = 0U; i < CLA_N_IN; i++)
+    {
+        uint32_t v = cla_in[i];
+
+        s += v;
+        if (v < mn) { mn = v; }
+        if (v > mx) { mx = v; }
+    }
+    cla_sum = s;
+    cla_min = mn;
+    cla_max = mx;
+    cla_done = 0xA5A5U;
+}

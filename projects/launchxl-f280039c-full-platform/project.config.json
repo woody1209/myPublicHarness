@@ -1,0 +1,21 @@
+{
+  "project": {
+    "name": "launchxl-f280039c-full-platform",
+    "target": "TMS320F280039C",
+    "board": "LAUNCHXL-F280039C",
+    "build_config": "CPU1_FLASH",
+    "arch": "c28x",
+    "fpu": "fpu32"
+  },
+  "paths": {
+    "source": "source",
+    "device": "device",
+    "target_configs": "targetConfigs",
+    "host_tests": "../../harness/tests/host",
+    "on_target_tests": "../../harness/tests/on-target"
+  },
+  "specs": {
+    "require_spec": true,
+    "dir": "specs"
+  }
+}

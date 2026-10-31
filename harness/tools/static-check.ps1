@@ -172,112 +172,141 @@ if (-not (Test-Path $ManifestPath)) {
     exit 2
 }
 $mf = Get-Content -Raw -Encoding UTF8 $ManifestPath | ConvertFrom-Json
-$logic = @($mf.logic) | ForEach-Object { [string]$_ }
-$suites = @($mf.suites)
-$runnerRel = [string]$mf.runner
 
-# M1: every host-compilable firmware module must be declared in the manifest.
-$eligible = @()
-foreach ($f in ($fwFiles | Where-Object { $_.Extension -eq '.c' } | Where-Object { $_.BaseName -ne 'main' })) {
-    $txt = ((Remove-CComments -Lines (Get-Content -Encoding UTF8 $f.FullName)) -join "`n")
-    if ($txt -notmatch '#\s*include\s*[<"](driverlib|device\.h)') {
-        $eligible += $f.BaseName
-    }
-}
-foreach ($m in $eligible) {
-    if ($logic -notcontains $m) {
-        Add-Viol -Rule 'TEST-MODULE-UNDECLARED' -Loc (Rel-Path (Join-Path $FwSrcDir "$m.c")) `
-            -Msg "host-compilable module '$m' is not in harness/tests/host/modules.json" `
-            -Fix "add '$m' to logic[] plus a suite that covers it, otherwise it ships untested (TDD)"
-    }
-}
-foreach ($m in $logic) {
-    if ($eligible -notcontains $m) {
-        Add-Viol -Rule 'TEST-MODULE-STALE' -Loc 'harness/tests/host/modules.json' `
-            -Msg "manifest declares '$m' as host-tested but no such host-compilable source exists" `
-            -Fix "drop it from logic[] or restore projects/$Project/source/$m.c"
-    }
+# v2 manifest: projects[] each declare their own logic set, suites and runner.
+# Every check below runs PER PROJECT so identical module names in different
+# projects are judged against their own declarations (spec 0002 T-005).
+$hostProjects = @($mf.projects)
+if ($hostProjects.Count -eq 0) {
+    Add-Viol -Rule 'TEST-MANIFEST-EMPTY' -Loc 'harness/tests/host/modules.json' `
+        -Msg 'modules.json declares no projects[]' `
+        -Fix 'declare at least one project with source_dir/logic/suites/runner'
 }
 
-# Logic-layer purity: declared logic modules must not reach hardware headers.
-foreach ($m in $logic) {
-    $p = Join-Path $FwSrcDir "$m.c"
-    if (-not (Test-Path $p)) { continue }
-    $code = @(Remove-CComments -Lines (Get-Content -Encoding UTF8 $p))
-    for ($i = 0; $i -lt $code.Count; $i++) {
-        if ($code[$i] -match '#\s*include\s*[<"](driverlib|device\.h)') {
-            Add-Viol -Rule 'LAY-DRIVERLIB-IN-LOGIC' -Loc ("{0}:{1}" -f (Rel-Path $p), ($i + 1)) `
-                -Msg "host-tested module '$m' includes a hardware header" `
-                -Fix 'move register access to the board layer or drop the module from logic[]'
-        }
-    }
-}
+foreach ($hp in $hostProjects) {
+    $pName = [string]$hp.name
+    $pSrc = Join-Path $RepoRoot (([string]$hp.source_dir) -replace '/', '\')
+    $pLogic = @($hp.logic) | ForEach-Object { [string]$_ }
+    $pSuites = @($hp.suites)
+    $pRunnerRel = [string]$hp.runner
+    $pLib = [string]$hp.cmake_lib
+    $pExe = [string]$hp.cmake_exe
 
-# M2: every declared module needs a suite that covers it, and that suite must
-# really be wired into the runner.
-$covered = @()
-foreach ($s in $suites) {
-    $sp = Join-Path $HostTestDir (([string]$s.file) -replace '/', '\')
-    if (-not (Test-Path $sp)) {
-        Add-Viol -Rule 'TEST-SUITE-MISSING' -Loc ('harness/tests/host/' + ([string]$s.file)) `
-            -Msg 'declared test suite file does not exist' `
-            -Fix 'create the suite or correct modules.json'
+    if (-not (Test-Path $pSrc)) {
+        Add-Viol -Rule 'TEST-SOURCE-DIR-MISSING' -Loc 'harness/tests/host/modules.json' `
+            -Msg "projects[] entry '$pName' source_dir does not resolve: $([string]$hp.source_dir)" `
+            -Fix 'fix source_dir or remove the stale project entry'
         continue
     }
-    foreach ($c in @($s.covers)) { $covered += [string]$c }
-    $runnerPath = Join-Path $HostTestDir ($runnerRel -replace '/', '\')
+
+    # M1: every host-compilable firmware module must be declared in the manifest.
+    $pEligible = @()
+    foreach ($f in (Get-ChildItem $pSrc -Filter *.c -File | Where-Object { $_.BaseName -ne 'main' })) {
+        $txt = ((Remove-CComments -Lines (Get-Content -Encoding UTF8 $f.FullName)) -join "`n")
+        if ($txt -notmatch '#\s*include\s*[<"](driverlib|device\.h)') {
+            $pEligible += $f.BaseName
+        }
+    }
+    foreach ($m in $pEligible) {
+        if ($pLogic -notcontains $m) {
+            Add-Viol -Rule 'TEST-MODULE-UNDECLARED' -Loc (Rel-Path (Join-Path $pSrc "$m.c")) `
+                -Msg "[$pName] host-compilable module '$m' is not in harness/tests/host/modules.json" `
+                -Fix "add '$m' to projects[$pName].logic[] plus a suite that covers it, otherwise it ships untested (TDD)"
+        }
+    }
+    foreach ($m in $pLogic) {
+        if ($pEligible -notcontains $m) {
+            Add-Viol -Rule 'TEST-MODULE-STALE' -Loc 'harness/tests/host/modules.json' `
+                -Msg "[$pName] manifest declares '$m' as host-tested but no such host-compilable source exists" `
+                -Fix "drop it from projects[$pName].logic[] or restore projects/$pName/source/$m.c"
+        }
+    }
+
+    # Logic-layer purity: declared logic modules must not reach hardware headers.
+    foreach ($m in $pLogic) {
+        $p = Join-Path $pSrc "$m.c"
+        if (-not (Test-Path $p)) { continue }
+        $code = @(Remove-CComments -Lines (Get-Content -Encoding UTF8 $p))
+        for ($i = 0; $i -lt $code.Count; $i++) {
+            if ($code[$i] -match '#\s*include\s*[<"](driverlib|device\.h)') {
+                Add-Viol -Rule 'LAY-DRIVERLIB-IN-LOGIC' -Loc ("{0}:{1}" -f (Rel-Path $p), ($i + 1)) `
+                    -Msg "[$pName] host-tested module '$m' includes a hardware header" `
+                    -Fix 'move register access to the board layer or drop the module from logic[]'
+            }
+        }
+    }
+
+    # M2: every declared module needs a suite that covers it, and that suite must
+    # really be wired into the per-project runner.
+    $covered = @()
+    $runnerPath = Join-Path $HostTestDir ($pRunnerRel -replace '/', '\')
     $rtxt = ''
     if (Test-Path $runnerPath) { $rtxt = Get-Content -Raw -Encoding UTF8 $runnerPath }
-    $entry = [string]$s.entry
-    if ($rtxt -notmatch ('(?m)^\s*' + [regex]::Escape($entry) + '\s*\(\s*\)\s*;')) {
-        Add-Viol -Rule 'TEST-SUITE-NOT-RUN' -Loc ('harness/tests/host/' + $runnerRel) `
-            -Msg "suite entry '$entry' is never called by the runner" `
-            -Fix "call $entry(); from main() in $runnerRel, else these cases silently do not run"
+    foreach ($s in $pSuites) {
+        $sp = Join-Path $HostTestDir (([string]$s.file) -replace '/', '\')
+        if (-not (Test-Path $sp)) {
+            Add-Viol -Rule 'TEST-SUITE-MISSING' -Loc ('harness/tests/host/' + ([string]$s.file)) `
+                -Msg "[$pName] declared test suite file does not exist" `
+                -Fix 'create the suite or correct modules.json'
+            continue
+        }
+        foreach ($c in @($s.covers)) { $covered += [string]$c }
+        $entry = [string]$s.entry
+        if ($rtxt -notmatch ('(?m)^\s*' + [regex]::Escape($entry) + '\s*\(\s*\)\s*;')) {
+            Add-Viol -Rule 'TEST-SUITE-NOT-RUN' -Loc ('harness/tests/host/' + $pRunnerRel) `
+                -Msg "[$pName] suite entry '$entry' is never called by the runner" `
+                -Fix "call $entry(); from main() in $pRunnerRel, else these cases silently do not run"
+        }
     }
-}
-foreach ($m in $logic) {
-    if ($covered -notcontains $m) {
-        Add-Viol -Rule 'TEST-MODULE-UNCOVERED' -Loc 'harness/tests/host/modules.json' `
-            -Msg "logic module '$m' has no suite with covers: $m" `
-            -Fix 'add a suite entry (and test/<name>.c) that covers it'
+    foreach ($m in $pLogic) {
+        if ($covered -notcontains $m) {
+            Add-Viol -Rule 'TEST-MODULE-UNCOVERED' -Loc 'harness/tests/host/modules.json' `
+                -Msg "[$pName] logic module '$m' has no suite with covers: $m" `
+                -Fix 'add a suite entry (and test/<name>.c) that covers it'
+        }
     }
-}
 
-# M3: CMakeLists must compile exactly the manifest module set (no 4th copy).
-$cmakePath = Join-Path $HostTestDir 'CMakeLists.txt'
-if (Test-Path $cmakePath) {
-    $ctxt = Get-Content -Raw -Encoding UTF8 $cmakePath
-    $fwBlock = [regex]::Match($ctxt, '(?s)add_library\(\s*fw_logic\s+STATIC(.*?)\)')
-    $cmakeLogic = @()
-    if ($fwBlock.Success) {
-        foreach ($mm in [regex]::Matches($fwBlock.Groups[1].Value, '([A-Za-z0-9_\-]+)\.c')) { $cmakeLogic += $mm.Groups[1].Value }
-    }
-    foreach ($m in $logic) {
-        if ($cmakeLogic -notcontains $m) {
+    # M3: CMakeLists must compile exactly the manifest module set (no 4th copy).
+    $cmakePath = Join-Path $HostTestDir 'CMakeLists.txt'
+    if (Test-Path $cmakePath) {
+        $ctxt = Get-Content -Raw -Encoding UTF8 $cmakePath
+        $fwBlock = [regex]::Match($ctxt, ('(?s)add_library\(\s*' + [regex]::Escape($pLib) + '\s+STATIC(.*?)\)'))
+        $cmakeLogic = @()
+        if ($fwBlock.Success) {
+            foreach ($mm in [regex]::Matches($fwBlock.Groups[1].Value, '([A-Za-z0-9_\-]+)\.c')) { $cmakeLogic += $mm.Groups[1].Value }
+        }
+        foreach ($m in $pLogic) {
+            if ($cmakeLogic -notcontains $m) {
+                Add-Viol -Rule 'TEST-CMAKE-DRIFT' -Loc 'harness/tests/host/CMakeLists.txt' `
+                    -Msg "[$pName] $pLib does not compile '$m.c' although modules.json declares it" `
+                    -Fix ('add "${FW_SOURCE_DIR}/' + $m + '.c" to add_library(' + $pLib + ' STATIC ...)')
+            }
+        }
+        foreach ($c in $cmakeLogic) {
+            if ($pLogic -notcontains $c) {
+                Add-Viol -Rule 'TEST-CMAKE-STALE' -Loc 'harness/tests/host/CMakeLists.txt' `
+                    -Msg "[$pName] $pLib compiles '$c.c' which modules.json does not declare" `
+                    -Fix 'declare it in projects[$pName].logic[] with a covering suite'
+            }
+        }
+        $exeBlock = [regex]::Match($ctxt, ('(?s)add_executable\(\s*' + [regex]::Escape($pExe) + '\s*\(?(.*?)\)'))
+        foreach ($s in $pSuites) {
+            $needle = ([string]$s.file)
+            if ($exeBlock.Success -and ($exeBlock.Groups[1].Value -notmatch [regex]::Escape($needle))) {
+                Add-Viol -Rule 'TEST-CMAKE-DRIFT' -Loc 'harness/tests/host/CMakeLists.txt' `
+                    -Msg "[$pName] $pExe does not build $needle" `
+                    -Fix "list $needle in add_executable($pExe ...) so ctest runs it"
+            }
+        }
+        if ($rtxt -and ($ctxt -notmatch ('runner/' + [regex]::Escape((Split-Path $pRunnerRel -Leaf))))) {
             Add-Viol -Rule 'TEST-CMAKE-DRIFT' -Loc 'harness/tests/host/CMakeLists.txt' `
-                -Msg "fw_logic does not compile '$m.c' although modules.json declares it" `
-                -Fix ('add "${FW_SOURCE_DIR}/' + $m + '.c" to add_library(fw_logic STATIC ...)')
+                -Msg "[$pName] CMakeLists does not build the runner $pRunnerRel" `
+                -Fix "list $pRunnerRel in add_executable($pExe ...)"
         }
+    } else {
+        Add-Viol -Rule 'TEST-CMAKE-MISSING' -Loc 'harness/tests/host/CMakeLists.txt' `
+            -Msg 'CMake host-test project missing' -Fix 'restore the cmake driver'
     }
-    foreach ($c in $cmakeLogic) {
-        if ($logic -notcontains $c) {
-            Add-Viol -Rule 'TEST-CMAKE-STALE' -Loc 'harness/tests/host/CMakeLists.txt' `
-                -Msg "fw_logic compiles '$c.c' which modules.json does not declare" `
-                -Fix 'declare it in modules.json logic[] with a covering suite'
-        }
-    }
-    $exeBlock = [regex]::Match($ctxt, '(?s)add_executable\(\s*test_runner(.*?)\)')
-    foreach ($s in $suites) {
-        $needle = ([string]$s.file)
-        if ($exeBlock.Success -and ($exeBlock.Groups[1].Value -notmatch [regex]::Escape($needle))) {
-            Add-Viol -Rule 'TEST-CMAKE-DRIFT' -Loc 'harness/tests/host/CMakeLists.txt' `
-                -Msg "test_runner does not build $needle" `
-                -Fix "list $needle in add_executable(test_runner ...) so ctest runs it"
-        }
-    }
-} else {
-    Add-Viol -Rule 'TEST-CMAKE-MISSING' -Loc 'harness/tests/host/CMakeLists.txt' `
-        -Msg 'CMake host-test project missing' -Fix 'restore the cmake driver'
 }
 
 Scan-Files -Files $fwFiles -Rules $fwRules
@@ -289,52 +318,58 @@ Scan-Files -Files $ps1Files -Rules $ps1Rules
 # (docs/00 owner table, README), so it must be executed somewhere. This leg is that
 # somewhere: contract-valid shape, name agrees with its directory, and every path it
 # declares really resolves. A contract nothing reads is how stale configs survive.
-$ProjDir = Join-Path $RepoRoot "projects\$Project"
-$cfgPath = Join-Path $ProjDir 'project.config.json'
+# (2026-10-24: iterates every project in the repo, not just -Project, so a second
+# project cannot grow an unvalidated config.)
 $cfgSchema = Join-Path $RepoRoot 'harness\schemas\project.config.schema.json'
-if (-not (Test-Path $cfgPath)) {
-    Add-Viol -Rule 'CFG-MISSING' -Loc (Rel-Path $cfgPath) `
-        -Msg 'the project has no project.config.json although docs declare it the project contract' `
-        -Fix "create projects/$Project/project.config.json or delete the claim from the docs"
+$cfgProjects = @(Get-ChildItem (Join-Path $RepoRoot 'projects') -Filter 'project.config.json' -Recurse -Depth 1 -ErrorAction SilentlyContinue)
+if ($cfgProjects.Count -eq 0) {
+    Add-Viol -Rule 'CFG-MISSING' -Loc 'projects/' `
+        -Msg 'no project.config.json exists although docs declare it the project contract' `
+        -Fix 'create projects/<proj>/project.config.json or delete the claim from the docs'
 }
-elseif (-not (Test-Path $cfgSchema)) {
-    Add-Viol -Rule 'CFG-SCHEMA-MISSING' -Loc 'harness/schemas/project.config.schema.json' `
-        -Msg 'project.config contract file is missing, so the config cannot be validated' `
-        -Fix 'restore the schema or drop the contract (a contract nothing executes must not be kept)'
-}
-else {
-    $cviol = @(Test-JsonFileAgainstSchema -JsonPath $cfgPath -SchemaPath $cfgSchema)
-    foreach ($x in @($cviol | Where-Object { $_ })) {
-        Add-Viol -Rule 'CFG-SCHEMA' -Loc (Rel-Path $cfgPath) -Msg ([string]$x) `
-            -Fix 'fix the value or update harness/schemas/project.config.schema.json + the ADR that justifies it'
+foreach ($cfgFile in $cfgProjects) {
+    $ProjDir = $cfgFile.Directory.FullName
+    $Project = Split-Path -Leaf $ProjDir
+    $cfgPath = $cfgFile.FullName
+    if (-not (Test-Path $cfgSchema)) {
+        Add-Viol -Rule 'CFG-SCHEMA-MISSING' -Loc 'harness/schemas/project.config.schema.json' `
+            -Msg 'project.config contract file is missing, so the config cannot be validated' `
+            -Fix 'restore the schema or drop the contract (a contract nothing executes must not be kept)'
     }
-    $cfg = Get-Content -Raw -Encoding UTF8 $cfgPath | ConvertFrom-Json
-    if ([string]$cfg.project.name -ne $Project) {
-        Add-Viol -Rule 'CFG-NAME' -Loc (Rel-Path $cfgPath) `
-            -Msg "project.name '$($cfg.project.name)' does not match the directory name '$Project'" `
-            -Fix 'the name is how ccs.ps1 resolves -Project; keep them equal'
-    }
-    if ($cfg.paths) {
-        foreach ($p in @($cfg.paths.PSObject.Properties)) {
-            $dir = Join-Path $ProjDir (([string]$p.Value) -replace '/', '\')
-            if (-not (Test-Path -LiteralPath $dir)) {
-                Add-Viol -Rule 'CFG-PATH' -Loc (Rel-Path $cfgPath) `
-                    -Msg "paths.$($p.Name) = '$($p.Value)' does not resolve to a directory" `
-                    -Fix 'point it at the real directory (relative to projects/<proj>/) or remove the entry'
+    else {
+        $cviol = @(Test-JsonFileAgainstSchema -JsonPath $cfgPath -SchemaPath $cfgSchema)
+        foreach ($x in @($cviol | Where-Object { $_ })) {
+            Add-Viol -Rule 'CFG-SCHEMA' -Loc (Rel-Path $cfgPath) -Msg ([string]$x) `
+                -Fix 'fix the value or update harness/schemas/project.config.schema.json + the ADR that justifies it'
+        }
+        $cfg = Get-Content -Raw -Encoding UTF8 $cfgPath | ConvertFrom-Json
+        if ([string]$cfg.project.name -ne $Project) {
+            Add-Viol -Rule 'CFG-NAME' -Loc (Rel-Path $cfgPath) `
+                -Msg "project.name '$($cfg.project.name)' does not match the directory name '$Project'" `
+                -Fix 'the name is how ccs.ps1 resolves -Project; keep them equal'
+        }
+        if ($cfg.paths) {
+            foreach ($p in @($cfg.paths.PSObject.Properties)) {
+                $dir = Join-Path $ProjDir (([string]$p.Value) -replace '/', '\')
+                if (-not (Test-Path -LiteralPath $dir)) {
+                    Add-Viol -Rule 'CFG-PATH' -Loc (Rel-Path $cfgPath) `
+                        -Msg "[$Project] paths.$($p.Name) = '$($p.Value)' does not resolve to a directory" `
+                        -Fix 'point it at the real directory (relative to projects/<proj>/) or remove the entry'
+                }
             }
         }
-    }
-    $bc = [string]$cfg.project.build_config
-    if ($bc -and -not (Test-Path (Join-Path $ProjDir $bc))) {
-        Add-Viol -Rule 'CFG-BUILD-CONFIG' -Loc (Rel-Path $cfgPath) `
-            -Msg "project.build_config '$bc' has no such output directory under the project" `
-            -Fix 'build it (ccs.ps1 build -Config) or correct the default in project.config.json'
-    }
-    $specDir = Join-Path $RepoRoot (([string]$cfg.specs.dir) -replace '/', '\')
-    if ($cfg.specs -and -not (Test-Path -LiteralPath $specDir)) {
-        Add-Viol -Rule 'CFG-PATH' -Loc (Rel-Path $cfgPath) `
-            -Msg "specs.dir '$($cfg.specs.dir)' does not exist from the repository root" `
-            -Fix 'point it at the spec root (specs/)'
+        $bc = [string]$cfg.project.build_config
+        if ($bc -and -not (Test-Path (Join-Path $ProjDir $bc))) {
+            Add-Viol -Rule 'CFG-BUILD-CONFIG' -Loc (Rel-Path $cfgPath) `
+                -Msg "[$Project] project.build_config '$bc' has no such output directory under the project" `
+                -Fix 'build it (ccs.ps1 build -Config) or correct the default in project.config.json'
+        }
+        $specDir = Join-Path $RepoRoot (([string]$cfg.specs.dir) -replace '/', '\')
+        if ($cfg.specs -and -not (Test-Path -LiteralPath $specDir)) {
+            Add-Viol -Rule 'CFG-PATH' -Loc (Rel-Path $cfgPath) `
+                -Msg "[$Project] specs.dir '$($cfg.specs.dir)' does not exist from the repository root" `
+                -Fix 'point it at the spec root (specs/)'
+        }
     }
 }
 
@@ -355,15 +390,20 @@ if (-not $SkipAnalyze) {
         $tmp = Join-Path $HostTestDir 'build-analyze'
         New-Item -ItemType Directory -Force -Path $tmp | Out-Null
         $sources = @()
-        foreach ($m in $logic) { $sources += (Join-Path $FwSrcDir "$m.c") }
+        $incDirs = @((Join-Path $HostTestDir 'framework'))
         foreach ($f in @($mf.framework)) { $sources += (Join-Path $HostTestDir ($f -replace '/', '\')) }
-        foreach ($s in $suites) { $sources += (Join-Path $HostTestDir (([string]$s.file) -replace '/', '\')) }
-        $sources += (Join-Path $HostTestDir ($runnerRel -replace '/', '\'))
-        $sources = @($sources | Where-Object { Test-Path $_ })
+        foreach ($hp in $hostProjects) {
+            $pSrc2 = Join-Path $RepoRoot (([string]$hp.source_dir) -replace '/', '\')
+            if (Test-Path $pSrc2) { $incDirs += $pSrc2 }
+            foreach ($m in @($hp.logic)) { $sources += (Join-Path $pSrc2 "$m.c") }
+            foreach ($s in @($hp.suites)) { $sources += (Join-Path $HostTestDir (([string]$s.file) -replace '/', '\')) }
+            $sources += (Join-Path $HostTestDir (([string]$hp.runner) -replace '/', '\'))
+        }
+        $sources = @($sources | Where-Object { Test-Path $_ } | Select-Object -Unique)
 
-        $clArgs = @('/nologo', '/W4', '/analyze', '/c', '/utf-8',
-                    "-I$(Join-Path $HostTestDir 'framework')", "-I$FwSrcDir",
-                    "/Fo:$tmp\") + $sources
+        $clArgs = @('/nologo', '/W4', '/analyze', '/c', '/utf-8', "/Fo:$tmp\")
+        foreach ($d in ($incDirs | Select-Object -Unique)) { $clArgs += "-I$d" }
+        $clArgs += $sources
 
         Write-Host "[analyze] cl.exe /analyze /W4 over $($sources.Count) host-compilable sources ($($msvc.Version))"
         $out = & $msvc.Cl @clArgs 2>&1
@@ -510,10 +550,13 @@ foreach ($f in @($docRouteFiles | Where-Object { $_ })) {
 
 # ----------------------------------------------------------------------- report ---
 
+$manifestLogicTotal = 0
+foreach ($hp in $hostProjects) { $manifestLogicTotal += @($hp.logic).Count }
+
 Write-Host ''
 Write-Host "static check: projects/$Project/source + harness tools" -ForegroundColor Cyan
-Write-Host ("  scanned : {0} firmware sources, {1} PowerShell scripts, {2} manifest modules, {3} doc routes" -f `
-    $fwFiles.Count, $ps1Files.Count, $logic.Count, $script:DocRoutesChecked)
+Write-Host ("  scanned : {0} firmware sources, {1} PowerShell scripts, {2} manifest modules in {3} projects, {4} doc routes" -f `
+    $fwFiles.Count, $ps1Files.Count, $manifestLogicTotal, $hostProjects.Count, $script:DocRoutesChecked)
 if ($analyzeSkipped) { Write-Host '  analyze : SKIPPED (-SkipAnalyze or no MSVC)' -ForegroundColor Yellow }
 
 if ($script:Violations.Count -eq 0) {

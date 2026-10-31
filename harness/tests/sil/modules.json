@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "purpose": "Declared truth for the SIL (Software-In-the-Loop) layer: which firmware modules run on the host inside a simulated main loop, and which SIL suites cover them. run-sil-tests.ps1 builds one runner per project from here. SIL is the middle layer of the test pyramid: unit tests (harness/tests/host) assert single return values, SIL asserts properties of TIME SERIES, HIL (harness/tools/dss) asserts the same properties on real silicon.",
+    "differs_from_host_tests": "A host unit test calls svpwm_modulate() once and checks the struct. A SIL test advances the angle generator 20 times and asserts the resulting waveform keeps a+b+c centred and the phase differences balanced for the whole revolution. Properties that only exist across a sequence of ticks live here, not there.",
+    "read_by": [
+      "harness/tools/run-sil-tests.ps1"
+    ]
+  },
+  "framework": [
+    "../host/framework/fw_test.c"
+  ],
+  "projects": [
+    {
+      "name": "launchxl-f280039c-full-platform",
+      "source_dir": "projects/launchxl-f280039c-full-platform/source",
+      "logic": [
+        "scheduler",
+        "health"
+      ],
+      "cmake_exe": "sil_runner_fp",
+      "runner": "runner/sil_runner_fp.c",
+      "suites": [
+        {
+          "file": "sil/sil_sched_timing.c",
+          "entry": "sil_sched_timing_tests",
+          "covers": [
+            "scheduler"
+          ]
+        },
+        {
+          "file": "sil/sil_health_fsm.c",
+          "entry": "sil_health_fsm_tests",
+          "covers": [
+            "health"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "launchxl-f280039c-motor-pwm",
+      "source_dir": "projects/launchxl-f280039c-motor-pwm/source",
+      "logic": [
+        "angle_gen",
+        "svpwm"
+      ],
+      "cmake_exe": "sil_runner_mp",
+      "runner": "runner/sil_runner_mp.c",
+      "suites": [
+        {
+          "file": "sil/sil_motor_wave.c",
+          "entry": "sil_motor_wave_tests",
+          "covers": [
+            "angle_gen",
+            "svpwm"
+          ]
+        }
+      ]
+    }
+  ]
+}

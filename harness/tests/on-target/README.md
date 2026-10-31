@@ -109,3 +109,49 @@ LED 极性与节拍 / 留板独立运行），证据写入 `records/hil-<日期>
   size 门禁 FLASH 5067 words=2.58 % / RAM 1038 words=2.94 %，`.text` 与基线 delta=0。
   证据 `records/hil-2026-10-18-led-chaser.md`（含 dss/sci 原始日志路径）；
   仍未覆盖：仪器级 ±2% 节拍、断电冷启动观察（需人工）。
+
+## motor-pwm（launchxl-f280039c-motor-pwm / spec 0003-motor-pwm-skeleton）
+
+DSS 脚本 `tools/dss/hil_test_mp.js` 自动完成 H1-H6（JTAG / flash / 自检 / 寄存器回读 /
+强制越限 trip + 自主恢复 / 留板独立运行）。证据写入
+`records/hil-<日期>-launchxl-f280039c-motor-pwm.md`。**无功率板、无电机**——本工程是
+开环角度→SVPWM→三相互补 PWM 的算法与波形骨架，只观察算法与 PWM 形态。
+
+### 自动 HIL 已覆盖（H1-H6 全 PASS，2026-10-25）
+
+- [x] **banner/自检**：`=== LAUNCHXL-F280039C motor-pwm ===` + `self-test: svpwm/angle/fmt OK`
+- [x] **PWM 寄存器回读**：`pwm: prd=6000 db=120 pol=2 OK`；H5a 读 ePWM1/2/3
+      `TBPRD=6000 DBRED=DBFED=120 DBCTL=0xB TZSEL=0x8000`（10 kHz 载波 / 1µs 死区）
+- [x] **CMPSS 双向探针**：`cmpss: adc=<基线> hi=1 lo=0 OK`
+      —— `hi`/`lo` 打印的是**比较器实际状态**（trip 方向=1 跳、免跳方向=0 不跳），
+      判定用 `board_cmpss_wait_status` 的**匹配布尔** `hi_ok && lo_ok`（见下"契约语义"）
+- [x] **CMPA 真在跑**：H4 统计 26–27 个 distinct CMPA 值（max=6000=PRD），证明 SVPWM
+      未停在零矢量；`motor:` 行 `a=/b=/c=` 占空比随电角度 10 Hz 更新
+- [x] **ADC 链**：`motor:` 行 `adc=37..40` 随 A2 电压变化（非 0xFFFF=超时）
+- [x] **CMPSS→XBAR→DCBH→DCBEVT1 一次性 trip 链**：强制 DAC 越限→COMPSTS=1→三模块
+      TZFLG bit5 锁存→GPADAT_R 六路输出全低（GPIO0-5=0）；恢复 DAC=4095→固件 5 s 驻留后
+      自清锁存并恢复调制（CMPA 寄存器重新变化）`FAULT: tz-latched`→`tz: cleared`
+- [x] **SCI 九项契约**：banner / sysclk=120MHz / rate / mag / pwm-OK / cmpss-OK /
+      tz-armed / motor-line / alive 心跳
+- [x] **故障只触发一次**：无重复 `FAULT` 行，恢复后 `motor:` 续跑
+
+### 契约语义（易错，务必区分）
+
+- **`cmpss:` 行的 `hi=`/`lo=` 是比较器状态值**（`board_cmpss_comp_status()`），
+  而**判定**用的是 `board_cmpss_wait_status(expect)` 的返回值——它返回"状态是否匹配
+  expect"**而非状态本身**。trip 方向 `wait(true)` 命中 → `hi_ok`；免跳方向 `wait(false)`
+  命中 → `lo_ok`；探针通过 = `hi_ok && lo_ok`。曾误写成 `hi && !lo` 导致 `lo=1` 假 FAIL。
+- **CMPSS lo 方向参考用满量程 `BOARD_CMPSS_DAC_MAX`**（不是 `isense+512`）：A2 悬空 +
+  ePWM 载波耦合噪声会超过 512 码窗口；满量程参考物理上界高于任何引脚电压，方向确定。
+- **`H5-trip-resume` 判"恢复"看 CMPA 寄存器变化，不能用瞬时 GPADAT_R**：中心对齐
+  up-down + AQ（ZRO→高、UP_CMPA→低、DOWN_CMPA→高）下，某相占空比=PRD=1000 时该相
+  A/B 两脚**整周期都是低**（两端谷+死区覆盖全周期），瞬时读全零属正常。CMPA 真变化
+  才是"调制恢复"的可靠信号。
+
+### 待人工补测（仪器/断电，自动门禁覆盖不到）
+
+- [ ] **死区/载波**：示波器测 ePWM1A/1B（GPIO0/1）互补波形死区=1µs、载波=10 kHz
+      （中心对齐 up-down，PRD=6000@120MHz）
+- [ ] **三相互序/相差**：示波器测 A/B/C 三相高侧（GPIO0/2/4）相差 120°（电角度 5 Hz）
+- [ ] **断电冷启动**：探针在线时 ROM 不交接 flash（ADR 0006），只有断电重启是
+      Stand-Alone Boot 观测窗口，需人工确认 banner/自检/心跳顺序一致

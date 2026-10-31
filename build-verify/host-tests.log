@@ -1,6 +1,6 @@
 ﻿cmake not found - falling back to MSVC cl.exe.
   (for the preferred path: winget install Kitware.CMake)
-[msvc fallback] building host tests with cl.exe (14.29.30133) - 7 sources from modules.json
+[msvc fallback] building launchxl-f280039c-led-chaser with cl.exe (14.29.30133) - 7 sources
 fw_test.c
 led_pattern.c
 fmt.c
@@ -9,37 +9,38 @@ test_led_pattern.c
 test_fmt.c
 test_runner.c
 Generating Code...
-
-=== host unit tests (f280039c-harness) ===
-
-=== led_pattern ===
-  - CHASE n=2 alternates and wraps
-  - CHASE n=4 walks 0..3 then wraps
-  - CHASE n=1 stays on channel 0
-  - BOUNCE n=4 reverses at the ends (period 2n-2 = 6)
-  - BOUNCE never repeats the end channel back to back
-  - BLINK alternates all-on / all-off
-  - invalid channel counts return 0 (no UB)
-  - maximum channel count (32) is handled without UB
-  - unknown mode yields an all-dark mask
-  - active-low inverts the lit bits, active-high passes through
-  - levels ignore bits outside the channel count
-  - FNV-1a reference matches the shared constant
-  - reference is stable and mode dependent
-
-=== fmt ===
-  - decimal: zero and small values
-  - decimal: UINT32_MAX boundary
-  - hexadecimal: prefix, upper case, no leading zeros
-  - bounded: buffer too small is reported, not overrun
-  - bounded: zero size and NULL destination are rejected
-  - bounded: exact fit succeeds (no NUL overruns)
-
-=== on-target self test executed on host ===
-  - self_test_run() == SELF_TEST_OK
-
-----------------------------------------
-cases: 20, failures: 0 -> PASS
-[msvc fallback] runner exit code: 0
+[msvc fallback] launchxl-f280039c-led-chaser runner exit 0 (20 cases, 0 failures) -> PASS
+[msvc fallback] building launchxl-f280039c-motor-pwm with cl.exe (14.29.30133) - 9 sources
+fw_test.c
+angle_gen.c
+svpwm.c
+fmt.c
+self_test.c
+test_angle_gen.c
+test_svpwm.c
+test_mp_selftest.c
+test_runner_mp.c
+Generating Code...
+[msvc fallback] launchxl-f280039c-motor-pwm runner exit 0 (41 cases, 0 failures) -> PASS
+[msvc fallback] building launchxl-f280039c-full-platform with cl.exe (14.29.30133) - 16 sources
+fw_test.c
+scheduler.c
+health.c
+self_test.c
+fmt.c
+led_pattern.c
+adc_stat.c
+math_ref.c
+frame_gen.c
+test_scheduler.c
+test_health.c
+test_fp_selftest.c
+test_adc_stat.c
+test_math_ref.c
+test_frame_gen.c
+test_runner_fp.c
+Generating Code...
+[msvc fallback] launchxl-f280039c-full-platform runner exit 0 (36 cases, 0 failures) -> PASS
+cases: 97, failures: 0 -> PASS (all projects aggregated)
 all host unit tests passed
 

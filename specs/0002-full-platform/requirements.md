@@ -1,0 +1,344 @@
+# requirements.md — 全外设并存平台工程（full-platform）
+
+> 状态：`draft`（待用户确认后改 `requirements-approved`）｜ 关联 ADR：0001（平台选型）、0002（字地址）、0003（启动顺序）、0005（时钟门控）
+> 阶段①（需求）。**经用户确认后**把状态改为 `requirements-approved`，才可进入 ② design。
+> 本文件的机读镜像为 `spec.json`，两者必须一致。
+> 目标工程：projects/launchxl-f280039c-full-platform（新建，实现阶段创建；参考工程 launchxl-f280039c-led-chaser 保持基线不动）
+
+## 1. 简介
+
+在 **LAUNCHXL-F280039C** 上以**一个独立大工程**体现 F28003x 的全部处理器功能：
+C28x CPU（FPU32/TMU/VCRC）+ CLA、CPUTimer×3、ADC×3、DAC×2/CMPSS×4、ePWM 8 模块 16 通道（含 HRPWM）、
+eCAP×3（HRCAP 仅 ECAP3）、eQEP×2、SPI×2、I2C×2、SCI×2+LIN×2、MCAN、FSI、DMA×6、CLB×4、EPG、AES、BGCRC、
+窗口看门狗、DCC、X-BAR——全部子系统**并存、不冲突、持续有效工作**，由统一调度器驱动、
+健康监视覆盖、HIL 自动判读，并以 30 分钟 soak 作为持续运行的交付门。
+（实例数以 hw_memmap.h 为准，2026-10-24 实测提取：无 SCIC，ePWM 为 8 模块而非 16 模块。）
+
+**范围决策（用户 2026-10-24 已确认）**：
+1. **全回环、零外部硬件**：通信外设一律用内部回环 / X-BAR 回灌 / 同板跳线互接演示，
+   不要求任何外部器件；MCAN 用自测回环模式。
+2. **FSI 跳线回环实证优先**：设计阶段先实证同板 TX→RX 低速跳线回环；不可行则降级为
+   驱动级+寄存器级上板验证，链路级演示记入未决项。
+3. **30 分钟 soak 交付门**：多模块并发零健康异常；日常 verify 用 2 分钟快速档。
+4. **新建独立大工程**：projects/launchxl-f280039c-full-platform，骨架拷自参考工程；
+   参考工程文件保持不动。
+
+## 2. 术语表
+
+| 术语 | 含义 |
+|---|---|
+| 子系统 | 一个外设/加速器/系统功能单元（如 ADC、ePWM、CLA），含初始化、任务与健康状态 |
+| 任务描述符 | 调度器注册单元：名称、初始化函数、周期、健康计数器 |
+| 回环 | 收发两端在同一芯片内闭环（数字回环、X-BAR 回灌、自测模式）或同板跳线互接 |
+| 健康状态字 | 聚合各子系统心跳/错误计数的全局结构，供 HIL/串口判读 |
+| fail-safe | 可见故障形态：LED 形态 + 状态字标记 + 串口报错，禁止假装正常 |
+| soak | 多模块并发持续运行的稳定性门禁（30 分钟） |
+
+## 3. 需求
+
+### REQ-001 工程与总体调度架构
+
+- **用户故事**：作为平台维护者，我想要一个独立大工程以统一的任务模型承载全部子系统，
+  以便任何子系统都能并存运行、互不干扰，并且新子系统有明确的接入方式。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在仓库内新建独立工程目录承载全部子系统，且不修改参考工程的任何文件。
+  - THE SYSTEM SHALL 以协作式 super-loop + ISR 置标志驱动全部子系统，任务内禁止忙等阻塞主循环。
+  - THE SYSTEM SHALL 以任务描述符注册每个子系统（名称/初始化/周期/健康计数），初始化失败的子系统被标记并按策略降级或触发 fail-safe。
+  - THE SYSTEM SHALL 保持启动顺序硬约束：ramfunc 重定位+校验 → 禁看门狗 → PIE 初始化 → 时钟 → 外设（ADR 0003）。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform（仓库相对 projects\ 目录下）成功
+  - .\harness\tools\static-check.ps1 输出 0 violations
+  - .\harness\tools\run-host-tests.ps1 全部用例通过（含调度器纯逻辑模块）
+
+### REQ-002 时钟系统与 DCC 持续校验
+
+- **用户故事**：作为验证者，我想要系统时钟不仅上电校验、而且运行中被 DCC 持续校验，
+  以便时钟失锁/漂移在运行期被立即发现而不是靠节拍间接猜。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 以 INTOSC2 经 PLL 产生 120MHz SYSCLK 与 30MHz LSPCLK，上电校验不符即 fail-safe。
+  - THE SYSTEM SHALL 使 DCC 以计数窗方式持续校验 SYSCLK（参考时钟对 SYSCLK），校验错误计入健康状态字。
+  - IF DCC 连续 N 次校验错误（N 在设计阶段定），THEN THE SYSTEM SHALL 进入 fail-safe 并打印错误。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板 HIL/串口：banner sysclk=120000000 行存在，健康状态行中 dcc 错误计数为 0
+
+### REQ-003 多速率调度与 CPUTimer×3
+
+- **用户故事**：作为调度器使用者，我想要三个 CPU 定时器分别承担不同速率的时基，
+  以便快慢任务（1ms 级与 100ms/1s 级）互不拖累。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 使用 CPUTimer0 产生 1ms 基准节拍（时基=SYSCLK，ADR 0005），CPUTimer1/2 承担更粗粒度任务的时基或运行统计。
+  - THE SYSTEM SHALL 为每个注册任务维护心跳计数，并使任务实际周期与配置周期偏差超出带宽时计入健康状态字（带宽在设计阶段定）。
+- **可执行验收**：
+  - .\harness\tools\run-host-tests.ps1：调度器纯逻辑模块（周期归一化/心跳统计）用例通过
+  - 上板 HIL：健康状态行各任务心跳计数单调递增
+
+### REQ-004 CLA 协处理器后台任务
+
+- **用户故事**：作为全功能验证者，我想要 CLA 真实承担一个周期性纯计算任务，
+  以便证明 CPU 与 CLA 并存工作且数据交换正确。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在 CLA 上运行一个周期性纯计算后台任务（如 FIR/均值/CRC，设计阶段定），不依赖 C28x 侧运行时资源。
+  - THE SYSTEM SHALL 通过 CLA 消息 RAM/标志完成 CPU→CLA→CPU 数据交换，并对每个结果与 CPU 参考计算比对。
+  - WHEN CLA 结果与参考不一致，THE SYSTEM SHALL 计入健康状态字，连续超阈值触发 fail-safe。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功（含 CLA 段链接）
+  - 上板健康状态行含 cla 校验通过计数
+
+### REQ-005 算术加速与运行期完整性（VCRC/TMU/FPU32/BGCRC/AES）
+
+- **用户故事**：作为平台维护者，我想要硬件加速器与后台完整性机制真实用于工作负载，
+  以便"全部处理器功能"不只是初始化而是持续产出可校验的结果。
+- **优先级**：should ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 使用 VCRC 硬件计算自检 CRC，并与主机侧共享参考常量一致。
+  - THE SYSTEM SHALL 使用 TMU 指令完成演示任务的三角/反正切计算，误差落在设计带宽内。
+  - THE SYSTEM SHALL 使 BGCRC 周期性校验 Flash .text 区背景 CRC，错误计入健康状态字。
+  - IF AES 加密再解密的结果与明文不一致，THEN THE SYSTEM SHALL 报告自检失败。
+- **可执行验收**：
+  - .\harness\tools\run-host-tests.ps1：VCRC 参考值/TMU 误差判据用例通过
+  - 上板健康状态行含 bgcrc 校验通过计数与 aes 自检通过
+
+### REQ-006 ADC×3 轮询扫描与统计
+
+- **用户故事**：作为模拟链路验证者，我想要三路 ADC 同时轮询扫描多通道并维护统计，
+  以便模拟输入子系统并存运行且结果可判读。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 以软件触发轮询方式扫描 ADC A/B/C 的已配置通道（合计 ≥6 通道，具体引脚在设计阶段按引脚矩阵定），并维护 min/max/avg 统计。
+  - IF ADC 序列器错误或转换超时，THEN THE SYSTEM SHALL 计入健康状态字。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板：SCI 状态行可读出各通道统计值，健康行 adc 错误计数为 0
+
+### REQ-007 DAC+CMPSS 模拟回环
+
+- **用户故事**：作为模拟子系统验证者，我想要 DAC 输出阶梯电压驱动 CMPSS 比较翻转，
+  以便 DAC/CMPSS 在零外部硬件下形成可自动判定的闭环。
+- **优先级**：should ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 以缓冲 DAC 输出阶梯电压，并使 CMPSS 比较翻转次数与阶梯边界数一致（路径经设计阶段实证：内部固定连接或同板跳线）。
+  - IF 设计阶段实证发现 F28003x 上不存在零外部硬件的 DAC→ADC/CMPSS 回环路径，THEN THE SYSTEM SHALL 降级为寄存器级验证并把结论登记到 open_questions。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板：cmpss 翻转计数行与阶梯数一致（或降级路径的寄存器判读记录）
+
+### REQ-008 ePWM 8 模块 16 通道输出引擎（含 HRPWM 与 Trip-Zone）
+
+- **用户故事**：作为控制外设验证者，我想要全部 8 个 ePWM 模块（16 通道）同时运行、多种频率/占空比/相位组合、
+  HRPWM 微步生效、trip-zone 可触发，以便 PWM 子系统的全部能力并存演示。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 同时初始化并运行全部 8 个 ePWM 模块（EPWM1A–EPWM8B 共 16 通道），至少 4 组不同频率/占空比组合，并以寄存器回读校验配置。
+  - THE SYSTEM SHALL 在至少 1 路上启用 HRPWM MEP 微步并验证寄存器生效。
+  - THE SYSTEM SHALL 至少配置 1 路 trip-zone（源为 CMPSS 或 X-BAR 路由）并验证 trip 动作生效。
+  - WHEN 判读输出，THE SYSTEM SHALL 以寄存器回读 + 经 Input X-BAR 回灌到 eCAP/eQEP 的实测（≥4 路）为准，不要求 16 路全部引出板外。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板：REQ-009 的 eCAP 回灌实测与配置频率一致
+
+### REQ-009 eCAP/HRCAP 回灌测量（闭环判读）
+
+- **用户故事**：作为验证者，我想要 eCAP 实测 ePWM 回灌信号的频率/占空比，
+  以便 PWM↔eCAP 形成零外部硬件的闭环判读。
+- **优先级**：must ｜ **类别**：performance
+- **EARS 验收**：
+  - THE SYSTEM SHALL 经 Input X-BAR 内部回灌测量至少 4 路 ePWM 输出的频率与占空比，频率误差落在设计带宽内（初值 ±2%）。
+  - THE SYSTEM SHALL 在支持 HRCAP 的通道上以高分辨率模式测量并报告；IF 设计实证该通道不支持，THEN 登记结论并降级普通模式。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS，健康状态行 ecap 实测频率与配置一致
+
+### REQ-010 eQEP×2 正交回灌
+
+- **用户故事**：作为运动外设验证者，我想要 ePWM 产生相位差 90° 的两路方波回灌 eQEP，
+  以便位置/方向/速度链路在零外部硬件下闭环。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 由 ePWM 产生两路相位差 90° 的方波经 Input X-BAR 回灌每个 eQEP，位置计数随方向单调变化且方向判定正确。
+  - WHEN 模拟转速变化，THE SYSTEM SHALL 报告的速度计数落在理论带宽内。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS，健康状态行 qep 位置/速度读数可判读
+
+### REQ-011 SPI×2 数字回环收发
+
+- **用户故事**：作为通信验证者，我想要两个 SPI 模块各自以数字回环自发自收固定数据块，
+  以便 SPI 子系统并存运行且数据完整性可判定。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 使每个 SPI 模块以数字回环方式自发自收固定数据块并逐字节校验。
+  - THE SYSTEM SHALL 使至少一个 SPI 的收发数据经 DMA 搬运并与 REQ-016 联动校验。
+- **可执行验收**：
+  - .\harness\tools\run-host-tests.ps1：SPI 帧组装/校验纯逻辑用例通过
+  - 上板健康状态行 spi 校验通过计数
+
+### REQ-012 I2C×2 主从互接
+
+- **用户故事**：作为通信验证者，我想要 I2CA 主机经同板跳线访问 I2CB 从机完成读写，
+  以便 I2C 子系统在零外部器件下形成主从闭环。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 使 I2CA 作主机经同板跳线（SDA/SCL 互接，上拉方案在设计阶段实证）对 I2CB 从机地址空间执行写入并读回，数据逐字节一致。
+  - IF 内部上拉不足或跳线路径不可行，THEN THE SYSTEM SHALL 降级为寄存器级验证并把结论登记到 open_questions。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板健康状态行 i2c 读写校验通过（或降级路径判读记录）
+
+### REQ-013 SCI 多通道与 LIN
+
+- **用户故事**：作为调试者，我想要保留 SCIA console 的同时让 SCIB 与两路 LIN 也真实收发，
+  以便串行子系统全部并存工作（F28003x 实例：SCIA/SCIB + LINA/LINB，无 SCIC）。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 保持 SCIA 115200-8N1 console 行为（banner/心跳/健康状态行）与参考工程一致。
+  - THE SYSTEM SHALL 使 SCIB 以内部回环（`SCI_enableLoopback`）完成固定报文收发校验。
+  - THE SYSTEM SHALL 使 LINA 与 LINB 各以数字回环（`LIN_LOOPBACK_DIGITAL`）完成报文收发校验；不可行则降级寄存器级验证并登记。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS（SCIA 串口证据照旧）
+  - 上板健康状态行 scib/lina/linb 校验通过（或降级判读记录）
+
+### REQ-014 MCAN 自测回环
+
+- **用户故事**：作为总线验证者，我想要 MCAN 在自测回环模式下收发标准帧与扩展帧，
+  以便 CAN 子系统无需收发器即可闭环。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 使 MCAN 以自测回环模式发送并接收标准帧与扩展帧各 ≥1，载荷逐字节一致。
+  - WHEN 收发计数与预期出现丢失或错误计数非零，THE SYSTEM SHALL 计入健康状态字。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板健康状态行 mcan 收发计数与校验结果
+
+### REQ-015 FSI 跳线回环（实证优先，降级明确）
+
+- **用户故事**：作为全功能验证者，我想要 FSI 在同板 TX→RX 低速跳线回环上真实收发，
+  以便 FSI 也有链路级证据；实证不可行时有明确的降级结论而不是含糊带过。
+- **优先级**：should ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在设计实证的低速跳线回环路径上完成 FSI TX→RX 固定数据块收发校验。
+  - IF 跳线回环实证不可行，THEN THE SYSTEM SHALL 降级为驱动级+寄存器级上板验证，并把链路级演示登记到 open_questions。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 收发校验记录（回环可行）或降级判读记录（写入 open_questions 与验证记录）
+
+### REQ-016 DMA 多通道搬运
+
+- **用户故事**：作为系统验证者，我想要 DMA 通道真实服务 ADC/SPI/内存搬运并可靠完成中断，
+  以便 DMA 与其他子系统并存工作。
+- **优先级**：must ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 至少以 4 个 DMA 通道分别服务 ADC 结果搬运、SPI 收发、MCAN 或内存块搬运，并逐通道校验数据完整性。
+  - WHEN 任一 DMA 通道完成中断计数不增长或数据校验失败，THE SYSTEM SHALL 计入健康状态字。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS，健康状态行 dma 各通道完成计数单调递增
+
+### REQ-017 CLB 可配置逻辑演示
+
+- **用户故事**：作为全功能验证者，我想要 CLB 以真实配置运行一个计数器/逻辑演示，
+  以便 CLB 子系统有可判读的运行证据。
+- **优先级**：should ｜ **类别**：functional
+- **EARS 验收**：
+  - THE SYSTEM SHALL 以移植的 CLB 配置（来源为 C2000Ware 示例生成文件或设计阶段选型的生成方式，来源在 ADR/设计文档标注）运行一个计数器/逻辑演示。
+  - WHEN CLB 计数值与理论值偏差超出设计带宽，THE SYSTEM SHALL 计入健康状态字。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 上板健康状态行 clb 计数判读
+
+### REQ-018 窗口看门狗服务
+
+- **用户故事**：作为可靠性验证者，我想要窗口看门狗在初始化完成后使能并被主循环按窗服务，
+  以便程序跑飞能被真实复位，而不是全程禁用看门狗假装可靠。
+- **优先级**：must ｜ **类别**：constraint
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在启动顺序的禁看门狗步骤之后、子系统初始化完成时使能窗口看门狗，并由主循环按窗服务。
+  - WHEN 看门狗复位发生，THE SYSTEM SHALL 在下次上电自检中读出复位源标志（RESC WDRSn）并计入状态字。
+  - IF 主循环任务周期性迟到超过窗口，THEN THE SYSTEM SHALL 触发看门狗复位（该行为仅在故障注入验收中检验，不进常规门禁）。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS 且整个 soak 期间无意外看门狗复位
+  - 故障注入验收（单独执行）：停止喂狗 → 看门狗复位 → RESC 判读记录
+
+### REQ-019 EPG 内部图案发生器（可选演示）
+
+- **用户故事**：作为全功能验证者，我想要 EPG 在可行的范围内作为内部信号源演示，
+  以便该功能也有运行证据；不可行时明确登记而不是静默遗漏。
+- **优先级**：could ｜ **类别**：functional
+- **EARS 验收**：
+  - WHERE 设计阶段实证 EPG 存在零外部硬件的注入路径，THE SYSTEM SHALL 以 EPG 向回环路径注入固定图案并由接收端校验。
+  - IF 无可行路径，THEN THE SYSTEM SHALL 把 EPG 登记为"寄存器级验证/不演示"并写入 open_questions。
+- **可执行验收**：
+  - .\harness\tools\ccs.ps1 build -Project launchxl-f280039c-full-platform 成功
+  - 演示判读记录或 open_questions 登记结论
+
+### REQ-020 健康监视、状态报告与扩展自检
+
+- **用户故事**：作为运维者，我想要每 5 秒从 SCIA 读到一行聚合健康状态（各子系统 OK/FAIL 汇总），
+  以便在任何时刻都能判定"全部子系统是否仍在持续有效工作"。
+- **优先级**：must ｜ **类别**：interface
+- **EARS 验收**：
+  - THE SYSTEM SHALL 为每个子系统维护心跳计数与错误计数，并每 5 秒经 SCIA 输出一行聚合健康状态（含运行秒数与各子系统汇总）。
+  - THE SYSTEM SHALL 扩展上电自检覆盖新增纯逻辑模块（调度器/帧校验/参考值），参考常量与主机单测共享同一头文件，禁止两份真相。
+  - IF 任一必选子系统的健康错误计数超过阈值，THEN THE SYSTEM SHALL 进入 fail-safe（LED 形态 + 状态字标记 + 串口报错）。
+- **可执行验收**：
+  - .\harness\tools\run-host-tests.ps1：扩展自检模块用例通过
+  - .\harness\tools\run-hil.ps1 全项 PASS 且串口捕获含健康状态行
+  - 故障注入（单独执行）：坏参考常量 → fail-safe（沿用 ADR 0007 的 dis2000 取证流程）
+
+### REQ-021 HIL 扩展与 30 分钟 soak 交付门
+
+- **用户故事**：作为验证者，我想要 HIL 增加新子系统判读项并提供两个时间档，
+  以便日常迭代快、交付时持续运行有硬证据。
+- **优先级**：must ｜ **类别**：constraint
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在 hil_test.js 中增加新子系统判读项（H7 起编号），每项有量化判据并逐项打印 PASS/FAIL。
+  - THE SYSTEM SHALL 提供 30 分钟 soak 模式：多模块并发运行零健康错误、心跳计数单调、无意外复位，结论与日志写入 records/。
+  - THE SYSTEM SHALL 在日常 verify.ps1 聚合门中以 2 分钟快速档执行 HIL，不把 soak 塞进每轮聚合门。
+- **可执行验收**：
+  - .\harness\tools\run-hil.ps1 全项 PASS（含新增判读项）
+  - soak 记录文件存在于 harness/tests/on-target/records/（交付时生成）
+
+### REQ-022 引脚预算与单一真相同步
+
+- **用户故事**：作为板级维护者，我想要全部子系统的引脚分配在设计阶段形成矩阵并同步到唯一真相处，
+  以便 16 路 PWM 与全部通信外设并存且零冲突。
+- **优先级**：must ｜ **类别**：interface
+- **EARS 验收**：
+  - THE SYSTEM SHALL 在设计文档中产出全部子系统的引脚分配矩阵与冲突消解结论（复用分析、Input X-BAR 路由表、跳线清单）。
+  - THE SYSTEM SHALL 使每个 GPIO 编号只在 board_pins.h 与 targets/F280039C.json 各出现一次，业务代码只用符号名。
+  - THE SYSTEM SHALL 不将 GPIO35-38 复用为 GPIO，且 GPIO20/22/28/29 的既有职能（LED/console）保持不变。
+  - WHEN 使用新外设，THE SYSTEM SHALL 在使能对应 PCLKCRn 时钟门控后才访问该外设（ADR 0005）。
+- **可执行验收**：
+  - .\harness\tools\static-check.ps1 输出 0 violations（含全部 PIN-* 规则）
+  - 设计文档含引脚矩阵（设计阶段产出，评审通过）
+
+## 4. 明确不做（Out of Scope）
+
+- **DCSM / JTAGLOCK / 任何 OTP 配置**：不可逆且可能砖板，仅保持默认状态。
+- **RTOS**：沿用 ADR 0001（FreeRTOS portasm.asm 与 C28x 汇编器不兼容）。
+- **SDFM**：需要外部 σ-Δ 调制器，零外部硬件前提下不做。
+- **PMBus / HIC**：需要外部主机设备，零外部硬件前提下不做。
+- **真实 CAN 总线与真实 FSI 双板链路**：用户已定全回环策略，外部链路演示不做。
+- **低功耗模式演示（IDLE/STANDBY/HALT）**：与"持续有效工作"的观测门禁冲突。
+- **运行期 Flash API 擦写演示**：擦写磨损与烧录验证冲突。
+- **CAN-FD 速率优化 / HRPWM 精度标定等性能调优**：演示"能力存在且工作"，不做标定。
+
+## 5. 未决项（Open Questions）
+
+| # | 问题 | 影响的需求 | 结论 |
+|---|---|---|---|
+| 1 | FSI 同板 TX→RX 跳线回环在低速档是否可行？ | REQ-015 | **已解（2026-10-24）**：`FSI_RX_MAIN_CTRL_INT_LOOPBACK` 内部回环存在（fsi.h:1740），主判据定为内部回环；跳线（45↔3/51↔39）降级为可选物理层增强证据，实证后补记录 |
+| 2 | I2C 主从跳线互接，内部上拉能否支撑 100kHz 通信？ | REQ-012 | pending：主判据已定为 I2CA 内部回环（i2c.h:1066）；跳线仍待上板实证，失败只降级 warn |
+| 3 | SCIB/LIN 的零外部硬件收发路径选型？ | REQ-013 | **已解（2026-10-24）**：`SCI_enableLoopback`（sci.h:1326）与 `LIN_LOOPBACK_DIGITAL`（lin.h:231）存在，选内部回环 |
+| 4 | DAC→ADC/CMPSS 的回环路径是否存在？ | REQ-007 | **已解（2026-10-24）**：`ASysCtl_enableADCDACLoopback(ENLB2ADCA\|ENLB2ADCC)` 内部模拟回环存在（asysctl.h:731）；落在哪个 ADCIN 通道 M2 上板实证后回写 |
+| 5 | CLB 配置来源：clb.h 寄存器级 API 还是 CLB tool 生成流程？ | REQ-017 | pending：倾向 clb.h 寄存器级（可 diff 评审、无 SysConfig 依赖），M4 定型并记 ADR |
+
+---
+
+### 检查清单（进入 ② design 前自检）
+
+- [x] 每条 REQ 都有用户故事 + ≥1 条 EARS 验收 + ≥1 条可执行验收
+- [x] EARS 句全部可观测、可判定（设计带宽处显式标注"设计阶段定"）
+- [x] 已列明 Out of Scope 与未决项
+- [ ] 用户已确认 requirements（确认后 meta.status → requirements-approved）

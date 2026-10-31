@@ -1,7 +1,7 @@
 ﻿{
-    "generated":  "2026-10-18T11:40:02",
+    "generated":  "2026-10-31T23:57:17",
     "os":  "Windows_NT 10.0.26300.0",
-    "repo_root":  "E:\\AIcherry\\C2000TI\\F280039C-harness",
+    "repo_root":  "E:\\AIcherry\\C2000TI\\myPublicHarness",
     "ccs":  {
                 "root":  "D:\\ti\\ccs2101\\ccs",
                 "version":  "21.0.1.00010"
@@ -37,7 +37,9 @@
                ],
     "workspace":  {
                       "app_dirs":  [
-                                       "launchxl-f280039c-led-chaser"
+                                       "launchxl-f280039c-full-platform",
+                                       "launchxl-f280039c-led-chaser",
+                                       "launchxl-f280039c-motor-pwm"
                                    ]
                   },
     "problems":  [

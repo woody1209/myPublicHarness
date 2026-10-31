@@ -29,13 +29,15 @@ f280039c-harness/
 │   └── tests/                   ← 主机侧单测（cmake + Unity）+ 目标机自检清单
 ├── specs/                       ← 特性规格（kiro 风格三件套 + 机读契约，见 specs/README.md）
 │   ├── _template/               ← 模板
-│   └── 0001-led-chaser/         ← 流水灯（首个完整范例）
+│   ├── 0001-led-chaser/         ← 流水灯（首个完整范例）
+│   └── 0003-motor-pwm-skeleton/ ← 电机 PWM 骨架（开环角度→SVPWM→三相互补 PWM，无电机）
 ├── targets/
 │   └── F280039C.json            ← 芯片规格卡（harness 元数据）
 └── projects/
-    └── launchxl-f280039c-led-chaser/   ← 参考工程（流水灯 + 上电自检 + SCI 日志）
-        ├── project.config.json  ← 工程级配置（契约 harness/schemas/project.config.schema.json）
-        └── state.json           ← 运行时状态快照（契约 harness/schemas/state.schema.json）
+    ├── launchxl-f280039c-led-chaser/   ← 参考工程（流水灯 + 上电自检 + SCI 日志）
+    │   ├── project.config.json  ← 工程级配置（契约 harness/schemas/project.config.schema.json）
+    │   └── state.json           ← 运行时状态快照（契约 harness/schemas/state.schema.json）
+    └── launchxl-f280039c-motor-pwm/    ← 电机 PWM 骨架（ePWM 三相 + ADC + CMPSS 过流 trip，无电机）
 ```
 
 ## 快速开始
@@ -86,9 +88,12 @@ f280039c-harness/
 | 烧录 | `ccs\ccs_base\scripting\examples\loadti\loadti.bat`（DSS） |
 | 探针工具 | `ccs\ccs_base\common\uscif\xds110\xdsdfu.exe`（固件 3.0.0.43） |
 | 主机侧工具链 | 本机为 **MSVC `cl.exe`**（`manifest.tools.host_cc=msvc`）；CMake/MinGW 未安装，`run-host-tests.ps1` 自动走离线回退路径 |
-| 参考工程 | `projects/launchxl-f280039c-led-chaser`，CPU1_FLASH 构建通过 |
-| 主机侧单测 | `harness/tests/host/modules.json` 声明的三个纯逻辑模块（led_pattern / fmt / self_test）用例全通过；模块与用例清单的双向一致由 `static-check.ps1` 强制 |
-| 硬件在环（HIL） | `run-hil.ps1`：H1 JTAG / H2 flash / H3 自检 / H4 主循环 / H5 流水灯 / H6 留板独立运行。**2026-10-18 真板 `verify.ps1 -Hil` → VERIFY OK（9 腿全 PASS）**，HIL 侧 `HIL RESULT: PASS`（H5 节拍 mean 195.0ms / 23 样本 / 12 跳变，同日四轮 195.0–197.0ms（散布 1.0 %）全落在 ±25 % 判据内，含 banner 与 12 行心跳串口证据，记录 `harness/tests/on-target/records/hil-2026-10-18-led-chaser.md`）；此前 H5 假 FAIL 的三类测试侧原因（16 位读、锁存判读、halt 采样）已全部修入 `hil_test.js` |
+| 参考工程 | 三个工程 CPU1_FLASH 构建全通过：`projects/launchxl-f280039c-led-chaser`；`projects/launchxl-f280039c-motor-pwm`（spec 0003 电机 PWM 骨架，开环 SVPWM + ePWM 三相 + CMPSS 过流 trip，无电机）；`projects/launchxl-f280039c-full-platform`（spec 0002 全外设平台，2026-10-31 自基线派生：58 源文件 / 22 REQ，含 CLA/CLB/DMA/CAN/FSI/SPI/I2C/eCAP/eQEP/DCC/AES/BGCRC/看门狗/多速率调度/健康监视） |
+| 主机侧单测 | `harness/tests/host/modules.json` 声明的三个纯逻辑模块（led_pattern / fmt / self_test）用例全通过；motor-pwm 另有 angle_gen / svpwm / mp_selftest 共 41 用例通过；模块与用例清单的双向一致由 `static-check.ps1` 强制 |
+| 硬件在环（HIL） | `run-hil.ps1`：H1 JTAG / H2 flash / H3 自检 / H4 主循环 / H5 外设链 / H6 留板独立运行。流水灯 `hil_test.js` **2026-10-18 真板 `verify.ps1 -Hil` → VERIFY OK（9 腿全 PASS）**（H5 节拍 mean 195.0ms，记录 `harness/tests/on-target/records/hil-2026-10-18-led-chaser.md`）；电机 PWM `hil_test_mp.js` **2026-10-25 真板二次 `HIL RESULT: PASS`（H1-H6 全过）**（CMPA 24 distinct 证明 SVPWM 在跑、CMPSS→XBAR→DCBEVT1 一次性 trip + 5s 自主恢复、`cmpss: adc=38 hi=1 lo=0 OK`、FAULT→tz:cleared，记录 `harness/tests/on-target/records/hil-2026-10-25-launchxl-f280039c-motor-pwm.md`）；此前 H5 假 FAIL 的多类测试侧原因（16 位读、CMPA 32 位对地址 0x6B、`board_cmpss_wait_status` 语义、GPADAT_R 瞬时读非恢复信号）已修入脚本 |
+| 门禁与 CI | 本地聚合门 `.\harness\tools\verify.ps1 [-Hil]`（9 腿，跳过≠通过，ADR 0009）；`.\github\workflows\harness.yml` 已实例化但**尚未推送/首跑**，托管 runner 无 CCS 故 `firmware-build` 默认关闭、HIL 有意不接 CI（见 `harness/docs/50-CI与版本管理.md`） |
+| 版本与变更 | git remote 已配 `woody1209/myPublicHarness`，当前**仅 1 commit**（2026-10-19）；10-25 之后的 motor-pwm 实现、spec 0002 定稿、学习站点**未提交**。`.gitignore` 2026-10-31 建立并清理 125 项入库产物；变更记录见 `CHANGELOG.md` |
+| 完备性审计 | 见 `harness/docs/82-工程完备性审计.md`（2026-10-31 二次审计）：基线 `specs/0002-full-platform` 已派生（G7 缺口闭合），门禁机制与真板自测成立。**已知未收口项已如实记账**：REQ-018 窗口看门狗间歇复位（H5b 检测为 WARN 而非掩盖）、m3 通信回环子系统未活动（状态字 0）、52 个派生源文件尚无 spec 追溯（review WARN）。spec 编号约定见 `specs/README.md`：full-platform 保留基线编号 `0002`（血缘），原 motor-pwm 顺延为 `0003` |
 | 外设时钟门控 | F28003x 复位后 PCLKCRn 全关，被门控外设的**写会被静默丢弃**：SCI 必须 `SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_SCIA)`（ADR 0005，HIL H3 有守卫） |
 | 仿真启动模式 | 探针在线时 `target.reset()` 不会交接给 flash（RESC.DCON→Emulation Boot）；H6 用 `PC=code_start` 等价冷启动，断电重启须人工（ADR 0006） |
 | GPIO 寄存器布局 | 字地址实证表见 `harness/docs/40-烧录与调试手册.md`：GPADAT@0x7F00（LED 位在**高字 0x7F01**）、GPADAT_R@0x7F80 |
@@ -130,6 +135,12 @@ DSS `readWord`、`PC`/`XARn` 完全一致；`sizeof(uint32_t)=2 字`，`*+XARn[N
 - [harness/docs/70-Spec驱动开发.md](harness/docs/70-Spec驱动开发.md)
 - [harness/docs/80-harness闭环符合性审计.md](harness/docs/80-harness闭环符合性审计.md) — **架构师审计**：三柱闭环（SPEC/TDD/harness 控制）符合性结论与缺口
 - [harness/docs/81-AIDLC符合性审计.md](harness/docs/81-AIDLC符合性审计.md) — **AIDLC（AI-DLC/SDD）符合性审计**：五阶段与十诫映射、证据完整性缺陷修复、遗留补强
-- [harness/docs/adr/](harness/docs/adr/) — 架构决策记录：0001 平台选型 / 0002 字地址模型 / 0003 ramfunc 重定位与启动顺序 / 0004 loadti 与 `__c_args__` / 0005 外设时钟门控与 CPUTIMER 时基 / 0006 仿真启动模式（DCON）与 H6 冷启动 / 0007 头文件依赖与陈旧镜像 / 0008 主机单测门禁的假 PASS
+- [harness/docs/adr/](harness/docs/adr/) — 架构决策记录：0001 平台选型 / 0002 字地址模型 / 0003 ramfunc 重定位与启动顺序 / 0004 loadti 与 `__c_args__` / 0005 外设时钟门控与 CPUTIMER 时基 / 0006 仿真启动模式（DCON）与 H6 冷启动 / 0007 头文件依赖与陈旧镜像 / 0008 主机单测门禁的假 PASS / 0009 门禁有效性判据与聚合门
+- [harness/docs/82-工程完备性审计.md](harness/docs/82-工程完备性审计.md) — **工程完备性审计（2026-10-31，最新）**：AIDLC + SDD + TDD + harness 逐条核对、10 条差距分级、与基线 `full-platform` 的功能覆盖矩阵、魔鬼代言人
+- [CHANGELOG.md](CHANGELOG.md) — 变更记录（来源/改动/验证命令），2026-10-31 建立
 - [specs/README.md](specs/README.md) — spec 工作区规则速查
+- [specs/0003-motor-pwm-skeleton/](specs/0003-motor-pwm-skeleton/) — 电机 PWM 骨架 spec（requirements/design/tasks/trace，status=done 已定稿 2026-10-25）
 - [projects/launchxl-f280039c-led-chaser/README.md](projects/launchxl-f280039c-led-chaser/README.md)
+- [projects/launchxl-f280039c-motor-pwm/README.md](projects/launchxl-f280039c-motor-pwm/README.md)
+- [docs/learning-site/index.html](docs/learning-site/index.html) — 电机控制学习站点（静态理论 / 动态演示 / MCU 资源时序）
+- [harness/tests/on-target/README.md](harness/tests/on-target/README.md) — 上板自检清单（含 motor-pwm H1-H6 契约语义与待人工补测项）
