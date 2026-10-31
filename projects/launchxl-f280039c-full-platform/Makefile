@@ -66,9 +66,12 @@ DEVICE_SRCS := $(DEVICE_DIR)/f28003x_codestartbranch.asm
 # SPI_disableTestMode at link, 2026-10-25), so the modules are compiled
 # straight from C2000Ware with the same flags.
 DLIB_COMPILED := spi can i2c lin fsi dma
-# cl2000 names objects after the SOURCE basename (--obj_directory only sets
-# the directory), so the objects are CPU1_FLASH/spi.obj etc.
-DLIB_OBJS := $(patsubst %,$(BUILD_DIR)/%.obj,$(DLIB_COMPILED))
+# Objects are prefixed `dlib_` so they can never collide with an application
+# module of the same basename, and the rule below passes --output_file=$@ so
+# the produced file name EQUALS the make target name. Without --output_file,
+# cl2000 names the object after the source basename (CPU1_FLASH/spi.obj) and
+# gmake prints "pattern recipe did not update peer target" every run (A11).
+DLIB_OBJS := $(patsubst %,$(BUILD_DIR)/dlib_%.obj,$(DLIB_COMPILED))
 
 CLA_SRCS := $(SOURCE_DIR)/cla_app.cla
 CLA_OBJS := $(BUILD_DIR)/cla_app.obj
@@ -102,9 +105,11 @@ $(BUILD_DIR)/cla_app.obj: $(SOURCE_DIR)/cla_app.cla $(HEADERS) | dirs
 	@echo 'CLA Compiler - building file: "$<"'
 	$(CC) $(CFLAGS) $(INCLUDES) --define=CLA_C --obj_directory="$(BUILD_DIR)" "$<"
 
-$(BUILD_DIR)/dlib_%.obj $(BUILD_DIR)/%.obj: $(DLIB_DIR)/%.c $(HEADERS) | dirs
+# Single-target pattern rule + explicit --output_file: the recipe always
+# creates exactly $@, so gmake stops force-rebuilding these every run.
+$(BUILD_DIR)/dlib_%.obj: $(DLIB_DIR)/%.c $(HEADERS) | dirs
 	@echo 'C2000 Compiler - building driverlib module: "$<"'
-	$(CC) $(CFLAGS) $(INCLUDES) --obj_directory="$(BUILD_DIR)" --temp_directory="$(BUILD_DIR)" "$<"
+	$(CC) $(CFLAGS) $(INCLUDES) --obj_directory="$(BUILD_DIR)" --temp_directory="$(BUILD_DIR)" --output_file="$@" "$<"
 
 # NOTE: the .out target depends on the Makefile itself - otherwise editing
 # LDFLAGS (e.g. --args=) would NOT trigger a relink and stale images ship.

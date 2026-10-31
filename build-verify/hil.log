@@ -30,14 +30,14 @@
   
   H2 PASS: flash programmed, code_start=0x48, all 5 HIL symbols resolve
   target running (5 s init settle before any counter sampling)
-  liveness samples: 24 halt-free peeks over 5.96 s (~259 ms/peek, 0 failed)
-  H5a PASS: watchdog service advanced in 15/23 sample intervals (+191148 total, 96321 -> 230980) - main loop turning
-  H5b WARN: RESET DETECTED - g_wd_service_count went backwards during sampling (REQ-018 windowed watchdog bring-up is OPEN; see harness/docs/82-�����걸�����.md backlog). Liveness is still judged by H5a/H5c; this line is the evidence that the defect exists.
+  liveness samples: 35 halt-free peeks over 5.88 s (~173 ms/peek, 0 failed)
+  H5a PASS: watchdog service advanced in 22/34 sample intervals (+132261 total, 94973 -> 227234) - main loop turning
+  H5b PASS: no reset observed during sampling (counter monotonic)
   subsystem status: m2=0x57 m3=0x0 m4=0x3f
   H5c PASS: 2/3 subsystem status words report activity
-  H5 PASS: halt-free liveness (wd service advances, subsystem status non-zero, RESET OBSERVED - see H5b WARN)
+  H5 PASS: halt-free liveness (wd service advances, subsystem status non-zero, no reset observed)
   H3 PASS: g_self_test_code == 0 (self test passed on target)
-  H4 PASS: PC=0x835C8 inside application flash
+  H4 PASS: PC=0x842CF inside application flash
   C28xx_CPU1: GEL Output: ... DCSM Initialization Start ... 
   
   C28xx_CPU1: GEL Output: ... DCSM Initialization Done ...
@@ -46,7 +46,7 @@
   HIL RESULT: PASS
 [hil ] waiting for SCI capture to finish ...
   serial job: SERIAL-CAPTURE-OK
-[hil ] evidence record: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-2026-10-31-launchxl-f280039c-full-platform.md
+[hil ] evidence record: E:\AIcherry\C2000TI\myPublicHarness\harness\tests\on-target\records\hil-2026-11-01-launchxl-f280039c-full-platform.md
 [hil ] state.json updated (hil=pass)
 
 [hil ] ================================================

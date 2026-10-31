@@ -15,7 +15,7 @@ codestart      FLASH     0x80000           2          4        0x2
 .args          RAM       0x128           512       1024      0x200
 .bss           RAM       0xA800          574       1148      0x23E
 .data          RAM       0xAA3E          284        568      0x11C
-.scratchpad    RAM       0x2              10         20        0xA
+.scratchpad    RAM       0x9000           10         20        0xA
 .stack         RAM       0x400           512       1024      0x200
 Cla1ToCpuMsgRAM RAM       0x1480            8         16        0x8
 CpuToCla1MsgRAM RAM       0x1500           32         64       0x20

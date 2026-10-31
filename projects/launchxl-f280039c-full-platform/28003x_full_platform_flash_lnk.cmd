@@ -101,6 +101,13 @@ SECTIONS
 
    .stack           : > RAMM1
 
+   /* CGT creates .scratchpad (compiler scratch area); without an explicit
+      SECTIONS entry the linker emits warning #10247-D "creating output
+      section .scratchpad without a SECTIONS specification" (待办 A10).
+      RAMLS2 is otherwise unused on this build - see the map's memory
+      configuration table. */
+   .scratchpad      : > RAMLS2, ALIGN(4)
+
 #if defined(__TI_EABI__)
    .init_array      : > FLASH_BANK0_SEC1,  ALIGN(8)
    .bss             : > RAMLS5

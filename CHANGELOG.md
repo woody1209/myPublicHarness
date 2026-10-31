@@ -114,6 +114,37 @@
   （main `2e97505` + 特性分支 `7832eac` 已推送 + PR 待创建）。
 - **G10**：本机无 cmake，主机单测走 MSVC `cl.exe` fallback（首选路径未启用）。
 
+### 构建与文档整改（2026-11-01，来源：82 §9 待办 A10 / A11 / A3 / A4）
+
+**A11 — Makefile driverlib 规则名与产物不一致（已修，可复核）**
+- 根因：`$(BUILD_DIR)/dlib_%.obj $(BUILD_DIR)/%.obj` 多目标模式规则，而 cl2000 用
+  `--obj_directory` 时**按源 basename 命名**（产出 `spi.obj`），故目标与产物名不一致 →
+  gmake 每次强制重编并打印 `pattern recipe did not update peer target`。
+- 修法：单目标规则 `$(BUILD_DIR)/dlib_%.obj: $(DLIB_DIR)/%.c`，配方加 **`--output_file="$@"`**，
+  使产物名恒等于目标名；`dlib_` 前缀同时避免与同名应用模块相撞。
+- 验证：`rebuild` EXIT=0 → **增量 `build` 零动作、告警消失**。
+
+**A10 — 链接脚本 `.scratchpad` 无 SECTIONS 规范（已修，可复核）**
+- 链接告警 `#10247-D: creating output section ".scratchpad" without a SECTIONS specification`。
+- 修法：`28003x_full_platform_flash_lnk.cmd` 增加 `.scratchpad : > RAMLS2, ALIGN(4)`
+  （RAMLS2 当时 map 用量 0）。
+- 验证：重链后告警消失，`size` 报告显式列出 `.scratchpad` RAM 0x9000 = 10 字；
+  FLASH/RAM 总量不变（18294 / 1932 字）。
+
+**A3（部分）/ A4 — 文档快照过时（审计"说明必须符合工程实际"）**
+- `80-harness闭环符合性审计.md`、`81-AIDLC符合性审计.md` 抬头加**「快照边界」声明**：
+  二者是 led-chaser 单工程快照，motor-pwm / full-platform / #1b / #2b 不在覆盖内，指向 82。
+  **正文按三工程逐条改写仍待做**（保留为待办）。
+- `00-harness工作流总览.md`：抬头补三工程清单 + 学习站点入口；§2 设施地图补
+  `review.ps1`（#1b）、`run-sil-tests.ps1`（#2b），verify 腿数 9 → **11**。
+
+**其他**
+- `.gitignore` 补 `harness/tests/sil/build-sil*/` 与一次性诊断日志（避免构建产物再次入库）；
+  已跟踪的 `sil_runner_*.exe` 用 `git rm --cached` 移出索引（**工作区文件未删**）。
+- 新增上板证据：`harness/tests/on-target/records/hil-2026-11-01-launchxl-f280039c-full-platform.md`。
+- 验证：`.\harness\tools\verify.ps1 -Project launchxl-f280039c-full-platform -Hil`
+  → **VERIFY OK - 11 legs PASS**（host 97 / SIL 15 / HIL PASS，`.text` 13994，SIZE FLASH 9.3 % / RAM 5.47 %）。
+
 ### PR 状态（2026-10-31）
 
 - 分支 `feat/full-platform-derivation-and-test-pyramid`（`7832eac`）**已推送**至远端 `myPublicHarness`。
