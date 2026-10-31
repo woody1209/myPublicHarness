@@ -163,9 +163,14 @@
   （或 `verify.ps1 ... -Hil`）。
 - 验证：`spec.ps1 check -Id 0002-full-platform` → **CHECK OK，0 警告**。
 
-### PR 状态（2026-10-31）
+### 合入主干（2026-11-01，用户指令：分支合并入 main）
 
-- 分支 `feat/full-platform-derivation-and-test-pyramid`（`7832eac`）**已推送**至远端 `myPublicHarness`。
-- **PR 本体待创建**：本机 git 走 TortoiseGit（无 PR API），`gh` 未认证。
-  标题/正文/证据/创建入口见 **`harness/docs/83-PR-变更记录.md`**；
-  compare 链接：`https://github.com/woody1209/myPublicHarness/compare/main...feat/full-platform-derivation-and-test-pyramid?expand=1`
+- 分支 `feat/full-platform-derivation-and-test-pyramid`（HEAD `9f0b5be`）**已合并入 `main` 并推送**。
+  合并方式：`git merge --no-ff`（**保留特性分支历史**，便于回滚与审计），提交信息写明来源与门禁结论。
+- **未走 GitHub PR 流程**，原因如实记录：本机 git 走 TortoiseGit（只覆盖 git 协议层，**无 PR API**），
+  `gh` CLI 已装但**未认证**（无 token）。因此"PR 编号"这一项空缺，改以本文 +
+  `harness/docs/83-PR-变更记录.md` 承担变更记录职责（标题 / 正文 / 证据表 / 遗留项齐备，见 83 §3）。
+- 合并前置门禁（全绿，实测）：`verify.ps1 -Project launchxl-f280039c-full-platform -Hil`
+  → **VERIFY OK - 11 legs PASS**（host 97 / SIL 15 / HIL PASS，`.text` 13994，FLASH 9.3 % / RAM 5.47 %）。
+- 合并后待办（不因合入而消失）：**A7** 看门狗间歇复位、**A9** m3 通信未活动、**A3 正文**
+  按三工程改写 80/81、**G4** CI 首次运行结果回填、**A5** cmake（均在 82 §9 待办表留痕）。
